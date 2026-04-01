@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1200 1200"
+     preserveAspectRatio="xMidYMid meet">
+
+  <defs>
+    <linearGradient id="luxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6b2d7c"/>
+      <stop offset="35%" stop-color="#a34f8c"/>
+      <stop offset="65%" stop-color="#e39a4c"/>
+      <stop offset="100%" stop-color="#f3c16f"/>
+    </linearGradient>
+  </defs>
+
+  <g fill="url(#luxGrad)">
+    <path d="M600 220
+             C520 140 360 140 320 260
+             C300 340 360 420 460 430
+             C520 440 560 400 600 360
+             C640 400 680 440 740 430
+             C840 420 900 340 880 260
+             C840 140 680 140 600 220Z"/>
+    <path d="M600 360
+             C540 450 520 560 540 640
+             C560 720 600 760 600 760
+             C600 760 640 720 660 640
+             C680 560 660 450 600 360Z"/>
+  </g>
+
+</svg>
