@@ -13,7 +13,7 @@ export const products: Product[] = [
   {
     id: "ivory-coat",
     name: "Crimson Rose",
-    price: 20000,
+    price: 30000,
     description: "A corset silhouette crafted in dual tone satin.",
     
     detailDescription: `

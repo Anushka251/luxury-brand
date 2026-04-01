@@ -28,10 +28,6 @@ export default function Navbar() {
           SHOP
         </Link>
 
-        <Link href="/about" className="hover:opacity-70 transition">
-          ABOUT
-        </Link>
-
         {/* BAG */}
         <Link href="/bag" className="relative hover:opacity-70 transition">
           BAG

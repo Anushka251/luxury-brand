@@ -3,8 +3,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer"; // 👈 ADD THIS
 import { usePathname } from "next/navigation";
-import { CartProvider } from "./context/CartContext"; // client component
+import { CartProvider } from "./context/CartContext";
 
 // Fonts
 const geistSans = Geist({
@@ -20,8 +21,8 @@ const geistMono = Geist_Mono({
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  // Hide navbar on home page
-  const hideNavbar = pathname === "/" || pathname === "/home";
+  // Hide navbar & footer on home page
+  const hideLayout = pathname === "/" || pathname === "/home";
 
   return (
     <html lang="en">
@@ -29,8 +30,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-ivory text-charcoal`}
       >
         <CartProvider>
-          {!hideNavbar && <Navbar />}
-          <main className={!hideNavbar ? "pt-24" : ""}>{children}</main>
+
+          {/* NAVBAR */}
+          {!hideLayout && <Navbar />}
+
+          {/* PAGE CONTENT */}
+          <main className={!hideLayout ? "pt-24" : ""}>
+            {children}
+          </main>
+
+          {/* FOOTER */}
+          {!hideLayout && <Footer />}
+
         </CartProvider>
       </body>
     </html>
