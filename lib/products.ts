@@ -11,7 +11,7 @@ export type Product = {
 
 export const products: Product[] = [
   {
-    id: "ivory-coat",
+    id: "crimson-rose",
     name: "Crimson Rose",
     price: 30000,
     description: "A corset silhouette crafted in dual tone satin.",
