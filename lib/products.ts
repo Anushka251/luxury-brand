@@ -22,12 +22,12 @@ Crafted in a dual-tone satin finish that shifts from vibrant red to muted purple
 Each garment is made in-house in limited quantities, ensuring attention to detail and individuality. The piece is designed to balance softness with structure, creating a refined yet striking presence.
     `,
 
-    coverImage: "/products/ivory-coat/cover.jpg",
+    coverImage: "/products/crimson-rose/cover.jpg",
     images: [
-      "/products/ivory-coat/1.jpg",
-      "/products/ivory-coat/2.jpg",
-      "/products/ivory-coat/3.jpg",
-      "/products/ivory-coat/4.jpg",
+      "/products/crimson-rose/1.jpg",
+      "/products/crimson-rose/2.jpg",
+      "/products/crimson-rose/3.jpg",
+      "/products/crimson-rose/4.jpg",
     ],
     totalPieces: 12,
   },
