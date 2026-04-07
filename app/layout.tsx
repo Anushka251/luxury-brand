@@ -1,10 +1,6 @@
-"use client";
-
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer"; // 👈 ADD THIS
-import { usePathname } from "next/navigation";
+import LayoutWrapper from "./components/LayoutWrapper";
 import { CartProvider } from "./context/CartContext";
 
 // Fonts
@@ -18,30 +14,24 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+// ✅ SEO Metadata (this fixes "Untitled")
+export const metadata = {
+  title: "Avenor | Luxury Fashion Brand",
+  description: "Discover premium luxury fashion apparel by Avenor.",
+};
 
-  // Hide navbar & footer on home page
-  const hideLayout = pathname === "/" || pathname === "/home";
-
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-ivory text-charcoal`}
       >
         <CartProvider>
-
-          {/* NAVBAR */}
-          {!hideLayout && <Navbar />}
-
-          {/* PAGE CONTENT */}
-          <main className={!hideLayout ? "pt-24" : ""}>
-            {children}
-          </main>
-
-          {/* FOOTER */}
-          {!hideLayout && <Footer />}
-
+          <LayoutWrapper>{children}</LayoutWrapper>
         </CartProvider>
       </body>
     </html>
