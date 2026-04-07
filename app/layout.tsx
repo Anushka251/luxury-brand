@@ -17,7 +17,10 @@ const geistMono = Geist_Mono({
 // ✅ SEO Metadata (this fixes "Untitled")
 export const metadata = {
   title: "Avenor | Luxury Fashion Brand",
-  description: "Discover premium luxury fashion apparel by Avenor.",
+  description: "Luxury fashion by Avenor",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({
