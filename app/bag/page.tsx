@@ -2,9 +2,11 @@
 
 import { useCart } from "@/app/context/CartContext";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function BagPage() {
   const { cart, updateQuantity, removeFromCart } = useCart();
+  const { data: session } = useSession();
 
   const total = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -23,13 +25,12 @@ export default function BagPage() {
           <ul className="space-y-8">
             {cart.map((item) => (
               <li
-                key={`${item.id}-${item.size}`} // ✅ important
+                key={`${item.id}-${item.size}`}
                 className="flex justify-between items-center border-b pb-6"
               >
                 <div>
                   <p className="text-lg">{item.name}</p>
 
-                  {/* ✅ SHOW SIZE */}
                   {item.size && (
                     <p className="text-xs text-gray-500 mt-1">
                       Size: {item.size}
@@ -85,11 +86,28 @@ export default function BagPage() {
               Total: ₹{total.toLocaleString()}
             </p>
 
-            <Link href="/checkout">
-              <button className="bg-black text-white px-10 py-4 tracking-widest">
-                CHECKOUT
-              </button>
-            </Link>
+            <div className="flex flex-col items-end">
+              
+              {!session && (
+                <p className="text-xs text-gray-500 mb-3">
+                  Please sign in to proceed to checkout
+                </p>
+              )}
+
+              {session ? (
+                <Link href="/checkout">
+                  <button className="bg-black text-white px-10 py-4 tracking-widest">
+                    CHECKOUT
+                  </button>
+                </Link>
+              ) : (
+                <Link href="/auth"> {/* ✅ UPDATED */}
+                  <button className="bg-black text-white px-10 py-4 tracking-widest hover:opacity-80 transition">
+                    LOGIN TO CHECKOUT
+                  </button>
+                </Link>
+              )}
+            </div>
           </div>
         </>
       )}

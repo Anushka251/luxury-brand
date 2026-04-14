@@ -1,178 +1,93 @@
 "use client";
 
 import { useCart } from "@/app/context/CartContext";
-import { useState } from "react";
-
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CheckoutPage() {
-  const { cart, clearCart } = useCart();
-  const [loading, setLoading] = useState(false);
-  const [placed, setPlaced] = useState(false);
+  const { cart } = useCart();
+  const router = useRouter();
 
-  const [shipping, setShipping] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-  });
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<any>(null);
+
+  // LOAD ADDRESSES
+  useEffect(() => {
+    const saved = localStorage.getItem("addresses");
+    if (saved) setAddresses(JSON.parse(saved));
+  }, []);
 
   const total = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
-  const isFormValid =
-    shipping.name &&
-    shipping.email &&
-    shipping.phone &&
-    shipping.address;
-
-  const loadRazorpay = () =>
-    new Promise<boolean>((resolve) => {
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-
-  const handlePayment = async () => {
-    if (!isFormValid) {
-      alert("Please fill all shipping details");
-      return;
-    }
-
-    setLoading(true);
-
-    const loaded = await loadRazorpay();
-    if (!loaded) {
-      alert("Razorpay failed to load");
-      setLoading(false);
-      return;
-    }
-
-    const orderRes = await fetch("/api/razorpay", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: total,
-        shipping,
-      }),
-    });
-
-    const order = await orderRes.json();
-
-    const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY!,
-      amount: order.amount,
-      currency: "INR",
-      name: "ANAYA",
-      description: "Order Payment",
-      order_id: order.id,
-
-      prefill: {
-        name: shipping.name,
-        email: shipping.email,
-        contact: shipping.phone,
-      },
-
-      handler: async function (response: any) {
-        const verifyRes = await fetch("/api/verify-payment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            shipping,
-          }),
-        });
-
-        const data = await verifyRes.json();
-
-        if (data.success) {
-          clearCart();
-          setPlaced(true);
-        } else {
-          alert("Payment verification failed");
-        }
-      },
-
-      theme: {
-        color: "#000000",
-      },
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-    setLoading(false);
+  // ADD NEW ADDRESS FLOW
+  const handleAddNew = () => {
+    localStorage.setItem("checkout_redirect", "true");
+    router.push("/account/address");
   };
 
-  if (placed) {
-    return (
-      <main className="py-32 text-center">
-        <h1 className="text-4xl font-light">Payment Successful</h1>
-        <p className="mt-4">Thank you for shopping with ANAYA</p>
-      </main>
-    );
-  }
+  // PAYMENT
+  const handlePayment = () => {
+    if (!selectedAddress) {
+      alert("Select an address");
+      return;
+    }
 
-  if (cart.length === 0) {
-    return (
-      <main className="py-32 text-center">
-        <h1 className="text-3xl">Your bag is empty</h1>
-      </main>
-    );
-  }
+    const order = {
+      orderId: `AVN-${Date.now()}`,
+      items: cart,
+      total,
+      address: selectedAddress,
+      createdAt: new Date(),
+    };
+
+    const prev = JSON.parse(localStorage.getItem("orders") || "[]");
+    localStorage.setItem("orders", JSON.stringify([...prev, order]));
+
+    alert("Order placed!");
+  };
 
   return (
     <main className="max-w-6xl mx-auto px-8 py-24 grid md:grid-cols-2 gap-20">
+      
+      {/* LEFT: ADDRESS */}
       <section>
-        <h2 className="text-2xl mb-6">Shipping Details</h2>
+        <h2 className="text-xl mb-6 tracking-widest">
+          SELECT ADDRESS
+        </h2>
 
-        <input
-          className="w-full border p-3 mb-3"
-          placeholder="Name"
-          value={shipping.name}
-          onChange={(e) =>
-            setShipping({ ...shipping, name: e.target.value })
-          }
-        />
+        <div className="space-y-4">
+          {addresses.map((addr) => (
+            <div
+              key={addr.id}
+              onClick={() => setSelectedAddress(addr)}
+              className={`border p-4 cursor-pointer transition ${
+                selectedAddress?.id === addr.id
+                  ? "border-black"
+                  : "border-gray-300"
+              }`}
+            >
+              <p>{addr.name}</p>
+              <p className="text-sm">{addr.address}</p>
+              <p className="text-xs text-gray-500">
+                {addr.city}, {addr.state} - {addr.pincode}
+              </p>
+            </div>
+          ))}
+        </div>
 
-        <input
-          className="w-full border p-3 mb-3"
-          placeholder="Email"
-          type="email"
-          value={shipping.email}
-          onChange={(e) =>
-            setShipping({ ...shipping, email: e.target.value })
-          }
-        />
-
-        <input
-          className="w-full border p-3 mb-3"
-          placeholder="Phone"
-          value={shipping.phone}
-          onChange={(e) =>
-            setShipping({ ...shipping, phone: e.target.value })
-          }
-        />
-
-        <input
-          className="w-full border p-3 mb-3"
-          placeholder="Address"
-          value={shipping.address}
-          onChange={(e) =>
-            setShipping({ ...shipping, address: e.target.value })
-          }
-        />
+        {/* ADD NEW */}
+        <button
+          onClick={handleAddNew}
+          className="mt-6 text-sm underline"
+        >
+          + ADD NEW ADDRESS
+        </button>
       </section>
 
+      {/* RIGHT: ORDER SUMMARY (UNCHANGED) */}
       <section>
         <h2 className="text-2xl mb-6">Order Summary</h2>
 
@@ -193,16 +108,19 @@ export default function CheckoutPage() {
         </div>
 
         <button
-          onClick={handlePayment}
-          disabled={loading || !isFormValid}
-          className={`
-            w-full py-4 mt-8 bg-black text-white
-            ${(loading || !isFormValid) &&
-              "opacity-50 cursor-not-allowed"}
-          `}
-        >
-          {loading ? "PROCESSING..." : "PAY NOW"}
-        </button>
+        onClick={handlePayment}
+        disabled={!selectedAddress}
+        className={`
+          w-full mt-8 py-4 tracking-widest text-white
+          ${
+            selectedAddress
+              ? "bg-black hover:opacity-80 transition"
+              : "bg-gray-300 cursor-not-allowed"
+          }
+        `}
+      >
+        PAY NOW
+      </button>
       </section>
     </main>
   );

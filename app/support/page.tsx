@@ -12,7 +12,7 @@ export default function SupportPage() {
       </p>
 
       <p className="mb-6">
-        Email: youremail@avenor.com
+        Email: support@avenorcollection.com
       </p>
 
       <p className="mb-6">

@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import LayoutWrapper from "./components/LayoutWrapper";
 import { CartProvider } from "./context/CartContext";
+import AuthProvider from "./components/AuthProvider";
 
 // Fonts
 const geistSans = Geist({
@@ -14,7 +15,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// ✅ SEO Metadata (this fixes "Untitled")
+// Metadata
 export const metadata = {
   title: "Avenor | Luxury Fashion Brand",
   description: "Luxury fashion by Avenor",
@@ -30,12 +31,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-ivory text-charcoal`}
-      >
-        <CartProvider>
-          <LayoutWrapper>{children}</LayoutWrapper>
-        </CartProvider>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <AuthProvider>
+          <CartProvider>
+            <LayoutWrapper>{children}</LayoutWrapper>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

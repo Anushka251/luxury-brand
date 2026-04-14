@@ -9,7 +9,7 @@ export default function AboutPage() {
 
       {/* STORY */}
       <p className="mb-6">
-        Avenor is a brand that we have synergized into creation for the essence of sensual luxury. The crafted colours, designs and patterns are chosen to represent passion in its natural blossom. The expression of art by the enunciation of luxury through timeless pieces. The exquisite finish provided from the finesse of our in-house dressmaker has been the chosen gift of our collection. We are a young brand, having been started during my education. There are many more designs and pieces yet to behold the space of your wardrobe, enhancing your presence.
+        Avenor is created as an expression of sensual luxury. Each piece is thoughtfully composed through a harmonious interplay of color, silhouette, and pattern, capturing passion in its purest bloom. Rooted in artistry, our creations embody a quiet opulence, brought to life through the precision and finesse of our in-house craftsmanship. Born during my academic journey, Avenor remains a young yet evolving vision—one that continues to unfold through designs that aspire to enhance your presence with elegance and disctinction. 
       </p>
 
       {/* SIGNATURE LINE */}

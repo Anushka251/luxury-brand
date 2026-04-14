@@ -36,7 +36,7 @@ export default function Footer() {
         {/* RIGHT (SOCIALS) */}
         <div className="space-y-4">
           <a
-            href="https://instagram.com/yourhandle"
+            href="https://instagram.com/anushka__m25"
             target="_blank"
             className="block hover:text-black transition"
           >
@@ -44,7 +44,7 @@ export default function Footer() {
           </a>
 
           <a
-            href="https://pinterest.com/yourhandle"
+            href="https://pinterest.com/Avenorcollection"
             target="_blank"
             className="block hover:text-black transition"
           >
@@ -52,7 +52,8 @@ export default function Footer() {
           </a>
 
           <a
-            href="mailto:youremail@avenor.com"
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=support@avenorcollection.com"
+            target="_blank"
             className="block hover:text-black transition"
           >
             CONTACT
