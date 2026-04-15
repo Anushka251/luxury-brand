@@ -4,7 +4,18 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
 
 export default function AccountPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
+  // ✅ WAIT FOR SESSION (prevents flicker)
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-sm tracking-widest animate-pulse">
+          AVENOR
+        </div>
+      </div>
+    );
+  }
 
   // NOT LOGGED IN
   if (!session) {

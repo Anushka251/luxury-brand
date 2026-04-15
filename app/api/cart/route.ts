@@ -1,37 +1,53 @@
 import { connectDB } from "@/lib/mongodb";
 import Cart from "@/models/Cart";
 
-// ✅ SAVE CART
+// ✅ SAVE / UPDATE CART (FIXED - NO VERSION ERROR)
 export async function POST(req: Request) {
-  const { email, cart } = await req.json();
+  try {
+    const { email, cart } = await req.json();
 
-  await connectDB();
+    if (!email) {
+      return Response.json({ error: "Email required" }, { status: 400 });
+    }
 
-  const existing = await Cart.findOne({ userEmail: email });
+    await connectDB();
 
-  if (existing) {
-    existing.items = cart;
-    await existing.save();
-  } else {
-    await Cart.create({
-      userEmail: email,
-      items: cart,
-    });
+    // ✅ ATOMIC UPDATE (NO .save())
+    await Cart.findOneAndUpdate(
+      { userEmail: email },
+      { $set: { items: cart } },
+      {
+        new: true,
+        upsert: true, // creates if not exists
+      }
+    );
+
+    return Response.json({ success: true });
+  } catch (err) {
+    console.error("Cart POST error:", err);
+    return Response.json({ error: "Failed to save cart" }, { status: 500 });
   }
-
-  return Response.json({ success: true });
 }
 
 // ✅ GET CART
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const email = searchParams.get("email");
+  try {
+    const { searchParams } = new URL(req.url);
+    const email = searchParams.get("email");
 
-  await connectDB();
+    if (!email) {
+      return Response.json({ items: [] });
+    }
 
-  const cart = await Cart.findOne({ userEmail: email });
+    await connectDB();
 
-  return Response.json({
-    items: cart?.items || [],
-  });
+    const cart = await Cart.findOne({ userEmail: email });
+
+    return Response.json({
+      items: cart?.items || [],
+    });
+  } catch (err) {
+    console.error("Cart GET error:", err);
+    return Response.json({ items: [] });
+  }
 }

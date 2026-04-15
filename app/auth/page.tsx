@@ -8,6 +8,7 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // ✅ loading state
 
   const handleLogin = async () => {
     setError("");
@@ -17,21 +18,33 @@ export default function AuthPage() {
       return;
     }
 
+    setLoading(true);
+
     const res = await signIn("credentials", {
       email,
       password,
-      redirect: false, // ✅ prevents redirect to default page
+      redirect: false, // ✅ no default page
     });
 
     if (res?.error) {
       setError(
         "Your details don’t seem to match. Try again or create an account."
       );
+      setLoading(false);
       return;
     }
 
-    // success
+    // ✅ smooth redirect
     window.location.href = "/account";
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+
+    await signIn("google", {
+      callbackUrl: "/account", // ✅ direct redirect (no flash)
+      redirect: true,
+    });
   };
 
   return (
@@ -43,12 +56,11 @@ export default function AuthPage() {
 
       {/* GOOGLE LOGIN */}
       <button
-        onClick={() =>
-          signIn("google", { callbackUrl: "/account" })
-        }
-        className="w-full border py-3 tracking-widest hover:bg-black hover:text-white transition"
+        onClick={handleGoogleLogin}
+        disabled={loading}
+        className="w-full border py-3 tracking-widest hover:bg-black hover:text-white transition disabled:opacity-50"
       >
-        CONTINUE WITH GOOGLE
+        {loading ? "PLEASE WAIT..." : "CONTINUE WITH GOOGLE"}
       </button>
 
       <div className="text-center text-xs text-gray-400">
@@ -63,6 +75,7 @@ export default function AuthPage() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={loading}
         />
 
         <input
@@ -71,6 +84,7 @@ export default function AuthPage() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          disabled={loading}
         />
 
         {/* ERROR MESSAGE */}
@@ -85,9 +99,10 @@ export default function AuthPage() {
 
         <button
           onClick={handleLogin}
-          className="w-full bg-black text-white py-3 tracking-widest"
+          disabled={loading}
+          className="w-full bg-black text-white py-3 tracking-widest disabled:opacity-50"
         >
-          LOGIN
+          {loading ? "LOGGING IN..." : "LOGIN"}
         </button>
       </div>
 

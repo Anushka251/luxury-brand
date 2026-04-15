@@ -7,6 +7,7 @@ import User from "@/models/User";
 
 const handler = NextAuth({
   providers: [
+    // 🔐 EMAIL / PASSWORD LOGIN
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -37,19 +38,33 @@ const handler = NextAuth({
       },
     }),
 
+    // 🌐 GOOGLE LOGIN
     GoogleProvider({
       clientId: process.env.GOOGLE_ID!,
       clientSecret: process.env.GOOGLE_SECRET!,
     }),
   ],
 
+  // ✅ USE YOUR CUSTOM LOGIN PAGE
   pages: {
-    signIn: "/login",
+    signIn: "/auth",
   },
 
+  // ✅ JWT SESSION
   session: {
     strategy: "jwt",
   },
+
+  // ✅ KEEP AUTH STABLE (NO FORCED REDIRECTS)
+  callbacks: {
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
+    },
+  },
+
+  secret: process.env.NEXTAUTH_SECRET,
 });
 
 export { handler as GET, handler as POST };
