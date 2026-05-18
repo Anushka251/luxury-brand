@@ -4,6 +4,7 @@ import LayoutWrapper from "./components/LayoutWrapper";
 import { CartProvider } from "./context/CartContext";
 import AuthProvider from "./components/AuthProvider";
 import Script from "next/script";
+import type { ReactNode } from "react";
 
 // Fonts
 const geistSans = Geist({
@@ -25,7 +26,11 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   return (
     <html lang="en">
       <body
