@@ -3,7 +3,7 @@ import "./globals.css";
 import LayoutWrapper from "./components/LayoutWrapper";
 import { CartProvider } from "./context/CartContext";
 import AuthProvider from "./components/AuthProvider";
-import Script from "next/script"; // ✅ ADD THIS
+import Script from "next/script";
 
 // Fonts
 const geistSans = Geist({
@@ -25,14 +25,13 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}) {
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-
-        {/* ✅ RAZORPAY SCRIPT (VERY IMPORTANT) */}
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        {/* Razorpay Script */}
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
           strategy="beforeInteractive"
@@ -43,7 +42,6 @@ export default function RootLayout({
             <LayoutWrapper>{children}</LayoutWrapper>
           </CartProvider>
         </AuthProvider>
-
       </body>
     </html>
   );
