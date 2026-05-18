@@ -3,21 +3,44 @@
 import Link from "next/link";
 import { useCart } from "@/app/context/CartContext";
 import { useSession, signOut } from "next-auth/react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function Navbar() {
   const { cart } = useCart();
   const { data: session } = useSession();
+
   const [open, setOpen] = useState(false);
+
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   const count = cart.reduce(
     (sum, item) => sum + item.quantity,
     0
   );
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside
+      );
+    };
+  }, []);
+
   return (
     <nav className="fixed top-0 w-full px-12 py-6 flex justify-between items-center text-sm tracking-widest bg-ivory z-50">
-      
+
       {/* LOGO */}
       <Link href="/home" className="hover:opacity-80 transition">
         <span className="text-charcoal text-lg tracking-[0.35em] font-light">
@@ -42,8 +65,11 @@ export default function Navbar() {
 
       {/* DROPDOWN MENU */}
       {open && (
-        <div className="absolute top-20 right-10 bg-white border p-6 flex flex-col gap-4 text-xs tracking-widest shadow-lg items-start min-w-[160px]">
-          
+        <div
+          ref={menuRef}
+          className="absolute top-20 right-10 bg-white border p-6 flex flex-col gap-4 text-xs tracking-widest shadow-lg items-start min-w-[160px]"
+        >
+
           {/* USER / LOGIN */}
           {session ? (
             <>
@@ -71,7 +97,7 @@ export default function Navbar() {
             </>
           ) : (
             <Link
-              href="/auth"   // ✅ UPDATED
+              href="/auth"
               onClick={() => setOpen(false)}
               className="hover:opacity-70 transition"
             >

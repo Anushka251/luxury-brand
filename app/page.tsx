@@ -8,7 +8,7 @@ export default function Home() {
       
       {/* HERO LOGO */}
       <Image
-        src="/logo-hero-v2.png"
+        src="/logo-hero.png"
         alt="AVENOR"
         width={400}
         height={300}

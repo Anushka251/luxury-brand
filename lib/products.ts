@@ -26,7 +26,7 @@ Each garment is made in-house in limited quantities, ensuring attention to detai
     images: [
       "/products/crimson-rose/1.jpg",
       "/products/crimson-rose/2.jpg",
-      "/products/crimson-rose/3.jpg",
+      "/products/crimson-rose/3-v2.jpg",
       "/products/crimson-rose/4.jpg",
       "/products/crimson-rose/5.jpg",
       "/products/crimson-rose/6.jpg",

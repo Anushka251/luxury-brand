@@ -11,7 +11,7 @@ export default function Footer() {
 
   return (
     <footer className="w-full border-t mt-32 px-12 py-16 text-xs tracking-widest text-gray-500">
-      
+
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-12">
 
         {/* LEFT */}
@@ -38,6 +38,7 @@ export default function Footer() {
           <a
             href="https://instagram.com/anushka__m25"
             target="_blank"
+            rel="noopener noreferrer"
             className="block hover:text-black transition"
           >
             INSTAGRAM
@@ -46,6 +47,7 @@ export default function Footer() {
           <a
             href="https://pinterest.com/Avenorcollection"
             target="_blank"
+            rel="noopener noreferrer"
             className="block hover:text-black transition"
           >
             PINTEREST
@@ -54,6 +56,7 @@ export default function Footer() {
           <a
             href="https://mail.google.com/mail/?view=cm&fs=1&to=support@avenorcollection.com"
             target="_blank"
+            rel="noopener noreferrer"
             className="block hover:text-black transition"
           >
             CONTACT
@@ -65,6 +68,7 @@ export default function Footer() {
       {/* SIGNATURE */}
       <div className="text-center mt-16 text-[10px] tracking-[0.3em] text-gray-400">
         AVENOR
+        <span className="text-[8px] align-top ml-1">™</span>
       </div>
 
     </footer>

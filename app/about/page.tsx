@@ -9,7 +9,10 @@ export default function AboutPage() {
 
       {/* STORY */}
       <p className="mb-6">
-        Avenor is created as an expression of sensual luxury. Each piece is thoughtfully composed through a harmonious interplay of color, silhouette, and pattern, capturing passion in its purest bloom. Rooted in artistry, our creations embody a quiet opulence, brought to life through the precision and finesse of our in-house craftsmanship. Born during my academic journey, Avenor remains a young yet evolving vision—one that continues to unfold through designs that aspire to enhance your presence with elegance and disctinction. 
+        Avenor is a cultural expression of Indian artistry, craftsmanship, and timeless elegance. Rooted in heritage yet designed for the modern world, the brand seeks to elevate Indian artisanship onto an international stage of luxury, respect, and recognition. Every creation reflects a dialogue between tradition and contemporary refinement, celebrating the skill, detail, and stories carried through generations of artisans.
+      </p>
+      <p className="mb-6">
+      At Avenor, fashion is more than clothing — it is a representation of culture, identity, and enduring craftsmanship. By blending authentic Indian techniques with a global luxury aesthetic, Avenor aspires to create a presence where Indian artistry is valued not only for its beauty, but for its legacy, excellence, and cultural significance across the world.
       </p>
 
       {/* SIGNATURE LINE */}
