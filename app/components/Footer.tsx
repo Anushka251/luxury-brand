@@ -11,9 +11,8 @@ export default function Footer() {
 
   return (
     <footer className="w-full border-t mt-32 px-12 py-16 text-xs tracking-widest text-gray-500">
-
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-12">
-
+        
         {/* LEFT */}
         <div className="space-y-4">
           <Link href="/about" className="block hover:text-black transition">
@@ -54,15 +53,12 @@ export default function Footer() {
           </a>
 
           <a
-            href="https://mail.google.com/mail/?view=cm&fs=1&to=support@avenorcollection.com"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="mailto:support@avenorcollection.com?subject=Avenor%20Inquiry"
             className="block hover:text-black transition"
           >
             CONTACT
           </a>
         </div>
-
       </div>
 
       {/* SIGNATURE */}
@@ -70,7 +66,6 @@ export default function Footer() {
         AVENOR
         <span className="text-[8px] align-top ml-1">™</span>
       </div>
-
     </footer>
   );
 }
