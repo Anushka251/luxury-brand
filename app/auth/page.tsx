@@ -8,7 +8,7 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); // ✅ loading state
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     setError("");
@@ -23,18 +23,17 @@ export default function AuthPage() {
     const res = await signIn("credentials", {
       email,
       password,
-      redirect: false, // ✅ no default page
+      redirect: false,
     });
 
     if (res?.error) {
       setError(
-        "Your details don’t seem to match. Try again or create an account."
+        "Your details don’t seem to match. Try again or reset your password."
       );
       setLoading(false);
       return;
     }
 
-    // ✅ smooth redirect
     window.location.href = "/account";
   };
 
@@ -42,7 +41,7 @@ export default function AuthPage() {
     setLoading(true);
 
     await signIn("google", {
-      callbackUrl: "/account", // ✅ direct redirect (no flash)
+      callbackUrl: "/account",
       redirect: true,
     });
   };
@@ -71,6 +70,7 @@ export default function AuthPage() {
       <div className="space-y-4">
 
         <input
+          type="email"
           className="w-full border p-3"
           placeholder="Email"
           value={email}
@@ -90,12 +90,19 @@ export default function AuthPage() {
         {/* ERROR MESSAGE */}
         {error && (
           <p className="text-xs text-red-500 text-center">
-            {error}{" "}
-            <Link href="/signup" className="underline">
-              Create one
-            </Link>
+            {error}
           </p>
         )}
+
+        {/* FORGOT PASSWORD */}
+        <div className="text-right">
+          <Link
+            href="/forgot-password"
+            className="text-xs text-gray-500 hover:text-black underline"
+          >
+            Forgot Password?
+          </Link>
+        </div>
 
         <button
           onClick={handleLogin}
