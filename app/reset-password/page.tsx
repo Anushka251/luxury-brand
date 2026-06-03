@@ -1,11 +1,10 @@
 "use client";
 
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const searchParams = useSearchParams();
-
   const token = searchParams.get("token");
 
   const [password, setPassword] = useState("");
@@ -13,6 +12,9 @@ export default function ResetPasswordPage() {
   const handleResetPassword = async () => {
     const res = await fetch("/api/reset-password", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         token,
         password,
@@ -27,7 +29,6 @@ export default function ResetPasswordPage() {
     }
 
     alert("Password updated successfully");
-
     window.location.href = "/auth";
   };
 
@@ -52,5 +53,13 @@ export default function ResetPasswordPage() {
         UPDATE PASSWORD
       </button>
     </main>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
