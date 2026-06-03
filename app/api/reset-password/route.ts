@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import clientPromise from "@/lib/mongodb";
+import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
 
 export async function POST(req: Request) {
@@ -13,10 +13,8 @@ export async function POST(req: Request) {
       });
     }
 
-    // Connect DB
-    await clientPromise();
+    await connectDB();
 
-    // Find user with token
     const user = await User.findOne({
       resetToken: token,
       resetTokenExpiry: { $gt: Date.now() },
@@ -28,13 +26,9 @@ export async function POST(req: Request) {
       });
     }
 
-    // Hash new password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Update password
     user.password = hashedPassword;
-
-    // Clear reset token
     user.resetToken = undefined;
     user.resetTokenExpiry = undefined;
 
@@ -43,12 +37,16 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
     });
-
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
-    return NextResponse.json({
-      error: "Something went wrong",
-    });
+    return NextResponse.json(
+      {
+        error: "Something went wrong",
+      },
+      {
+        status: 500,
+      }
+    );
   }
 }
