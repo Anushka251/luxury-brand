@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 
-import clientPromise from "@/lib/mongodb";
+import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
 
 export async function POST(req: Request) {
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     }
 
     // Connect database
-    await clientPromise();
+    await connectDB();
 
     // Find user
     const user = await User.findOne({ email });
@@ -83,12 +83,14 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
     });
-
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
-    return NextResponse.json({
-      error: "Something went wrong",
-    });
+    return NextResponse.json(
+      {
+        error: "Something went wrong",
+      },
+      { status: 500 }
+    );
   }
 }
