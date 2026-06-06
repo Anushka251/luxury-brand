@@ -6,7 +6,6 @@ import AuthProvider from "./components/AuthProvider";
 import Script from "next/script";
 import type { ReactNode } from "react";
 
-// Fonts
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -17,7 +16,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Metadata
 export const metadata = {
   title: "Avenor | Luxury Fashion Brand",
   description: "Luxury fashion by Avenor",
@@ -36,9 +34,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* Razorpay Script */}
         <Script
-          src="https://checkout.razorpay.com/v1/checkout.js"
+          src="https://sdk.cashfree.com/js/v3/cashfree.js"
           strategy="beforeInteractive"
         />
 
