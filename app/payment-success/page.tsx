@@ -1,11 +1,13 @@
-"use client";
+interface PageProps {
+  searchParams: Promise<{
+    order_id?: string;
+  }>;
+}
 
-import { useSearchParams } from "next/navigation";
-
-export default function PaymentSuccessPage() {
-  const searchParams = useSearchParams();
-
-  const orderId = searchParams.get("order_id");
+export default async function PaymentSuccessPage({
+  searchParams,
+}: PageProps) {
+  const params = await searchParams;
 
   return (
     <main className="max-w-3xl mx-auto py-32 px-8">
@@ -23,7 +25,7 @@ export default function PaymentSuccessPage() {
         </p>
 
         <p className="text-lg font-medium mt-2">
-          {orderId || "Order ID not available"}
+          {params.order_id || "Order ID not available"}
         </p>
       </div>
 
