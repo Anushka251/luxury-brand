@@ -54,7 +54,7 @@ export default function CheckoutPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amount: total,
+          amount: 1,
         }),
       });
 
