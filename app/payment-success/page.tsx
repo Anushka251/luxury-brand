@@ -1,69 +1,17 @@
-"use client";
+export const dynamic = "force-dynamic";
 
-import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+interface PageProps {
+  searchParams: Promise<{
+    order_id?: string;
+  }>;
+}
 
-function PaymentSuccessContent() {
-  const searchParams = useSearchParams();
+export default async function PaymentSuccessPage({
+  searchParams,
+}: PageProps) {
+  const params = await searchParams;
 
-  const orderId = searchParams.get("order_id");
-
-  const [loading, setLoading] = useState(true);
-  const [paid, setPaid] = useState(false);
-
-  useEffect(() => {
-    const verifyPayment = async () => {
-      if (!orderId) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const res = await fetch(
-          `/api/verify-order?order_id=${orderId}`
-        );
-
-        const data = await res.json();
-
-        if (
-          data.success &&
-          data.order_status === "PAID"
-        ) {
-          setPaid(true);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-
-      setLoading(false);
-    };
-
-    verifyPayment();
-  }, [orderId]);
-
-  if (loading) {
-    return (
-      <main className="max-w-3xl mx-auto py-32 px-8">
-        <h1 className="text-3xl">
-          Verifying Payment...
-        </h1>
-      </main>
-    );
-  }
-
-  if (!paid) {
-    return (
-      <main className="max-w-3xl mx-auto py-32 px-8">
-        <h1 className="text-4xl font-light mb-6">
-          Payment Not Verified
-        </h1>
-
-        <p>
-          We could not verify this payment.
-        </p>
-      </main>
-    );
-  }
+  const orderId = params.order_id;
 
   return (
     <main className="max-w-3xl mx-auto py-32 px-8">
@@ -81,7 +29,7 @@ function PaymentSuccessContent() {
         </p>
 
         <p className="text-lg font-medium mt-2">
-          {orderId}
+          {orderId || "Order ID not available"}
         </p>
       </div>
 
@@ -91,21 +39,5 @@ function PaymentSuccessContent() {
         </p>
       </div>
     </main>
-  );
-}
-
-export default function PaymentSuccessPage() {
-  return (
-    <Suspense
-      fallback={
-        <main className="max-w-3xl mx-auto py-32 px-8">
-          <h1 className="text-3xl">
-            Loading...
-          </h1>
-        </main>
-      }
-    >
-      <PaymentSuccessContent />
-    </Suspense>
   );
 }
