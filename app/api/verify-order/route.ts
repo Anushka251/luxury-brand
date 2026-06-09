@@ -23,8 +23,7 @@ export async function GET(req: Request) {
       {
         method: "GET",
         headers: {
-          "x-client-id":
-            process.env.CASHFREE_CLIENT_ID!,
+          "x-client-id": process.env.CASHFREE_CLIENT_ID!,
           "x-client-secret":
             process.env.CASHFREE_CLIENT_SECRET!,
           "x-api-version": "2023-08-01",
@@ -50,10 +49,13 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       success: true,
+
       order_status: data.order_status,
       order_id: data.order_id,
       cf_order_id: data.cf_order_id,
       order_amount: data.order_amount,
+
+      customer_details: data.customer_details,
     });
   } catch (error) {
     console.error(
