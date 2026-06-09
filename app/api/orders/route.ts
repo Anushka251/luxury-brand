@@ -8,6 +8,18 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
+    if (!body.orderNumber) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Order number is required",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
     const order = await Order.create({
       orderNumber: body.orderNumber,
       cashfreeOrderId: body.cashfreeOrderId,
@@ -22,7 +34,7 @@ export async function POST(req: Request) {
 
       total: body.total,
 
-      paymentStatus: "PAID",
+      paymentStatus: body.paymentStatus || "PAID",
     });
 
     return NextResponse.json({
@@ -30,11 +42,12 @@ export async function POST(req: Request) {
       order,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Order save error:", error);
 
     return NextResponse.json(
       {
         success: false,
+        message: "Failed to save order",
       },
       {
         status: 500,
