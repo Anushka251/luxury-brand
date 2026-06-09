@@ -24,6 +24,7 @@ const OrderSchema = new mongoose.Schema(
     items: [
       {
         id: String,
+        slug: String,
         name: String,
         image: String,
         size: String,
