@@ -42,49 +42,59 @@ export default function CheckoutPage() {
   };
 
   const handlePayment = async () => {
-    if (!selectedAddress) {
-      alert("Select an address");
+  if (!selectedAddress) {
+    alert("Select an address");
+    return;
+  }
+
+  try {
+    // Save checkout data for payment-success page
+    localStorage.setItem(
+      "pendingOrder",
+      JSON.stringify({
+        cart,
+        address: selectedAddress,
+        total,
+      })
+    );
+
+    const res = await fetch("/api/cashfree", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount: 1, // change back to total after testing
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!data.payment_session_id) {
+      console.error(data);
+
+      alert(
+        data.error ||
+          data.message ||
+          "Unable to create payment session"
+      );
+
       return;
     }
 
-    try {
-      const res = await fetch("/api/cashfree", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: 1,
-        }),
-      });
+    const cashfree = window.Cashfree({
+      mode: "production",
+    });
 
-      const data = await res.json();
-
-      if (!data.payment_session_id) {
-        console.error(data);
-
-        alert(
-          data.error ||
-            data.message ||
-            "Unable to create payment session"
-        );
-
-        return;
-      }
-
-      const cashfree = window.Cashfree({
-        mode: "production",
-      });
-
-      await cashfree.checkout({
-        paymentSessionId: data.payment_session_id,
-        redirectTarget: "_self",
-      });
-    } catch (err) {
-      console.error("Payment Error:", err);
-      alert("Payment failed. Try again.");
-    }
-  };
+    await cashfree.checkout({
+      paymentSessionId: data.payment_session_id,
+      redirectTarget: "_self",
+    });
+  } catch (err) {
+    console.error("Payment Error:", err);
+    alert("Payment failed. Try again.");
+  }
+};
 
   return (
     <main className="max-w-6xl mx-auto px-8 py-24 grid md:grid-cols-2 gap-20">
