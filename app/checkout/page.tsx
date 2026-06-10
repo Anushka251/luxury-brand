@@ -3,6 +3,7 @@
 import { useCart } from "@/app/context/CartContext";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 
 declare global {
@@ -18,11 +19,13 @@ export default function CheckoutPage() {
     removeFromCart,
   } = useCart();
 
+  const { data: session } = useSession();
+
   const router = useRouter();
 
   const [addresses, setAddresses] = useState<any[]>([]);
-  const [selectedAddress, setSelectedAddress] = useState<any>(null);
-
+  const [selectedAddress, setSelectedAddress] =
+    useState<any>(null);
   useEffect(() => {
     const saved = localStorage.getItem("addresses");
 
@@ -50,12 +53,21 @@ export default function CheckoutPage() {
   try {
     // Save checkout data for payment-success page
     localStorage.setItem(
-      "pendingOrder",
-      JSON.stringify({
-        cart,
-        address: selectedAddress,
-        total,
-      })
+  "pendingOrder",
+  JSON.stringify({
+    cart,
+    address: selectedAddress,
+    total,
+
+    customerEmail:
+      session?.user?.email || "",
+
+    customerName:
+      selectedAddress.name || "",
+
+    customerPhone:
+      selectedAddress.phone || "",
+  })
     );
 
     const res = await fetch("/api/cashfree", {
