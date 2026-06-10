@@ -55,3 +55,48 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export async function GET(req: Request) {
+  try {
+    await connectDB();
+
+    const { searchParams } = new URL(req.url);
+
+    const email = searchParams.get("email");
+
+    if (!email) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Email is required",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    const orders = await Order.find({
+      customerEmail: email,
+    }).sort({
+      createdAt: -1,
+    });
+
+    return NextResponse.json({
+      success: true,
+      orders,
+    });
+  } catch (error) {
+    console.error("Fetch orders error:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Failed to fetch orders",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}
