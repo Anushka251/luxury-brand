@@ -28,12 +28,16 @@ interface CartContextProps {
     size: string | undefined,
     quantity: number
   ) => void;
-  clearCart: () => void;
+  clearCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextProps | undefined>(undefined);
 
-export const CartProvider = ({ children }: { children: ReactNode }) => {
+export const CartProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   const { data: session } = useSession();
   const [cart, setCart] = useState<CartItem[]>([]);
 
@@ -42,6 +46,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     if (session) return;
 
     const savedCart = localStorage.getItem("cart");
+
     if (savedCart) {
       setCart(JSON.parse(savedCart));
     }
@@ -55,7 +60,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [cart, session]);
 
   // 🔥 MERGE FUNCTION
-  const mergeCarts = (localCart: CartItem[], dbCart: CartItem[]) => {
+  const mergeCarts = (
+    localCart: CartItem[],
+    dbCart: CartItem[]
+  ) => {
     const merged = [...dbCart];
 
     localCart.forEach((localItem) => {
@@ -78,11 +86,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   // ✅ LOAD USER CART (with merge)
   useEffect(() => {
     const email = session?.user?.email;
+
     if (!email) return;
 
     const loadCart = async () => {
       try {
-        const res = await fetch("/api/cart?email=" + email);
+        const res = await fetch(
+          "/api/cart?email=" + email
+        );
+
         const data = await res.json();
 
         const dbCart = data.items || [];
@@ -91,11 +103,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           localStorage.getItem("cart") || "[]"
         );
 
-        const finalCart = mergeCarts(localCart, dbCart);
+        const finalCart = mergeCarts(
+          localCart,
+          dbCart
+        );
 
         setCart(finalCart);
 
-        // save merged cart to DB
+        // Save merged cart to DB
         await fetch("/api/cart", {
           method: "POST",
           body: JSON.stringify({
@@ -106,7 +121,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
         localStorage.removeItem("cart");
       } catch (err) {
-        console.error("Load cart error:", err);
+        console.error(
+          "Load cart error:",
+          err
+        );
       }
     };
 
@@ -116,6 +134,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   // ✅ SAVE USER CART (to DB)
   useEffect(() => {
     const email = session?.user?.email;
+
     if (!email) return;
 
     const saveCart = async () => {
@@ -128,7 +147,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           }),
         });
       } catch (err) {
-        console.error("Save cart error:", err);
+        console.error(
+          "Save cart error:",
+          err
+        );
       }
     };
 
@@ -139,13 +161,19 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const addToCart = (item: CartItem) => {
     setCart((prev) => {
       const exists = prev.find(
-        (i) => i.id === item.id && i.size === item.size
+        (i) =>
+          i.id === item.id &&
+          i.size === item.size
       );
 
       if (exists) {
         return prev.map((i) =>
-          i.id === item.id && i.size === item.size
-            ? { ...i, quantity: i.quantity + 1 }
+          i.id === item.id &&
+          i.size === item.size
+            ? {
+                ...i,
+                quantity: i.quantity + 1,
+              }
             : i
         );
       }
@@ -155,9 +183,18 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // ✅ REMOVE ITEM
-  const removeFromCart = (id: string, size?: string) =>
+  const removeFromCart = (
+    id: string,
+    size?: string
+  ) =>
     setCart((prev) =>
-      prev.filter((i) => !(i.id === id && i.size === size))
+      prev.filter(
+        (i) =>
+          !(
+            i.id === id &&
+            i.size === size
+          )
+      )
     );
 
   // ✅ UPDATE QUANTITY
@@ -168,18 +205,42 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   ) =>
     setCart((prev) =>
       prev.map((i) =>
-        i.id === id && i.size === size
-          ? { ...i, quantity: Math.max(quantity, 1) }
+        i.id === id &&
+        i.size === size
+          ? {
+              ...i,
+              quantity: Math.max(
+                quantity,
+                1
+              ),
+            }
           : i
       )
     );
 
   // ✅ CLEAR CART
-  const clearCart = () => {
+  const clearCart = async (): Promise<void> => {
     setCart([]);
 
-    if (!session) {
-      localStorage.removeItem("cart");
+    localStorage.removeItem("cart");
+
+    const email = session?.user?.email;
+
+    if (email) {
+      try {
+        await fetch("/api/cart", {
+          method: "POST",
+          body: JSON.stringify({
+            email,
+            cart: [],
+          }),
+        });
+      } catch (error) {
+        console.error(
+          "Clear cart error:",
+          error
+        );
+      }
     }
   };
 
@@ -201,7 +262,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 // ✅ HOOK
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context)
-    throw new Error("useCart must be used within CartProvider");
+
+  if (!context) {
+    throw new Error(
+      "useCart must be used within CartProvider"
+    );
+  }
+
   return context;
 };
