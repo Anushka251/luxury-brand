@@ -26,6 +26,7 @@ export default function CheckoutPage() {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [selectedAddress, setSelectedAddress] =
     useState<any>(null);
+
   useEffect(() => {
     const saved = localStorage.getItem("addresses");
 
@@ -35,78 +36,94 @@ export default function CheckoutPage() {
   }, []);
 
   const total = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) =>
+      sum + item.price * item.quantity,
     0
   );
 
   const handleAddNew = () => {
-    localStorage.setItem("checkout_redirect", "true");
+    localStorage.setItem(
+      "checkout_redirect",
+      "true"
+    );
+
     router.push("/account/address");
   };
 
   const handlePayment = async () => {
-  if (!selectedAddress) {
-    alert("Select an address");
-    return;
-  }
-
-  try {
-    // Save checkout data for payment-success page
-    localStorage.setItem(
-  "pendingOrder",
-  JSON.stringify({
-    cart,
-    address: selectedAddress,
-    total,
-
-    customerEmail:
-      session?.user?.email || "",
-
-    customerName:
-      selectedAddress.name || "",
-
-    customerPhone:
-      selectedAddress.phone || "",
-  })
-    );
-
-    const res = await fetch("/api/cashfree", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        amount: 1, // change back to total after testing
-      }),
-    });
-
-    const data = await res.json();
-
-    if (!data.payment_session_id) {
-      console.error(data);
-
-      alert(
-        data.error ||
-          data.message ||
-          "Unable to create payment session"
-      );
-
+    if (!selectedAddress) {
+      alert("Select an address");
       return;
     }
 
-    const cashfree = window.Cashfree({
-      mode: "production",
-    });
+    try {
+      // Save checkout data for payment-success page
+      localStorage.setItem(
+        "pendingOrder",
+        JSON.stringify({
+          cart,
+          address: selectedAddress,
+          total,
 
-    await cashfree.checkout({
-      paymentSessionId: data.payment_session_id,
-      redirectTarget: "_self",
-    });
-  } catch (err) {
-    console.error("Payment Error:", err);
-    alert("Payment failed. Try again.");
-  }
-};
+          customerEmail:
+            session?.user?.email || "",
+
+          customerName:
+            selectedAddress.name || "",
+
+          customerPhone:
+            selectedAddress.phone || "",
+        })
+      );
+
+      const res = await fetch(
+        "/api/cashfree",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            amount: 1, // change back to total after testing
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!data.payment_session_id) {
+        console.error(data);
+
+        alert(
+          data.error ||
+            data.message ||
+            "Unable to create payment session"
+        );
+
+        return;
+      }
+
+      const cashfree = window.Cashfree({
+        mode: "production",
+      });
+
+      await cashfree.checkout({
+        paymentSessionId:
+          data.payment_session_id,
+        redirectTarget: "_self",
+      });
+    } catch (err) {
+      console.error(
+        "Payment Error:",
+        err
+      );
+
+      alert(
+        "Payment failed. Try again."
+      );
+    }
+  };
 
   return (
     <main className="max-w-6xl mx-auto px-8 py-24 grid md:grid-cols-2 gap-20">
@@ -120,17 +137,26 @@ export default function CheckoutPage() {
           {addresses.map((addr) => (
             <div
               key={addr.id}
-              onClick={() => setSelectedAddress(addr)}
+              onClick={() =>
+                setSelectedAddress(addr)
+              }
               className={`border p-4 cursor-pointer ${
-                selectedAddress?.id === addr.id
+                selectedAddress?.id ===
+                addr.id
                   ? "border-black"
                   : "border-gray-300"
               }`}
             >
               <p>{addr.name}</p>
-              <p className="text-sm">{addr.address}</p>
+
+              <p className="text-sm">
+                {addr.address}
+              </p>
+
               <p className="text-xs text-gray-500">
-                {addr.city}, {addr.state} - {addr.pincode}
+                {addr.city},{" "}
+                {addr.state} -{" "}
+                {addr.pincode}
               </p>
             </div>
           ))}
@@ -178,7 +204,8 @@ export default function CheckoutPage() {
               )}
 
               <p className="text-sm mt-1">
-                ₹{item.price.toLocaleString()}
+                ₹
+                {item.price.toLocaleString()}
               </p>
 
               {/* QUANTITY */}
@@ -196,7 +223,9 @@ export default function CheckoutPage() {
                   −
                 </button>
 
-                <span>{item.quantity}</span>
+                <span>
+                  {item.quantity}
+                </span>
 
                 <button
                   onClick={() =>
@@ -230,7 +259,8 @@ export default function CheckoutPage() {
             <div className="text-sm font-medium">
               ₹
               {(
-                item.price * item.quantity
+                item.price *
+                item.quantity
               ).toLocaleString()}
             </div>
           </div>
@@ -240,6 +270,7 @@ export default function CheckoutPage() {
 
         <div className="flex justify-between text-lg">
           <span>Total</span>
+
           <span>
             ₹{total.toLocaleString()}
           </span>
