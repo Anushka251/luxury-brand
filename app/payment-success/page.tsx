@@ -1,31 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
-interface PageProps {
-  searchParams: Promise<{
-    order_id?: string;
-  }>;
-}
+export default function PaymentSuccessPage() {
+  const searchParams = useSearchParams();
 
-export default function PaymentSuccessPage({
-  searchParams,
-}: PageProps) {
   const [orderId, setOrderId] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const saveOrder = async () => {
       try {
-        const params = await searchParams;
-
-        const cashfreeOrderId = params.order_id || "";
+        const cashfreeOrderId =
+          searchParams.get("order_id") || "";
 
         setOrderId(cashfreeOrderId);
 
-        const pendingOrder = localStorage.getItem(
-          "pendingOrder"
-        );
+        const pendingOrder =
+          localStorage.getItem("pendingOrder");
 
         if (!pendingOrder) {
           setLoading(false);
@@ -86,7 +79,7 @@ export default function PaymentSuccessPage({
           // Clear guest cart
           localStorage.removeItem("cart");
 
-          // Clear logged-in cart from DB
+          // Clear logged-in user's cart in DB
           if (orderData.customerEmail) {
             try {
               await fetch("/api/cart", {
@@ -109,6 +102,7 @@ export default function PaymentSuccessPage({
             }
           }
 
+          // Remove pending order
           localStorage.removeItem(
             "pendingOrder"
           );
@@ -153,9 +147,8 @@ export default function PaymentSuccessPage({
 
           <div className="mt-8">
             <p className="text-sm text-gray-600">
-              A confirmation email
-              will be sent to you
-              shortly.
+              A confirmation email will
+              be sent to you shortly.
             </p>
           </div>
         </>
