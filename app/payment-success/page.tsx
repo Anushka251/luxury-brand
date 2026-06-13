@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 
 export default function PaymentSuccessPage() {
-  const searchParams = useSearchParams();
-
   const [orderId, setOrderId] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -13,7 +10,9 @@ export default function PaymentSuccessPage() {
     const saveOrder = async () => {
       try {
         const cashfreeOrderId =
-          searchParams.get("order_id") || "";
+          new URLSearchParams(
+            window.location.search
+          ).get("order_id") || "";
 
         setOrderId(cashfreeOrderId);
 
@@ -79,7 +78,7 @@ export default function PaymentSuccessPage() {
           // Clear guest cart
           localStorage.removeItem("cart");
 
-          // Clear logged-in user's cart in DB
+          // Clear logged-in user's DB cart
           if (orderData.customerEmail) {
             try {
               await fetch("/api/cart", {
@@ -118,7 +117,7 @@ export default function PaymentSuccessPage() {
     };
 
     saveOrder();
-  }, [searchParams]);
+  }, []);
 
   return (
     <main className="max-w-3xl mx-auto py-32 px-8">
@@ -147,8 +146,8 @@ export default function PaymentSuccessPage() {
 
           <div className="mt-8">
             <p className="text-sm text-gray-600">
-              A confirmation email will
-              be sent to you shortly.
+              A confirmation email
+              will be sent to you shortly.
             </p>
           </div>
         </>
