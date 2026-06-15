@@ -6,6 +6,7 @@ import {
   useState,
   ReactNode,
   useEffect,
+  useRef,
 } from "react";
 import { useSession } from "next-auth/react";
 
@@ -31,35 +32,59 @@ interface CartContextProps {
   clearCart: () => Promise<void>;
 }
 
-const CartContext = createContext<CartContextProps | undefined>(undefined);
+const CartContext = createContext<CartContextProps | undefined>(
+  undefined
+);
 
 export const CartProvider = ({
   children,
 }: {
   children: ReactNode;
 }) => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  // ✅ LOAD LOCAL CART (guest)
+  // Prevent saving before loading finishes
+  const hasLoadedCart = useRef(false);
+
+  // ==========================
+  // Guest Cart Load
+  // ==========================
   useEffect(() => {
+    if (status === "loading") return;
+
     if (session) return;
 
     const savedCart = localStorage.getItem("cart");
 
     if (savedCart) {
-      setCart(JSON.parse(savedCart));
+      try {
+        setCart(JSON.parse(savedCart));
+      } catch {
+        localStorage.removeItem("cart");
+      }
     }
-  }, [session]);
 
-  // ✅ SAVE LOCAL CART (guest)
+    hasLoadedCart.current = true;
+  }, [session, status]);
+
+  // ==========================
+  // Guest Cart Save
+  // ==========================
   useEffect(() => {
+    if (status === "loading") return;
+
     if (session) return;
 
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart, session]);
+    if (!hasLoadedCart.current) return;
 
-  // 🔥 MERGE FUNCTION
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart, session, status]);
+
+  // ==========================
+  // Merge Carts
+  // ==========================
   const mergeCarts = (
     localCart: CartItem[],
     dbCart: CartItem[]
@@ -67,14 +92,14 @@ export const CartProvider = ({
     const merged = [...dbCart];
 
     localCart.forEach((localItem) => {
-      const exists = merged.find(
-        (i) =>
-          i.id === localItem.id &&
-          i.size === localItem.size
+      const existingItem = merged.find(
+        (item) =>
+          item.id === localItem.id &&
+          item.size === localItem.size
       );
 
-      if (exists) {
-        exists.quantity += localItem.quantity;
+      if (existingItem) {
+        existingItem.quantity += localItem.quantity;
       } else {
         merged.push(localItem);
       }
@@ -83,23 +108,27 @@ export const CartProvider = ({
     return merged;
   };
 
-  // ✅ LOAD USER CART (with merge)
+  // ==========================
+  // Load User Cart
+  // ==========================
   useEffect(() => {
+    if (status === "loading") return;
+
     const email = session?.user?.email;
 
     if (!email) return;
 
     const loadCart = async () => {
       try {
-        const res = await fetch(
-          "/api/cart?email=" + email
+        const response = await fetch(
+          `/api/cart?email=${encodeURIComponent(email)}`
         );
 
-        const data = await res.json();
+        const data = await response.json();
 
-        const dbCart = data.items || [];
+        const dbCart: CartItem[] = data.items || [];
 
-        const localCart = JSON.parse(
+        const localCart: CartItem[] = JSON.parse(
           localStorage.getItem("cart") || "[]"
         );
 
@@ -110,9 +139,12 @@ export const CartProvider = ({
 
         setCart(finalCart);
 
-        // Save merged cart to DB
+        // Save merged cart back to DB
         await fetch("/api/cart", {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             email,
             cart: finalCart,
@@ -120,59 +152,75 @@ export const CartProvider = ({
         });
 
         localStorage.removeItem("cart");
-      } catch (err) {
+
+        hasLoadedCart.current = true;
+      } catch (error) {
         console.error(
-          "Load cart error:",
-          err
+          "Failed to load cart:",
+          error
         );
+
+        hasLoadedCart.current = true;
       }
     };
 
     loadCart();
-  }, [session]);
+  }, [session, status]);
 
-  // ✅ SAVE USER CART (to DB)
+  // ==========================
+  // Save User Cart
+  // ==========================
   useEffect(() => {
+    if (status === "loading") return;
+
     const email = session?.user?.email;
 
     if (!email) return;
+
+    if (!hasLoadedCart.current) return;
 
     const saveCart = async () => {
       try {
         await fetch("/api/cart", {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             email,
             cart,
           }),
         });
-      } catch (err) {
+      } catch (error) {
         console.error(
-          "Save cart error:",
-          err
+          "Failed to save cart:",
+          error
         );
       }
     };
 
     saveCart();
-  }, [cart, session]);
+  }, [cart, session, status]);
 
-  // ✅ ADD TO CART
+  // ==========================
+  // Add To Cart
+  // ==========================
   const addToCart = (item: CartItem) => {
     setCart((prev) => {
-      const exists = prev.find(
+      const existingItem = prev.find(
         (i) =>
           i.id === item.id &&
           i.size === item.size
       );
 
-      if (exists) {
+      if (existingItem) {
         return prev.map((i) =>
           i.id === item.id &&
           i.size === item.size
             ? {
                 ...i,
-                quantity: i.quantity + 1,
+                quantity:
+                  i.quantity + item.quantity,
               }
             : i
         );
@@ -182,44 +230,52 @@ export const CartProvider = ({
     });
   };
 
-  // ✅ REMOVE ITEM
+  // ==========================
+  // Remove From Cart
+  // ==========================
   const removeFromCart = (
     id: string,
     size?: string
-  ) =>
+  ) => {
     setCart((prev) =>
       prev.filter(
-        (i) =>
+        (item) =>
           !(
-            i.id === id &&
-            i.size === size
+            item.id === id &&
+            item.size === size
           )
       )
     );
+  };
 
-  // ✅ UPDATE QUANTITY
+  // ==========================
+  // Update Quantity
+  // ==========================
   const updateQuantity = (
     id: string,
     size: string | undefined,
     quantity: number
-  ) =>
+  ) => {
     setCart((prev) =>
-      prev.map((i) =>
-        i.id === id &&
-        i.size === size
+      prev.map((item) =>
+        item.id === id &&
+        item.size === size
           ? {
-              ...i,
+              ...item,
               quantity: Math.max(
                 quantity,
                 1
               ),
             }
-          : i
+          : item
       )
     );
+  };
 
-  // ✅ CLEAR CART
-  const clearCart = async (): Promise<void> => {
+  // ==========================
+  // Clear Cart
+  // ==========================
+  const clearCart = async () => {
     setCart([]);
 
     localStorage.removeItem("cart");
@@ -230,6 +286,9 @@ export const CartProvider = ({
       try {
         await fetch("/api/cart", {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             email,
             cart: [],
@@ -237,7 +296,7 @@ export const CartProvider = ({
         });
       } catch (error) {
         console.error(
-          "Clear cart error:",
+          "Failed to clear cart:",
           error
         );
       }
@@ -259,7 +318,6 @@ export const CartProvider = ({
   );
 };
 
-// ✅ HOOK
 export const useCart = () => {
   const context = useContext(CartContext);
 
