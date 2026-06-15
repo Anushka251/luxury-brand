@@ -29,16 +29,62 @@ export async function sendOrderConfirmationEmail({
     .map(
       (item) => `
         <tr>
-          <td style="padding:8px;">
-            ${item.name}
-          </td>
+          <td style="padding:16px 0;border-bottom:1px solid #e5e5e5;">
+            <table width="100%">
+              <tr>
+                <td width="90">
+                  <img
+                    src="${item.image}"
+                    alt="${item.name}"
+                    width="80"
+                    style="display:block;border-radius:4px;"
+                  />
+                </td>
 
-          <td style="padding:8px;">
-            ${item.quantity}
-          </td>
+                <td style="padding-left:16px;">
+                  <p style="
+                    margin:0;
+                    font-size:14px;
+                    color:#111;
+                    font-weight:500;
+                  ">
+                    ${item.name}
+                  </p>
 
-          <td style="padding:8px;">
-            ₹${item.price.toLocaleString()}
+                  ${
+                    item.size
+                      ? `
+                        <p style="
+                          margin:6px 0 0;
+                          color:#666;
+                          font-size:13px;
+                        ">
+                          Size: ${item.size}
+                        </p>
+                      `
+                      : ""
+                  }
+
+                  <p style="
+                    margin:6px 0 0;
+                    color:#666;
+                    font-size:13px;
+                  ">
+                    Qty: ${item.quantity}
+                  </p>
+                </td>
+
+                <td align="right" style="
+                  color:#111;
+                  font-size:14px;
+                  font-weight:500;
+                ">
+                  ₹${(
+                    item.price * item.quantity
+                  ).toLocaleString()}
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
       `
@@ -49,71 +95,235 @@ export async function sendOrderConfirmationEmail({
     from: `"Avenor Collection" <${process.env.ZOHO_EMAIL}>`,
     to: customerEmail,
 
-    subject: `Order Confirmed - ${orderNumber}`,
+    subject: `Avenor Order Confirmation • ${orderNumber}`,
 
     html: `
-      <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;">
-        <h2>Thank you for shopping with Avenor Collection.</h2>
-
-        <p>Hi ${customerName},</p>
-
-        <p>
-          Your order has been confirmed.
-        </p>
-
-        <p>
-          <strong>Order Number:</strong>
-          ${orderNumber}
-        </p>
-
+      <div style="
+        margin:0;
+        padding:0;
+        background:#f7f7f5;
+      ">
         <table
           width="100%"
-          border="1"
-          cellspacing="0"
           cellpadding="0"
-          style="border-collapse:collapse;margin-top:20px;"
+          cellspacing="0"
+          style="
+            background:#f7f7f5;
+            padding:40px 20px;
+            font-family:
+              Helvetica,
+              Arial,
+              sans-serif;
+          "
         >
-          <thead>
-            <tr>
-              <th style="padding:8px;">
-                Product
-              </th>
+          <tr>
+            <td align="center">
 
-              <th style="padding:8px;">
-                Qty
-              </th>
+              <table
+                width="600"
+                cellpadding="0"
+                cellspacing="0"
+                style="
+                  max-width:600px;
+                  background:#ffffff;
+                  padding:50px 40px;
+                "
+              >
+                <tr>
+                  <td align="center">
+                    <p style="
+                      margin:0;
+                      font-size:32px;
+                      letter-spacing:10px;
+                      color:#111111;
+                      font-weight:300;
+                    ">
+                      AVENOR
+                    </p>
+                  </td>
+                </tr>
 
-              <th style="padding:8px;">
-                Price
-              </th>
-            </tr>
-          </thead>
+                <tr>
+                  <td style="padding-top:40px;">
+                    <p style="
+                      margin:0;
+                      color:#666;
+                      font-size:12px;
+                      letter-spacing:2px;
+                    ">
+                      ORDER CONFIRMED
+                    </p>
 
-          <tbody>
-            ${itemsHtml}
-          </tbody>
+                    <h1 style="
+                      margin:12px 0 0;
+                      color:#111;
+                      font-size:30px;
+                      font-weight:400;
+                    ">
+                      Thank you for your order.
+                    </h1>
+
+                    <p style="
+                      margin:20px 0 0;
+                      color:#555;
+                      font-size:15px;
+                      line-height:1.8;
+                    ">
+                      Dear ${customerName},
+                      your order has been received and is
+                      now being prepared with care.
+                    </p>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="
+                    padding:30px;
+                    margin-top:30px;
+                    border:1px solid #e5e5e5;
+                  ">
+                    <p style="
+                      margin:0;
+                      color:#888;
+                      font-size:12px;
+                      letter-spacing:1px;
+                    ">
+                      ORDER NUMBER
+                    </p>
+
+                    <p style="
+                      margin:8px 0 0;
+                      font-size:18px;
+                      color:#111;
+                    ">
+                      ${orderNumber}
+                    </p>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding-top:40px;">
+                    <table width="100%">
+                      ${itemsHtml}
+                    </table>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="
+                    padding-top:30px;
+                    border-top:1px solid #e5e5e5;
+                  ">
+                    <table width="100%">
+                      <tr>
+                        <td style="
+                          color:#666;
+                          font-size:15px;
+                        ">
+                          Total Paid
+                        </td>
+
+                        <td
+                          align="right"
+                          style="
+                            color:#111;
+                            font-size:22px;
+                            font-weight:500;
+                          "
+                        >
+                          ₹${total.toLocaleString()}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td
+                    align="center"
+                    style="padding-top:40px;"
+                  >
+                    <a
+                      href="https://avenorcollection.com/account/orders"
+                      style="
+                        display:inline-block;
+                        background:#111111;
+                        color:#ffffff;
+                        text-decoration:none;
+                        padding:16px 40px;
+                        font-size:13px;
+                        letter-spacing:2px;
+                      "
+                    >
+                      VIEW YOUR ORDER
+                    </a>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="
+                    padding-top:40px;
+                    color:#666;
+                    font-size:14px;
+                    line-height:1.8;
+                  ">
+                    We will notify you again once your
+                    order has been shipped.
+
+                    <br /><br />
+
+                    If you have any questions, simply
+                    reply to this email or contact us at
+                    <a
+                      href="mailto:support@avenorcollection.com"
+                      style="
+                        color:#111;
+                        text-decoration:none;
+                      "
+                    >
+                      support@avenorcollection.com
+                    </a>.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" style="
+                    padding-top:50px;
+                    border-top:1px solid #eeeeee;
+                  ">
+                    <p style="
+                      margin:0;
+                      font-size:12px;
+                      color:#999;
+                      letter-spacing:4px;
+                    ">
+                      AVENOR
+                    </p>
+
+                    <p style="
+                      margin:12px 0 0;
+                      color:#999;
+                      font-size:12px;
+                    ">
+                      Luxury crafted for everyday elegance.
+                    </p>
+
+                    <p style="
+                      margin:12px 0 0;
+                      color:#999;
+                      font-size:12px;
+                    ">
+                      © ${new Date().getFullYear()}
+                      Avenor Collection
+                    </p>
+                  </td>
+                </tr>
+
+              </table>
+
+            </td>
+          </tr>
         </table>
-
-        <h3 style="margin-top:20px;">
-          Total: ₹${total.toLocaleString()}
-        </h3>
-
-        <p>
-          We will notify you once your order is shipped.
-        </p>
-
-        <p>
-          If you have any questions, reply to this email or contact us at
-          support@avenorcollection.com.
-        </p>
-
-        <br />
-
-        <p>
-          Regards,
-          <br />
-          Avenor Collection
-        </p>
       </div>
     `,
   });
