@@ -11,15 +11,16 @@ export default function Navbar() {
 
   const [open, setOpen] = useState(false);
 
-  const menuRef = useRef<HTMLDivElement | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const count = cart.reduce(
     (sum, item) => sum + item.quantity,
     0
   );
 
+  // Close menu when clicking outside
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(event: PointerEvent) {
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target as Node)
@@ -28,102 +29,204 @@ export default function Navbar() {
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener(
+      "pointerdown",
+      handleClickOutside
+    );
 
     return () => {
       document.removeEventListener(
-        "mousedown",
+        "pointerdown",
         handleClickOutside
       );
     };
   }, []);
 
   return (
-    <nav className="fixed top-0 w-full px-12 py-6 flex justify-between items-center text-sm tracking-widest bg-ivory z-50">
-      {/* LOGO */}
-      <Link href="/home" className="hover:opacity-80 transition">
-        <span className="text-charcoal text-lg tracking-[0.35em] font-light">
-          AVENOR
-        </span>
-      </Link>
-
-      {/* RIGHT SIDE */}
-      <div className="flex items-center gap-6 relative">
-        {/* HAMBURGER + BAG COUNT */}
-        <div className="relative">
-          <button
-            onClick={() => setOpen(!open)}
-            className="space-y-1"
-          >
-            <div className="w-5 h-[1px] bg-black"></div>
-            <div className="w-5 h-[1px] bg-black"></div>
-            <div className="w-5 h-[1px] bg-black"></div>
-          </button>
-
-          {count > 0 && (
-            <span className="absolute -top-2 -right-3 min-w-[18px] h-[18px] px-1 rounded-full bg-black text-white text-[10px] flex items-center justify-center">
-              {count}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* DROPDOWN MENU */}
+    <>
+      {/* Overlay */}
       {open && (
         <div
-          ref={menuRef}
-          className="absolute top-20 right-10 bg-white border p-6 flex flex-col gap-4 text-xs tracking-widest shadow-lg items-start min-w-[160px]"
-        >
-          {/* SHOP */}
-          <Link
-            href="/shop"
-            onClick={() => setOpen(false)}
-            className="hover:opacity-70 transition"
-          >
-            SHOP
-          </Link>
+          className="fixed inset-0 z-40"
+          onClick={() => setOpen(false)}
+        />
+      )}
 
-          {/* LOGIN / ACCOUNT */}
-          {session ? (
-            <>
+      <nav className="fixed top-0 left-0 w-full px-6 md:px-12 py-6 flex justify-between items-center text-sm tracking-widest bg-ivory z-50">
+        {/* LOGO */}
+        <Link
+          href="/home"
+          className="hover:opacity-80 transition"
+        >
+          <span className="text-charcoal text-lg tracking-[0.35em] font-light">
+            AVENOR
+          </span>
+        </Link>
+
+        {/* MENU */}
+        <div
+          ref={menuRef}
+          className="relative flex items-center"
+        >
+          {/* Hamburger */}
+          <button
+            type="button"
+            aria-label="Toggle menu"
+            onClick={() =>
+              setOpen((prev) => !prev)
+            }
+            className="
+              relative
+              flex flex-col justify-center items-center
+              w-11 h-11
+              rounded-md
+              touch-manipulation
+              select-none
+              active:scale-95
+              transition-transform
+            "
+          >
+            <div className="w-5 h-[1.5px] bg-black mb-1"></div>
+            <div className="w-5 h-[1.5px] bg-black mb-1"></div>
+            <div className="w-5 h-[1.5px] bg-black"></div>
+
+            {count > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-black text-white text-[10px] flex items-center justify-center">
+                {count}
+              </span>
+            )}
+          </button>
+
+          {/* Dropdown */}
+          {open && (
+            <div
+              className="
+                absolute
+                top-14
+                right-0
+                z-50
+                bg-white
+                border
+                shadow-xl
+                p-4
+                flex
+                flex-col
+                gap-1
+                min-w-[180px]
+                text-xs
+                tracking-widest
+                animate-in
+                fade-in
+                zoom-in-95
+                duration-150
+              "
+            >
+              {/* SHOP */}
               <Link
-                href="/account"
-                onClick={() => setOpen(false)}
-                className="hover:opacity-70 transition"
+                href="/shop"
+                onClick={() =>
+                  setOpen(false)
+                }
+                className="
+                  w-full
+                  px-3
+                  py-3
+                  rounded
+                  hover:bg-gray-100
+                  active:bg-gray-200
+                  transition
+                "
               >
-                ACCOUNT
+                SHOP
               </Link>
 
-              <button
-                onClick={() => {
-                  setOpen(false);
-                  signOut({ callbackUrl: "/home" });
-                }}
-                className="text-left w-full hover:opacity-70 transition"
-              >
-                LOGOUT
-              </button>
-            </>
-          ) : (
-            <Link
-              href="/auth"
-              onClick={() => setOpen(false)}
-              className="hover:opacity-70 transition"
-            >
-              LOGIN
-            </Link>
-          )}
+              {session ? (
+                <>
+                  {/* ACCOUNT */}
+                  <Link
+                    href="/account"
+                    onClick={() =>
+                      setOpen(false)
+                    }
+                    className="
+                      w-full
+                      px-3
+                      py-3
+                      rounded
+                      hover:bg-gray-100
+                      active:bg-gray-200
+                      transition
+                    "
+                  >
+                    ACCOUNT
+                  </Link>
 
-          {/* BAG */}
-          <Link
-            href="/bag"
-            onClick={() => setOpen(false)}
-            className="hover:opacity-70 transition"
-          >
-            BAG ({count})
-          </Link>
+                  {/* LOGOUT */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+
+                      signOut({
+                        callbackUrl: "/home",
+                      });
+                    }}
+                    className="
+                      w-full
+                      text-left
+                      px-3
+                      py-3
+                      rounded
+                      hover:bg-gray-100
+                      active:bg-gray-200
+                      transition
+                    "
+                  >
+                    LOGOUT
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/auth"
+                  onClick={() =>
+                    setOpen(false)
+                  }
+                  className="
+                    w-full
+                    px-3
+                    py-3
+                    rounded
+                    hover:bg-gray-100
+                    active:bg-gray-200
+                    transition
+                  "
+                >
+                  LOGIN
+                </Link>
+              )}
+
+              {/* BAG */}
+              <Link
+                href="/bag"
+                onClick={() =>
+                  setOpen(false)
+                }
+                className="
+                  w-full
+                  px-3
+                  py-3
+                  rounded
+                  hover:bg-gray-100
+                  active:bg-gray-200
+                  transition
+                "
+              >
+                BAG ({count})
+              </Link>
+            </div>
+          )}
         </div>
-      )}
-    </nav>
+      </nav>
+    </>
   );
 }
