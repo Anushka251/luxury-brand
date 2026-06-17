@@ -1,7 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import Image from "next/image";
+import {
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
 
 type Props = {
   images: string[];
@@ -24,10 +27,13 @@ export default function ProductGallery({
 
   const minSwipeDistance = 50;
 
-  const nextIndex =
-    index === images.length - 1
-      ? 0
-      : index + 1;
+  // Preload all images
+  useEffect(() => {
+    images.forEach((src) => {
+      const img = new window.Image();
+      img.src = src;
+    });
+  }, [images]);
 
   const onTouchStart = (
     e: React.TouchEvent<HTMLDivElement>
@@ -112,21 +118,25 @@ export default function ProductGallery({
 
   return (
     <div className="w-full">
-      {/* IMAGE SECTION */}
       <section
-        className="group relative w-full h-[70vh] max-h-[70vh] overflow-hidden bg-white"
+        className="
+          group
+          relative
+          w-full
+          h-[70vh]
+          max-h-[70vh]
+          overflow-hidden
+          bg-ivory
+        "
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* MAIN IMAGE */}
-        <Image
+        {/* IMAGE */}
+        <img
           src={images[index]}
           alt={name}
-          fill
-          priority
-          sizes="100vw"
-          className={`object-contain object-center transition-opacity duration-300 pointer-events-none ${
+          className={`w-full h-full object-contain object-center transition-opacity duration-300 ${
             isTransitioning
               ? "opacity-80"
               : "opacity-100"
@@ -140,21 +150,17 @@ export default function ProductGallery({
           disabled={isTransitioning}
           className="
             absolute
-            left-0
-            top-0
-            h-full
-            w-20
+            left-4
+            top-1/2
+            -translate-y-1/2
             z-20
-            flex
-            items-center
-            justify-center
             text-5xl
             font-light
-            text-black/70
-            active:scale-95
-            transition
+            text-charcoal
+            opacity-70
+            hover:opacity-100
             disabled:opacity-30
-            touch-manipulation
+            transition
           "
         >
           ‹
@@ -167,35 +173,22 @@ export default function ProductGallery({
           disabled={isTransitioning}
           className="
             absolute
-            right-0
-            top-0
-            h-full
-            w-20
+            right-4
+            top-1/2
+            -translate-y-1/2
             z-20
-            flex
-            items-center
-            justify-center
             text-5xl
             font-light
-            text-black/70
-            active:scale-95
-            transition
+            text-charcoal
+            opacity-70
+            hover:opacity-100
             disabled:opacity-30
-            touch-manipulation
+            transition
           "
         >
           ›
         </button>
       </section>
-
-      {/* PRELOAD NEXT IMAGE */}
-      <Image
-        src={images[nextIndex]}
-        alt=""
-        width={1}
-        height={1}
-        className="hidden"
-      />
 
       {/* COUNTER */}
       <div className="flex justify-center mt-4">
@@ -203,11 +196,9 @@ export default function ProductGallery({
           className="
             px-4 py-1.5
             rounded-lg
-            text-sm
-            font-medium
+            text-sm font-medium
             text-gray-700
-            border
-            border-gray-400/40
+            border border-gray-400/40
             bg-transparent
             backdrop-blur-sm
           "
