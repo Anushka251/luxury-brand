@@ -7,7 +7,11 @@ const OrderSchema = new mongoose.Schema(
       required: true,
     },
 
-    cashfreeOrderId: String,
+    cashfreeOrderId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
 
     customerEmail: String,
     customerName: String,
