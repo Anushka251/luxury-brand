@@ -1,10 +1,7 @@
 "use client";
 
-import {
-  useState,
-  useCallback,
-  useEffect,
-} from "react";
+import { useState, useCallback } from "react";
+import Image from "next/image";
 
 type Props = {
   images: string[];
@@ -19,7 +16,6 @@ export default function ProductGallery({
   const [isTransitioning, setIsTransitioning] =
     useState(false);
 
-  // Touch swipe support
   const [touchStartX, setTouchStartX] =
     useState<number | null>(null);
 
@@ -28,13 +24,10 @@ export default function ProductGallery({
 
   const minSwipeDistance = 50;
 
-  // ✅ Preload all images
-  useEffect(() => {
-    images.forEach((src) => {
-      const img = new window.Image();
-      img.src = src;
-    });
-  }, [images]);
+  const nextIndex =
+    index === images.length - 1
+      ? 0
+      : index + 1;
 
   const onTouchStart = (
     e: React.TouchEvent<HTMLDivElement>
@@ -121,16 +114,19 @@ export default function ProductGallery({
     <div className="w-full">
       {/* IMAGE SECTION */}
       <section
-        className="group relative w-full h-[70vh] max-h-[70vh] overflow-hidden"
+        className="group relative w-full h-[70vh] max-h-[70vh] overflow-hidden bg-white"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* IMAGE */}
-        <img
+        {/* MAIN IMAGE */}
+        <Image
           src={images[index]}
           alt={name}
-          className={`w-full h-full object-contain object-center transition-opacity duration-300 ${
+          fill
+          priority
+          sizes="100vw"
+          className={`object-contain object-center transition-opacity duration-300 pointer-events-none ${
             isTransitioning
               ? "opacity-80"
               : "opacity-100"
@@ -143,13 +139,22 @@ export default function ProductGallery({
           aria-label="Previous image"
           disabled={isTransitioning}
           className="
-            absolute left-6 top-1/2 -translate-y-1/2
-            text-5xl font-light
-            text-black/60
-            opacity-0 group-hover:opacity-100
-            transition-all duration-300
-            hover:text-black hover:scale-110
+            absolute
+            left-0
+            top-0
+            h-full
+            w-20
+            z-20
+            flex
+            items-center
+            justify-center
+            text-5xl
+            font-light
+            text-black/70
+            active:scale-95
+            transition
             disabled:opacity-30
+            touch-manipulation
           "
         >
           ‹
@@ -161,28 +166,48 @@ export default function ProductGallery({
           aria-label="Next image"
           disabled={isTransitioning}
           className="
-            absolute right-6 top-1/2 -translate-y-1/2
-            text-5xl font-light
-            text-black/60
-            opacity-0 group-hover:opacity-100
-            transition-all duration-300
-            hover:text-black hover:scale-110
+            absolute
+            right-0
+            top-0
+            h-full
+            w-20
+            z-20
+            flex
+            items-center
+            justify-center
+            text-5xl
+            font-light
+            text-black/70
+            active:scale-95
+            transition
             disabled:opacity-30
+            touch-manipulation
           "
         >
           ›
         </button>
       </section>
 
-      {/* COUNTER BELOW IMAGE */}
+      {/* PRELOAD NEXT IMAGE */}
+      <Image
+        src={images[nextIndex]}
+        alt=""
+        width={1}
+        height={1}
+        className="hidden"
+      />
+
+      {/* COUNTER */}
       <div className="flex justify-center mt-4">
         <div
           className="
             px-4 py-1.5
             rounded-lg
-            text-sm font-medium
+            text-sm
+            font-medium
             text-gray-700
-            border border-gray-400/40
+            border
+            border-gray-400/40
             bg-transparent
             backdrop-blur-sm
           "
