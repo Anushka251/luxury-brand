@@ -7,8 +7,7 @@ export default function ReturnsPage() {
       </h1>
 
       <p className="mb-6">
-        As each piece is made to order, returns are accepted at 50% of the
-        order value.
+        As each piece is made to order and produced in limited quantities, all sales are final. We do not accept returns or refunds.
       </p>
 
       <p className="mb-6">
