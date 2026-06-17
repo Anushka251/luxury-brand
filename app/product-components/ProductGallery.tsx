@@ -17,25 +17,40 @@ export default function ProductGallery({ images, name }: Props) {
 
   const minSwipeDistance = 50;
 
-  const onTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+  const onTouchStart = (
+    e: React.TouchEvent<HTMLDivElement>
+  ) => {
     setTouchStartX(e.touches[0].clientX);
     setTouchEndX(null);
   };
 
-  const onTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+  const onTouchMove = (
+    e: React.TouchEvent<HTMLDivElement>
+  ) => {
     setTouchEndX(e.touches[0].clientX);
   };
 
   const onTouchEnd = () => {
-    if (touchStartX === null || touchEndX === null) return;
+    if (
+      touchStartX === null ||
+      touchEndX === null
+    )
+      return;
 
-    const distance = touchStartX - touchEndX;
+    const distance =
+      touchStartX - touchEndX;
 
-    if (distance > minSwipeDistance && !isTransitioning) {
+    if (
+      distance > minSwipeDistance &&
+      !isTransitioning
+    ) {
       next();
     }
 
-    if (distance < -minSwipeDistance && !isTransitioning) {
+    if (
+      distance < -minSwipeDistance &&
+      !isTransitioning
+    ) {
       prev();
     }
 
@@ -44,21 +59,41 @@ export default function ProductGallery({ images, name }: Props) {
   };
 
   const prev = useCallback(() => {
-    if (isTransitioning || images.length <= 1) return;
+    if (
+      isTransitioning ||
+      images.length <= 1
+    )
+      return;
+
     setIsTransitioning(true);
 
     setTimeout(() => {
-      setIndex((i) => (i === 0 ? images.length - 1 : i - 1));
+      setIndex((i) =>
+        i === 0
+          ? images.length - 1
+          : i - 1
+      );
+
       setIsTransitioning(false);
     }, 180);
   }, [images.length, isTransitioning]);
 
   const next = useCallback(() => {
-    if (isTransitioning || images.length <= 1) return;
+    if (
+      isTransitioning ||
+      images.length <= 1
+    )
+      return;
+
     setIsTransitioning(true);
 
     setTimeout(() => {
-      setIndex((i) => (i === images.length - 1 ? 0 : i + 1));
+      setIndex((i) =>
+        i === images.length - 1
+          ? 0
+          : i + 1
+      );
+
       setIsTransitioning(false);
     }, 180);
   }, [images.length, isTransitioning]);
@@ -76,8 +111,10 @@ export default function ProductGallery({ images, name }: Props) {
         <img
           src={images[index]}
           alt={name}
-          className={`w-full h-full object-contain object-center transition-opacity duration-300 ${
-            isTransitioning ? "opacity-80" : "opacity-100"
+          className={`w-full h-full object-contain object-center transition-opacity duration-300 pointer-events-none ${
+            isTransitioning
+              ? "opacity-80"
+              : "opacity-100"
           }`}
         />
 
@@ -87,13 +124,22 @@ export default function ProductGallery({ images, name }: Props) {
           aria-label="Previous image"
           disabled={isTransitioning}
           className="
-            absolute left-6 top-1/2 -translate-y-1/2
-            text-5xl font-light
-            text-black/60
-            opacity-0 group-hover:opacity-100
-            transition-all duration-300
-            hover:text-black hover:scale-110
+            absolute
+            left-0
+            top-0
+            h-full
+            w-20
+            z-20
+            flex
+            items-center
+            justify-center
+            text-5xl
+            font-light
+            text-black/70
+            active:scale-95
+            transition
             disabled:opacity-30
+            touch-manipulation
           "
         >
           ‹
@@ -105,13 +151,22 @@ export default function ProductGallery({ images, name }: Props) {
           aria-label="Next image"
           disabled={isTransitioning}
           className="
-            absolute right-6 top-1/2 -translate-y-1/2
-            text-5xl font-light
-            text-black/60
-            opacity-0 group-hover:opacity-100
-            transition-all duration-300
-            hover:text-black hover:scale-110
+            absolute
+            right-0
+            top-0
+            h-full
+            w-20
+            z-20
+            flex
+            items-center
+            justify-center
+            text-5xl
+            font-light
+            text-black/70
+            active:scale-95
+            transition
             disabled:opacity-30
+            touch-manipulation
           "
         >
           ›
@@ -120,15 +175,17 @@ export default function ProductGallery({ images, name }: Props) {
 
       {/* COUNTER BELOW IMAGE */}
       <div className="flex justify-center mt-4">
-        <div className="
-    px-4 py-1.5 
-    rounded-lg 
-    text-sm font-medium 
-    text-gray-700
-    border border-gray-400/40
-    bg-transparent
-    backdrop-blur-sm
-  ">
+        <div
+          className="
+            px-4 py-1.5
+            rounded-lg
+            text-sm font-medium
+            text-gray-700
+            border border-gray-400/40
+            bg-transparent
+            backdrop-blur-sm
+          "
+        >
           {index + 1} / {images.length}
         </div>
       </div>
