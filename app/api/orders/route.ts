@@ -23,6 +23,24 @@ export async function POST(req: Request) {
       );
     }
 
+    // ✅ Prevent duplicate orders
+    if (body.cashfreeOrderId) {
+      const existingOrder =
+        await Order.findOne({
+          cashfreeOrderId:
+            body.cashfreeOrderId,
+        });
+
+      if (existingOrder) {
+        return NextResponse.json({
+          success: true,
+          order: existingOrder,
+          message:
+            "Order already exists",
+        });
+      }
+    }
+
     const order = await Order.create({
       orderNumber: body.orderNumber,
 
