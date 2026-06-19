@@ -28,7 +28,7 @@ export default function Footer() {
           </Link>
 
           <Link href="/returns" className="block hover:text-black transition">
-            RETURNS & REFUNDS
+            RETURNS & EXCHANGES
           </Link>
         </div>
 
