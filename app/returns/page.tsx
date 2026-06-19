@@ -3,7 +3,7 @@ export default function ReturnsPage() {
     <div className="px-12 py-28 max-w-3xl mx-auto text-sm leading-8 text-gray-700">
       
       <h1 className="text-3xl tracking-[0.2em] mb-12 font-light">
-        RETURNS & REFUNDS
+        RETURNS & EXCHANGES
       </h1>
 
       <p className="mb-6">
