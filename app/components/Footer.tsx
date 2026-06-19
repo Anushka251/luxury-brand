@@ -12,23 +12,56 @@ export default function Footer() {
   return (
     <footer className="w-full border-t mt-32 px-12 py-16 text-xs tracking-widest text-gray-500">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-12">
-        
+
         {/* LEFT */}
         <div className="space-y-4">
-          <Link href="/about" className="block hover:text-black transition">
+          <Link
+            href="/about"
+            className="block hover:text-black transition"
+          >
             ABOUT
           </Link>
 
-          <Link href="/policies" className="block hover:text-black transition">
+          <Link
+            href="/policies"
+            className="block hover:text-black transition"
+          >
             POLICIES
           </Link>
 
-          <Link href="/support" className="block hover:text-black transition">
+          <Link
+            href="/support"
+            className="block hover:text-black transition"
+          >
             SUPPORT
           </Link>
 
-          <Link href="/returns" className="block hover:text-black transition">
+          <Link
+            href="/shipping"
+            className="block hover:text-black transition"
+          >
+            SHIPPING
+          </Link>
+
+          <Link
+            href="/returns"
+            className="block hover:text-black transition"
+          >
             RETURNS & EXCHANGES
+          </Link>
+
+          <Link
+            href="/privacy"
+            className="block hover:text-black transition"
+          >
+            PRIVACY
+          </Link>
+
+          <Link
+            href="/terms"
+            className="block hover:text-black transition"
+          >
+            TERMS & CONDITIONS
           </Link>
         </div>
 
@@ -64,7 +97,9 @@ export default function Footer() {
       {/* SIGNATURE */}
       <div className="text-center mt-16 text-[10px] tracking-[0.3em] text-gray-400">
         AVENOR
-        <span className="text-[8px] align-top ml-1">™</span>
+        <span className="text-[8px] align-top ml-1">
+          ™
+        </span>
       </div>
     </footer>
   );
