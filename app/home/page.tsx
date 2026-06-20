@@ -22,7 +22,7 @@ export default function Home() {
       <Link
         href="/shop"
         className="
-          mt-24
+          mt-32
           border border-bronze/80
           px-10 py-4
           tracking-[0.2em]
@@ -38,11 +38,11 @@ export default function Home() {
 
       {/* Content below */}
       <section className="bg-ivory py-32 text-center w-full">
-        <h2 className="text-3xl tracking-[0.2em]">
+        <h2 className="text-4xl tracking-[0.3em] text-bronze uppercase">
           AVENOR
         </h2>
 
-        <p className="mt-6 max-w-xl mx-auto text-gray-600">
+        <p className="mt-6 max-w-xl mx-auto text-bronze/80 leading-8 tracking-[0.08em]">
           Quiet luxury. Limited pieces. Thoughtfully crafted.
         </p>
       </section>
