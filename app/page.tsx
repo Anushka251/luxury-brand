@@ -17,7 +17,7 @@ export default function Home() {
           priority
           className="
             w-full
-            max-w-[700px]
+            max-w-[650px]
             h-auto
             object-contain
           "
