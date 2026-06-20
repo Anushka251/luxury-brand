@@ -5,10 +5,10 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="w-full">
+    <main className="min-h-screen flex flex-col items-center bg-ivory pt-24">
 
-      {/* Hero Section */}
-      <section className="relative h-screen w-full bg-ivory">
+      {/* HERO IMAGE */}
+      <div className="relative w-full h-screen">
         <Image
           src="/logo-hero-g3.png"
           alt="AVENOR"
@@ -16,28 +16,28 @@ export default function Home() {
           priority
           className="object-contain"
         />
+      </div>
 
-        {/* Button */}
-        <div className="absolute bottom-16 left-1/2 -translate-x-1/2">
-          <Link
-            href="/shop"
-            className="
-              border border-bronze/80
-              px-10 py-4
-              tracking-[0.2em]
-              text-bronze
-              hover:bg-maroon
-              hover:text-ivory
-              transition-all duration-300
-            "
-          >
-            SHOP COLLECTION
-          </Link>
-        </div>
-      </section>
+      {/* SHOP BUTTON */}
+      <Link
+        href="/shop"
+        className="
+          mt-24
+          border border-bronze/80
+          px-10 py-4
+          tracking-[0.2em]
+          text-bronze
+          hover:bg-maroon
+          hover:text-ivory
+          transition-all duration-300
+          mb-24
+        "
+      >
+        SHOP COLLECTION
+      </Link>
 
       {/* Content below */}
-      <section className="bg-ivory py-32 text-center">
+      <section className="bg-ivory py-32 text-center w-full">
         <h2 className="text-3xl tracking-[0.2em]">
           AVENOR
         </h2>
