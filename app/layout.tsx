@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Avenor — Contemporary Luxury Fashion",
+  title: "Avenor",
   description:
     "Avenor is a contemporary luxury house creating limited collections through intentional design, refined craftsmanship, and timeless elegance.",
   icons: {
