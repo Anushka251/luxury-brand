@@ -5,17 +5,22 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center bg-ivory pt-24">
+    <main className="bg-ivory min-h-screen flex flex-col items-center pt-16">
 
       {/* HERO IMAGE */}
-      <section className="flex items-center justify-center w-full min-h-screen px-6">
+      <section className="w-full flex justify-center px-6">
         <Image
           src="/logo-hero-g3.png"
           alt="AVENOR"
-          width={700}
-          height={1050}
+          width={900}
+          height={1350}
           priority
-          className="w-auto max-h-[85vh] object-contain"
+          className="
+            w-full
+            max-w-[650px]
+            h-auto
+            object-contain
+          "
         />
       </section>
 
@@ -27,7 +32,7 @@ export default function Home() {
           mb-24
           border border-bronze/80
           px-10 py-4
-          tracking-[0.2em]
+          tracking-[0.25em]
           text-bronze
           hover:bg-maroon
           hover:text-ivory
@@ -38,12 +43,12 @@ export default function Home() {
       </Link>
 
       {/* BRAND SECTION */}
-      <section className="w-full bg-ivory py-32 text-center px-6">
-        <h2 className="text-4xl md:text-5xl tracking-[0.35em] text-bronze uppercase">
+      <section className="w-full bg-ivory py-24 text-center px-6">
+        <h2 className="text-4xl md:text-5xl tracking-[0.35em] text-bronze">
           AVENOR
         </h2>
 
-        <p className="mt-8 max-w-xl mx-auto text-bronze/80 text-sm tracking-[0.08em] leading-8">
+        <p className="mt-8 max-w-xl mx-auto text-bronze/80 leading-8 tracking-[0.08em]">
           Quiet luxury. Limited pieces. Thoughtfully crafted.
         </p>
       </section>
