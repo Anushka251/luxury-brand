@@ -28,7 +28,7 @@ export default function Home() {
       <Link
         href="/shop"
         className="
-          mt-12
+          mt-20
           mb-24
           border border-bronze/80
           px-10 py-4
