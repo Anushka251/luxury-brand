@@ -8,29 +8,26 @@ export default function Home() {
     <main className="w-full">
 
       {/* Hero Section */}
-      <section className="relative h-screen w-full">
+      <section className="relative h-screen w-full bg-ivory">
         <Image
           src="/logo-hero-g3.png"
           alt="AVENOR"
           fill
           priority
-          className="object-cover"
+          className="object-contain"
         />
 
-        {/* Optional overlay */}
-        <div className="absolute inset-0 bg-black/20" />
-
         {/* Button */}
-        <div className="absolute inset-0 flex items-end justify-center pb-16">
+        <div className="absolute bottom-16 left-1/2 -translate-x-1/2">
           <Link
             href="/shop"
             className="
-              border border-ivory/80
+              border border-bronze/80
               px-10 py-4
               tracking-[0.2em]
-              text-ivory
-              hover:bg-ivory
-              hover:text-maroon
+              text-bronze
+              hover:bg-maroon
+              hover:text-ivory
               transition-all duration-300
             "
           >
