@@ -5,36 +5,37 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-ivory pt-24">
+    <main className="relative h-screen w-full overflow-hidden">
 
-      {/* HERO LOGO */}
+      {/* Full-screen hero image */}
       <Image
         src="/logo-hero-g3.png"
         alt="AVENOR"
-        width={400}
-        height={300}
+        fill
         priority
-        className="mb-20 animate-fadeIn"
+        className="object-cover"
       />
 
-      {/* CTA */}
-      <Link
-        href="/shop"
-        className="
-          mt-24
-          border border-bronze/80
-          px-10 py-4
-          tracking-[0.2em]
-          text-bronze
-          hover:bg-maroon
-          hover:text-ivory
-          transition-all
-          duration-300
-          mb-24
-        "
-      >
-        SHOP COLLECTION
-      </Link>
+      {/* Dark overlay (optional) */}
+      <div className="absolute inset-0 bg-black/20" />
+
+      {/* Button */}
+      <div className="absolute inset-0 flex items-end justify-center pb-16">
+        <Link
+          href="/shop"
+          className="
+            border border-ivory/80
+            px-10 py-4
+            tracking-[0.2em]
+            text-ivory
+            hover:bg-ivory
+            hover:text-maroon
+            transition-all duration-300
+          "
+        >
+          SHOP COLLECTION
+        </Link>
+      </div>
 
     </main>
   );
