@@ -8,41 +8,42 @@ export default function Home() {
     <main className="min-h-screen flex flex-col items-center bg-ivory pt-24">
 
       {/* HERO IMAGE */}
-      <div className="relative w-full h-screen">
+      <section className="flex items-center justify-center w-full min-h-screen px-6">
         <Image
           src="/logo-hero-g3.png"
           alt="AVENOR"
-          fill
+          width={700}
+          height={1050}
           priority
-          className="object-contain"
+          className="w-auto max-h-[85vh] object-contain"
         />
-      </div>
+      </section>
 
       {/* SHOP BUTTON */}
       <Link
         href="/shop"
         className="
-          mt-24
+          mt-12
+          mb-24
           border border-bronze/80
           px-10 py-4
           tracking-[0.2em]
           text-bronze
           hover:bg-maroon
           hover:text-ivory
-          transition-all duration-300
-          mb-24
+          transition-all duration-500
         "
       >
         SHOP COLLECTION
       </Link>
 
-      {/* Content below */}
-      <section className="bg-ivory py-32 text-center w-full">
-        <h2 className="text-3xl tracking-[0.2em]">
+      {/* BRAND SECTION */}
+      <section className="w-full bg-ivory py-32 text-center px-6">
+        <h2 className="text-4xl md:text-5xl tracking-[0.35em] text-bronze uppercase">
           AVENOR
         </h2>
 
-        <p className="mt-6 max-w-xl mx-auto text-gray-600">
+        <p className="mt-8 max-w-xl mx-auto text-bronze/80 text-sm tracking-[0.08em] leading-8">
           Quiet luxury. Limited pieces. Thoughtfully crafted.
         </p>
       </section>
