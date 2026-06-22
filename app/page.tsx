@@ -2,20 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import Footer from "../components/Footer";
 
 export default function Home() {
   return (
     <>
-      <Navbar />
-
       <main className="min-h-screen w-full bg-ivory">
 
         {/* HERO IMAGE */}
         <section className="relative h-screen w-full">
           <Image
-            src="/avenor-hero1.jpg"
+            src="/avenor-hero.jpg"
             alt="AVENOR"
             fill
             priority
@@ -40,6 +37,7 @@ export default function Home() {
             SHOP COLLECTION
           </Link>
         </div>
+
       </main>
 
       <Footer />
