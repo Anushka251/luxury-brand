@@ -10,17 +10,20 @@ export default function LayoutWrapper({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const hideLayout = pathname === "/" || pathname === "/home";
+
+  // Hide only the navbar
+  const hideNavbar =
+    pathname === "/" || pathname === "/home";
 
   return (
     <>
-      {!hideLayout && <Navbar />}
+      {!hideNavbar && <Navbar />}
 
-      <main className={!hideLayout ? "pt-24" : ""}>
+      <main className={!hideNavbar ? "pt-24" : ""}>
         {children}
       </main>
 
-      {!hideLayout && <Footer />}
+      <Footer />
     </>
   );
 }
