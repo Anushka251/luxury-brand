@@ -10,7 +10,7 @@ export default function Home() {
       {/* HERO IMAGE */}
       <section className="relative h-screen w-full">
         <Image
-          src="/avenor-hero.jpg"
+          src="/avenor-hero1.jpg"
           alt="AVENOR"
           fill
           priority
