@@ -8,13 +8,14 @@ export default function Home() {
     <main className="min-h-screen w-full bg-ivory">
 
       {/* HERO IMAGE */}
-      <section className="relative h-screen w-full">
+      <section className="flex justify-center pt-24 px-6">
         <Image
           src="/avenor-hero1.jpg"
           alt="AVENOR"
-          fill
+          width={900}
+          height={1200}
           priority
-          className="object-cover"
+          className="w-full max-w-3xl h-auto object-contain"
         />
       </section>
 
