@@ -9,14 +9,43 @@ export default function Home() {
 
       {/* HERO IMAGE */}
       <section className="flex justify-center pt-24 px-6">
-        <Image
-          src="/avenor-hero2.jpg"
-          alt="AVENOR"
-          width={900}
-          height={1200}
-          priority
-          className="w-full max-w-3xl h-auto object-contain"
-        />
+        <div className="relative w-full max-w-3xl">
+
+          <Image
+            src="/avenor-hero2.jpg"
+            alt="AVENOR"
+            width={900}
+            height={1200}
+            priority
+            className="w-full h-auto object-contain"
+          />
+
+          {/* AVENOR LOGO */}
+          <Link
+            href="/"
+            className="absolute inset-0 flex items-end justify-center pb-32"
+          >
+            <h1
+              className="
+                text-[#b59d8d]
+                text-5xl
+                sm:text-7xl
+                md:text-8xl
+                font-light
+                tracking-tight
+                hover:opacity-80
+                transition-opacity
+                select-none
+              "
+              style={{
+                fontFamily: '"Cormorant Garamond", serif',
+              }}
+            >
+              AVENOR
+            </h1>
+          </Link>
+
+        </div>
       </section>
 
       {/* SHOP COLLECTION BUTTON */}
