@@ -49,7 +49,7 @@ export default function Home() {
       </section>
 
       {/* SHOP COLLECTION BUTTON */}
-      <div className="flex justify-center py-24">
+      <div className="flex justify-center pt-20 pb-8">
         <Link
           href="/shop"
           className="
