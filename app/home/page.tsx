@@ -40,7 +40,7 @@ export default function Home(): React.JSX.Element {
           >
             <h1
               className="
-                text-[#b59d8d]
+                text-[#C9B37E]
                 text-5xl
                 sm:text-7xl
                 md:text-8xl
@@ -50,6 +50,7 @@ export default function Home(): React.JSX.Element {
                 transition-opacity
                 select-none
                 whitespace-nowrap
+                drop-shadow-sm
               "
               style={{
                 fontFamily: '"Cormorant Garamond", serif',
