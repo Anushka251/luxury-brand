@@ -10,7 +10,7 @@ export default function Home() {
       {/* HERO IMAGE */}
       <section className="flex justify-center pt-24 px-6">
         <Image
-          src="/avenor-hero1.jpg"
+          src="/avenor-hero2.jpg"
           alt="AVENOR"
           width={900}
           height={1200}
