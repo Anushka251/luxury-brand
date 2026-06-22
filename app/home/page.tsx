@@ -40,7 +40,7 @@ export default function Home(): React.JSX.Element {
           >
             <h1
               className="
-                text-[#AF9685]
+                text-[#CFB095]
                 text-5xl
                 sm:text-7xl
                 md:text-8xl
