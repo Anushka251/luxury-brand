@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function Home(): React.JSX.Element {
   return (
@@ -35,7 +36,11 @@ export default function Home(): React.JSX.Element {
               cursor-pointer
             "
           >
-            <h1
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false }}
+              transition={{ duration: 1.4 }}
               className="
                 text-[#CFB095]
                 text-5xl
@@ -54,7 +59,7 @@ export default function Home(): React.JSX.Element {
               }}
             >
               AVENOR
-            </h1>
+            </motion.h1>
           </div>
         </div>
       </section>
@@ -80,6 +85,74 @@ export default function Home(): React.JSX.Element {
           SHOP COLLECTION
         </Link>
       </div>
+
+      {/* BRAND STATEMENT */}
+      <div className="flex justify-center pt-8 pb-12">
+        <p
+          className="
+            text-center
+            text-[#AF9685]
+            text-xs
+            sm:text-sm
+            tracking-[0.25em]
+            uppercase
+            font-light
+          "
+          style={{
+            fontFamily: '"Cormorant Garamond", serif',
+          }}
+        >
+          Quiet Luxury. Contemporary Fashion. Limited Drop.
+        </p>
+      </div>
+
+      {/* CRIMSON ROSE */}
+      <section className="flex justify-center px-6 pb-24">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false }}
+          transition={{ duration: 1.4 }}
+          className="max-w-md w-full"
+        >
+          <Link
+            href="/product/crimson-rose"
+            className="
+              block
+              hover:opacity-90
+              transition-opacity
+              duration-500
+            "
+          >
+            <Image
+              src="/products/crimson-rose/cover.jpg"
+              alt="Crimson Rose"
+              width={700}
+              height={950}
+              className="w-full h-auto object-cover"
+            />
+
+            <div className="pt-6 text-center">
+              <h2
+                className="
+                  text-xl
+                  tracking-[0.2em]
+                  text-[#AF9685]
+                "
+                style={{
+                  fontFamily: '"Cormorant Garamond", serif',
+                }}
+              >
+                CRIMSON ROSE
+              </h2>
+
+              <p className="mt-2 text-sm tracking-[0.15em] text-bronze">
+                DISCOVER THE COLLECTION
+              </p>
+            </div>
+          </Link>
+        </motion.div>
+      </section>
     </main>
   );
 }
