@@ -1,38 +1,48 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-ivory pt-24">
+    <>
+      <Navbar />
 
-      {/* HERO LOGO */}
-      <Image
-        src="/avenor-hero.jpg"
-        alt="AVENOR"
-        width={400}
-        height={300}
-        priority
-        className="mb-20 animate-fadeIn"
-      />
+      <main className="min-h-screen w-full bg-ivory">
 
-      {/* CTA */}
-      <Link
-        href="/shop"
-        className=" mt-24
-  border border-bronze/80
-  px-10 py-4
-  tracking-[0.2em]
-  text-bronze
-  hover:bg-maroon hover:text-ivory
-  transition-all duration-300 mb-24
-"
+        {/* HERO IMAGE */}
+        <section className="relative h-screen w-full">
+          <Image
+            src="/avenor-hero.jpg"
+            alt="AVENOR"
+            fill
+            priority
+            className="object-cover"
+          />
+        </section>
 
+        {/* SHOP COLLECTION BUTTON */}
+        <div className="flex justify-center py-24">
+          <Link
+            href="/shop"
+            className="
+              border border-bronze/80
+              px-10 py-4
+              tracking-[0.2em]
+              text-bronze
+              hover:bg-maroon
+              hover:text-ivory
+              transition-all duration-300
+            "
+          >
+            SHOP COLLECTION
+          </Link>
+        </div>
+      </main>
 
-      >
-        SHOP COLLECTION
-      </Link>
-
-    </main>
+      <Footer />
+    </>
   );
 }
