@@ -3,14 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Home() {
+export default function Home(): React.JSX.Element {
   return (
     <main className="w-full bg-ivory">
-
       {/* HERO IMAGE */}
       <section className="flex justify-center pt-24 px-6">
         <div className="relative w-full max-w-3xl">
-
           <Image
             src="/avenor-hero2.jpg"
             alt="AVENOR"
@@ -21,9 +19,22 @@ export default function Home() {
           />
 
           {/* AVENOR LOGO */}
-          <Link
-            href="/"
-            className="absolute inset-0 flex items-end justify-center pb-32"
+          <div
+            onClick={(): void => {
+              window.location.href = "/";
+            }}
+            className="
+              absolute
+              left-1/2
+              top-[38%]
+              -translate-x-1/2
+              -translate-y-1/2
+              z-10
+              cursor-pointer
+              active:scale-95
+              transition-transform
+              duration-200
+            "
           >
             <h1
               className="
@@ -36,6 +47,7 @@ export default function Home() {
                 hover:opacity-80
                 transition-opacity
                 select-none
+                whitespace-nowrap
               "
               style={{
                 fontFamily: '"Cormorant Garamond", serif',
@@ -43,8 +55,7 @@ export default function Home() {
             >
               AVENOR
             </h1>
-          </Link>
-
+          </div>
         </div>
       </section>
 
@@ -59,13 +70,13 @@ export default function Home() {
             text-bronze
             hover:bg-maroon
             hover:text-ivory
-            transition-all duration-300
+            transition-all
+            duration-300
           "
         >
           SHOP COLLECTION
         </Link>
       </div>
-
     </main>
   );
 }
