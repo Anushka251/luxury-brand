@@ -9,7 +9,7 @@ export default function Home(): React.JSX.Element {
     <main className="w-full bg-ivory">
       {/* HERO IMAGE */}
       <section className="flex justify-center pt-24 px-6">
-        <div className="relative w-full max-w-5xl">
+        <div className="relative w-full max-w-3xl">
           <Image
             src="/avenor-hero2.jpg"
             alt="AVENOR"
