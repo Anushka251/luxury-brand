@@ -2,11 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 export default function Home(): React.JSX.Element {
-  const router = useRouter();
-
   return (
     <main className="w-full bg-ivory">
       {/* HERO IMAGE */}
@@ -23,7 +20,11 @@ export default function Home(): React.JSX.Element {
 
           {/* AVENOR LOGO */}
           <div
-            onClick={() => router.refresh()}
+            onClick={() => {
+              document
+                .getElementById("shop")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
             className="
               absolute
               left-1/2
@@ -32,10 +33,6 @@ export default function Home(): React.JSX.Element {
               -translate-y-1/2
               z-10
               cursor-pointer
-              hover:scale-105
-              active:scale-95
-              transition-transform
-              duration-200
             "
           >
             <h1
@@ -48,9 +45,9 @@ export default function Home(): React.JSX.Element {
                 tracking-tight
                 hover:opacity-80
                 transition-opacity
+                duration-300
                 select-none
                 whitespace-nowrap
-                drop-shadow-sm
               "
               style={{
                 fontFamily: '"Cormorant Garamond", serif',
@@ -63,7 +60,10 @@ export default function Home(): React.JSX.Element {
       </section>
 
       {/* SHOP COLLECTION BUTTON */}
-      <div className="flex justify-center pt-12 pb-4">
+      <div
+        id="shop"
+        className="flex justify-center pt-12 pb-4"
+      >
         <Link
           href="/shop"
           className="
@@ -80,6 +80,68 @@ export default function Home(): React.JSX.Element {
           SHOP COLLECTION
         </Link>
       </div>
+
+      {/* BRAND STATEMENT */}
+      <div className="flex justify-center pt-8 pb-12">
+        <p
+          className="
+            text-center
+            text-[#AF9685]
+            text-xs
+            sm:text-sm
+            tracking-[0.25em]
+            uppercase
+            font-light
+          "
+          style={{
+            fontFamily: '"Cormorant Garamond", serif',
+          }}
+        >
+          Quiet Luxury. Contemporary Fashion. Limited Drop.
+        </p>
+      </div>
+
+      {/* FEATURED PRODUCT */}
+      <section className="flex justify-center px-6 pb-24">
+        <Link
+          href="/product/crimson-rose"
+          className="
+            block
+            max-w-md
+            w-full
+            hover:opacity-90
+            transition-opacity
+            duration-500
+          "
+        >
+          <Image
+            src="/products/crimson-rose/cover.jpg"
+            alt="Crimson Rose"
+            width={700}
+            height={950}
+            className="w-full h-auto object-cover"
+          />
+
+          <div className="pt-6 text-center">
+            <h2
+              className="
+                text-xl
+                tracking-[0.2em]
+                text-[#AF9685]
+              "
+              style={{
+                fontFamily: '"Cormorant Garamond", serif',
+              }}
+            >
+              CRIMSON ROSE
+            </h2>
+
+            <p className="mt-2 text-sm tracking-[0.15em] text-bronze">
+              DISCOVER THE COLLECTION
+            </p>
+          </div>
+        </Link>
+      </section>
     </main>
   );
 }
