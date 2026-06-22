@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen w-full bg-ivory">
+    <main className="w-full bg-ivory">
 
       {/* HERO IMAGE */}
       <section className="flex justify-center pt-24 px-6">
@@ -49,7 +49,7 @@ export default function Home() {
       </section>
 
       {/* SHOP COLLECTION BUTTON */}
-      <div className="flex justify-center pt-20 pb-8">
+      <div className="flex justify-center pt-12 pb-4">
         <Link
           href="/shop"
           className="
