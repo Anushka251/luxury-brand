@@ -2,11 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 export default function Home(): React.JSX.Element {
-  const router = useRouter();
-
   return (
     <main className="w-full bg-ivory">
       {/* HERO IMAGE */}
@@ -23,7 +20,11 @@ export default function Home(): React.JSX.Element {
 
           {/* AVENOR LOGO */}
           <div
-            onClick={() => router.refresh()}
+            onClick={() => {
+              document
+                .getElementById("shop")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
             className="
               absolute
               left-1/2
@@ -32,10 +33,6 @@ export default function Home(): React.JSX.Element {
               -translate-y-1/2
               z-10
               cursor-pointer
-              hover:scale-105
-              active:scale-95
-              transition-transform
-              duration-200
             "
           >
             <h1
@@ -48,6 +45,7 @@ export default function Home(): React.JSX.Element {
                 tracking-tight
                 hover:opacity-80
                 transition-opacity
+                duration-300
                 select-none
                 whitespace-nowrap
               "
@@ -62,7 +60,10 @@ export default function Home(): React.JSX.Element {
       </section>
 
       {/* SHOP COLLECTION BUTTON */}
-      <div className="flex justify-center pt-12 pb-4">
+      <div
+        id="shop"
+        className="flex justify-center pt-12 pb-4"
+      >
         <Link
           href="/shop"
           className="
