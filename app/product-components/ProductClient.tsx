@@ -1,14 +1,27 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useCart } from "@/app/context/CartContext";
 import { Product } from "@/lib/products";
 import ProductGallery from "./ProductGallery";
 
-export default function ProductClient({ product }: { product: Product }) {
+export default function ProductClient({
+  product,
+}: {
+  product: Product;
+}) {
   const { addToCart } = useCart();
 
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedSize, setSelectedSize] =
+    useState<string | null>(null);
+
+  // Scroll to top when product page opens
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "instant",
+    });
+  }, []);
 
   const sizes = ["XS", "S", "M", "L", "XL"];
 
@@ -28,7 +41,10 @@ export default function ProductClient({ product }: { product: Product }) {
 
   return (
     <div className="max-w-4xl mx-auto mt-16 px-6">
-      <ProductGallery images={product.images} name={product.name} />
+      <ProductGallery
+        images={product.images}
+        name={product.name}
+      />
 
       <div className="mt-8">
         <h1 className="text-4xl font-light tracking-wide">
@@ -43,7 +59,9 @@ export default function ProductClient({ product }: { product: Product }) {
           LIMITED TO {product.totalPieces} PIECES
         </p>
 
-        <p className="mt-6 text-muted">{product.description}</p>
+        <p className="mt-6 text-muted">
+          {product.description}
+        </p>
 
         {/* SIZE SELECTOR */}
         <div className="mt-8">
@@ -95,7 +113,7 @@ export default function ProductClient({ product }: { product: Product }) {
           ADD TO BAG
         </button>
 
-        {/* 🔥 NEW DETAILS SECTION */}
+        {/* DETAILS */}
         <div className="mt-12 border-t pt-8">
           <p className="text-xs tracking-widest text-gray-500 mb-4">
             DESIGN
