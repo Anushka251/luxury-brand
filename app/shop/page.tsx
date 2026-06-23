@@ -1,15 +1,12 @@
-import { products } from "@/lib/products";
-import Link from "next/link";
-import Image from "next/image";
-
 export default function Shop() {
   return (
     <main className="px-6 pt-0 pb-20 max-w-7xl mx-auto">
-      <section className="flex justify-center items-start">
+      <section className="flex justify-center items-start -mt-8">
         {products.map((p) => (
           <Link
             key={p.id}
             href={`/product/${p.id}`}
+            scroll={true}
             className="group w-full max-w-sm"
           >
             <div className="relative aspect-[3/4] overflow-hidden rounded-lg">
