@@ -27,7 +27,6 @@ export default function ProductGallery({
 
   const minSwipeDistance = 50;
 
-  // Preload images
   useEffect(() => {
     images.forEach((src) => {
       const img = new window.Image();
@@ -125,8 +124,8 @@ export default function ProductGallery({
           justify-center
           items-center
           w-full
-          min-h-[55vh]
-          md:min-h-[65vh]
+          min-h-[48vh]
+          md:min-h-[58vh]
           bg-ivory
         "
         onTouchStart={onTouchStart}
@@ -163,8 +162,8 @@ export default function ProductGallery({
           className="
             relative
             w-full
-            max-w-xs
-            md:max-w-md
+            max-w-[260px]
+            md:max-w-sm
             aspect-[3/4]
             overflow-hidden
             rounded-lg
