@@ -32,7 +32,9 @@ export default function Home(): React.JSX.Element {
             onClick={() => {
               document
                 .getElementById("shop")
-                ?.scrollIntoView({ behavior: "smooth" });
+                ?.scrollIntoView({
+                  behavior: "smooth",
+                });
             }}
             className="
               absolute
@@ -44,11 +46,7 @@ export default function Home(): React.JSX.Element {
               cursor-pointer
             "
           >
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1.4 }}
+            <h1
               className="
                 text-[#CFB095]
                 text-5xl
@@ -63,11 +61,12 @@ export default function Home(): React.JSX.Element {
                 whitespace-nowrap
               "
               style={{
-                fontFamily: '"Cormorant Garamond", serif',
+                fontFamily:
+                  '"Cormorant Garamond", serif',
               }}
             >
               AVENOR
-            </motion.h1>
+            </h1>
           </div>
         </div>
       </section>
@@ -109,7 +108,8 @@ export default function Home(): React.JSX.Element {
             font-light
           "
           style={{
-            fontFamily: '"Cormorant Garamond", serif',
+            fontFamily:
+              '"Cormorant Garamond", serif',
           }}
         >
           Quiet Luxury. Contemporary Fashion. Limited Drop.
@@ -150,7 +150,8 @@ export default function Home(): React.JSX.Element {
                   text-[#AF9685]
                 "
                 style={{
-                  fontFamily: '"Cormorant Garamond", serif',
+                  fontFamily:
+                    '"Cormorant Garamond", serif',
                 }}
               >
                 CRIMSON ROSE
