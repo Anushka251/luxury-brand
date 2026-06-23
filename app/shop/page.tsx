@@ -4,28 +4,49 @@ import Image from "next/image";
 
 export default function Shop() {
   return (
-    <main className="px-12 py-24 max-w-7xl mx-auto">
-      <div className="mb-24">
-        <h1 className="text-4xl tracking-wide font-light">SHOP</h1>
-        <p className="text-muted mt-4 max-w-md">
-          A curated selection of timeless pieces designed with intention.
-        </p>
-      </div>
-
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-x-16 gap-y-32">
+    <main className="px-6 py-20 max-w-7xl mx-auto">
+      <section className="flex justify-center">
         {products.map((p) => (
-          <Link key={p.id} href={`/product/${p.id}`} className="group cursor-pointer">
-            <div className="relative h-[520px] mb-8 overflow-hidden rounded-lg">
+          <Link
+            key={p.id}
+            href={`/product/${p.id}`}
+            className="group cursor-pointer max-w-lg w-full"
+          >
+            <div className="relative aspect-[3/4] overflow-hidden rounded-lg">
               <Image
                 src={p.coverImage}
                 alt={p.name}
                 fill
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                priority
+                className="
+                  object-cover
+                  transition-transform
+                  duration-700
+                  group-hover:scale-[1.02]
+                "
               />
             </div>
 
-            <h2 className="text-lg tracking-wide">{p.name}</h2>
-            <p className="text-muted mt-2 tracking-wide">₹{p.price.toLocaleString()}</p>
+            <div className="pt-8 text-center">
+              <h2
+                className="
+                  text-2xl
+                  tracking-[0.2em]
+                  text-[#AF9685]
+                  font-light
+                "
+                style={{
+                  fontFamily:
+                    '"Cormorant Garamond", serif',
+                }}
+              >
+                {p.name.toUpperCase()}
+              </h2>
+
+              <p className="mt-3 text-sm tracking-[0.18em] text-bronze">
+                DISCOVER THE COLLECTION
+              </p>
+            </div>
           </Link>
         ))}
       </section>
