@@ -4,13 +4,13 @@ import Image from "next/image";
 
 export default function Shop() {
   return (
-    <main className="px-6 pt-4 pb-20 max-w-7xl mx-auto">
+    <main className="px-6 pt-0 pb-20 max-w-7xl mx-auto">
       <section className="flex justify-center items-start">
         {products.map((p) => (
           <Link
             key={p.id}
             href={`/product/${p.id}`}
-            className="group w-full max-w-sm"
+            className="group w-full max-w-md"
           >
             <div className="relative aspect-[3/4] overflow-hidden rounded-lg">
               <Image
