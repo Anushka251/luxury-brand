@@ -163,8 +163,8 @@ export default function ProductGallery({
           className="
             relative
             w-full
-            max-w-sm
-            md:max-w-lg
+            max-w-xs
+            md:max-w-md
             aspect-[3/4]
             overflow-hidden
             rounded-lg
