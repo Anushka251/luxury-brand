@@ -37,7 +37,7 @@ export default function Home(): React.JSX.Element {
             className="
               absolute
               left-1/2
-              top-[38%
+              top-[38%]
               -translate-x-1/2
               -translate-y-1/2
               z-10
