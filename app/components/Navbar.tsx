@@ -5,7 +5,7 @@ import { useCart } from "@/app/context/CartContext";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
 
-export default function Navbar() {
+export default function Navbar(): React.JSX.Element {
   const { cart } = useCart();
   const { data: session } = useSession();
 
@@ -52,13 +52,13 @@ export default function Navbar() {
         />
       )}
 
-      <nav className="fixed top-0 left-0 w-full px-6 md:px-12 py-6 flex justify-between items-center text-sm tracking-widest bg-ivory z-50">
+      <nav className="fixed top-0 left-0 w-full px-6 md:px-12 py-4 flex justify-between items-center text-sm tracking-widest bg-ivory z-50">
         {/* LOGO */}
         <Link
           href="/home"
           className="hover:opacity-80 transition"
         >
-          <span className="text-charcoal text-lg tracking-[0.35em] font-light">
+          <span className="text-charcoal text-base tracking-[0.35em] font-light">
             AVENOR
           </span>
         </Link>
@@ -78,7 +78,7 @@ export default function Navbar() {
             className="
               relative
               flex flex-col justify-center items-center
-              w-11 h-11
+              w-10 h-10
               rounded-md
               touch-manipulation
               select-none
@@ -102,7 +102,7 @@ export default function Navbar() {
             <div
               className="
                 absolute
-                top-14
+                top-12
                 right-0
                 z-50
                 bg-white
