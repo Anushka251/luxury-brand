@@ -52,13 +52,13 @@ export default function Navbar(): React.JSX.Element {
         />
       )}
 
-      <nav className="fixed top-0 left-0 w-full px-6 md:px-12 py-4 flex justify-between items-center text-sm tracking-widest bg-ivory z-50">
+      <nav className="fixed top-0 left-0 w-full px-6 md:px-12 py-3 flex justify-between items-center text-sm tracking-widest bg-ivory z-50">
         {/* LOGO */}
         <Link
           href="/home"
           className="hover:opacity-80 transition"
         >
-          <span className="text-charcoal text-base tracking-[0.35em] font-light">
+          <span className="text-charcoal text-lg tracking-[0.32em] font-light">
             AVENOR
           </span>
         </Link>
