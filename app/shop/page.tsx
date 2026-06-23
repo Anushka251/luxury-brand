@@ -10,7 +10,7 @@ export default function Shop() {
           <Link
             key={p.id}
             href={`/product/${p.id}`}
-            className="group w-full max-w-md"
+            className="group w-full max-w-sm"
           >
             <div className="relative aspect-[3/4] overflow-hidden rounded-lg">
               <Image
