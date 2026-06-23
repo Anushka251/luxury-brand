@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCart } from "@/app/context/CartContext";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
+import { motion } from "framer-motion";
 
 export default function Navbar(): React.JSX.Element {
   const { cart } = useCart();
@@ -52,7 +53,27 @@ export default function Navbar(): React.JSX.Element {
         />
       )}
 
-      <nav className="fixed top-0 left-0 w-full px-6 md:px-12 py-3 flex justify-between items-center text-sm tracking-widest bg-ivory z-50">
+      <motion.nav
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1 }}
+        className="
+          fixed
+          top-0
+          left-0
+          w-full
+          px-6
+          md:px-12
+          py-3
+          flex
+          justify-between
+          items-center
+          text-sm
+          tracking-widest
+          bg-ivory
+          z-50
+        "
+      >
         {/* LOGO */}
         <Link
           href="/home"
@@ -77,8 +98,12 @@ export default function Navbar(): React.JSX.Element {
             }
             className="
               relative
-              flex flex-col justify-center items-center
-              w-10 h-10
+              flex
+              flex-col
+              justify-center
+              items-center
+              w-10
+              h-10
               rounded-md
               touch-manipulation
               select-none
@@ -99,7 +124,10 @@ export default function Navbar(): React.JSX.Element {
 
           {/* Dropdown */}
           {open && (
-            <div
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
               className="
                 absolute
                 top-12
@@ -115,25 +143,17 @@ export default function Navbar(): React.JSX.Element {
                 min-w-[180px]
                 text-xs
                 tracking-widest
-                animate-in
-                fade-in
-                zoom-in-95
-                duration-150
               "
             >
-              {/* SHOP */}
               <Link
                 href="/shop"
-                onClick={() =>
-                  setOpen(false)
-                }
+                onClick={() => setOpen(false)}
                 className="
                   w-full
                   px-3
                   py-3
                   rounded
                   hover:bg-gray-100
-                  active:bg-gray-200
                   transition
                 "
               >
@@ -142,26 +162,21 @@ export default function Navbar(): React.JSX.Element {
 
               {session ? (
                 <>
-                  {/* ACCOUNT */}
                   <Link
                     href="/account"
-                    onClick={() =>
-                      setOpen(false)
-                    }
+                    onClick={() => setOpen(false)}
                     className="
                       w-full
                       px-3
                       py-3
                       rounded
                       hover:bg-gray-100
-                      active:bg-gray-200
                       transition
                     "
                   >
                     ACCOUNT
                   </Link>
 
-                  {/* LOGOUT */}
                   <button
                     type="button"
                     onClick={() => {
@@ -178,7 +193,6 @@ export default function Navbar(): React.JSX.Element {
                       py-3
                       rounded
                       hover:bg-gray-100
-                      active:bg-gray-200
                       transition
                     "
                   >
@@ -188,16 +202,13 @@ export default function Navbar(): React.JSX.Element {
               ) : (
                 <Link
                   href="/auth"
-                  onClick={() =>
-                    setOpen(false)
-                  }
+                  onClick={() => setOpen(false)}
                   className="
                     w-full
                     px-3
                     py-3
                     rounded
                     hover:bg-gray-100
-                    active:bg-gray-200
                     transition
                   "
                 >
@@ -205,28 +216,24 @@ export default function Navbar(): React.JSX.Element {
                 </Link>
               )}
 
-              {/* BAG */}
               <Link
                 href="/bag"
-                onClick={() =>
-                  setOpen(false)
-                }
+                onClick={() => setOpen(false)}
                 className="
                   w-full
                   px-3
                   py-3
                   rounded
                   hover:bg-gray-100
-                  active:bg-gray-200
                   transition
                 "
               >
                 BAG ({count})
               </Link>
-            </div>
+            </motion.div>
           )}
         </div>
-      </nav>
+      </motion.nav>
     </>
   );
 }
