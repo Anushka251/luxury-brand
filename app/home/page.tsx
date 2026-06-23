@@ -8,14 +8,13 @@ export default function Home(): React.JSX.Element {
   return (
     <main className="w-full bg-ivory">
       {/* HERO IMAGE */}
-      <section className="flex justify-center pt-24 px-6">
-        <div className="relative w-full max-w-3xl">
-
-          {/* HERO IMAGE FADE */}
+      <section className="flex justify-center pt-24 px-4">
+        <div className="relative w-full max-w-5xl">
+          {/* HERO IMAGE */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false }}
+            viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 1.5 }}
           >
             <Image
@@ -38,7 +37,7 @@ export default function Home(): React.JSX.Element {
             className="
               absolute
               left-1/2
-              top-[38%]
+              top-[38%
               -translate-x-1/2
               -translate-y-1/2
               z-10
@@ -48,7 +47,7 @@ export default function Home(): React.JSX.Element {
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false }}
+              viewport={{ once: true }}
               transition={{ duration: 1.4 }}
               className="
                 text-[#CFB095]
@@ -81,8 +80,10 @@ export default function Home(): React.JSX.Element {
         <Link
           href="/shop"
           className="
-            border border-bronze/80
-            px-10 py-4
+            border
+            border-bronze/80
+            px-10
+            py-4
             tracking-[0.2em]
             text-bronze
             hover:bg-maroon
@@ -120,7 +121,7 @@ export default function Home(): React.JSX.Element {
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false }}
+          viewport={{ once: false, amount: 0.3 }}
           transition={{ duration: 1.4 }}
           className="max-w-md w-full"
         >
@@ -143,7 +144,11 @@ export default function Home(): React.JSX.Element {
 
             <div className="pt-6 text-center">
               <h2
-                className="text-xl tracking-[0.2em] text-[#AF9685]"
+                className="
+                  text-xl
+                  tracking-[0.2em]
+                  text-[#AF9685]
+                "
                 style={{
                   fontFamily: '"Cormorant Garamond", serif',
                 }}
