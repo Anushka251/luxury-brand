@@ -15,22 +15,11 @@ export default function LayoutWrapper({
   const hideNavbar =
     pathname === "/" || pathname === "/home";
 
-  // Smaller spacing for shop page
-  const isShop = pathname === "/shop";
-
   return (
     <>
       {!hideNavbar && <Navbar />}
 
-      <main
-        className={
-          !hideNavbar
-            ? isShop
-              ? "pt-14"
-              : "pt-24"
-            : ""
-        }
-      >
+      <main className={!hideNavbar ? "pt-14" : ""}>
         {children}
       </main>
 
