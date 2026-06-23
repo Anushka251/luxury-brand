@@ -27,7 +27,7 @@ export default function ProductGallery({
 
   const minSwipeDistance = 50;
 
-  // Preload all images
+  // Preload images
   useEffect(() => {
     images.forEach((src) => {
       const img = new window.Image();
@@ -120,29 +120,18 @@ export default function ProductGallery({
     <div className="w-full">
       <section
         className="
-          group
           relative
+          flex
+          justify-center
+          items-center
           w-full
-          h-[70vh]
-          max-h-[70vh]
-          overflow-hidden
+          min-h-[72vh]
           bg-ivory
         "
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* IMAGE */}
-        <img
-          src={images[index]}
-          alt={name}
-          className={`w-full h-full object-contain object-center transition-opacity duration-300 ${
-            isTransitioning
-              ? "opacity-80"
-              : "opacity-100"
-          }`}
-        />
-
         {/* LEFT ARROW */}
         <button
           onClick={prev}
@@ -150,7 +139,7 @@ export default function ProductGallery({
           disabled={isTransitioning}
           className="
             absolute
-            left-4
+            left-6
             top-1/2
             -translate-y-1/2
             z-20
@@ -166,6 +155,37 @@ export default function ProductGallery({
           ‹
         </button>
 
+        {/* IMAGE */}
+        <div
+          className="
+            relative
+            w-full
+            max-w-lg
+            aspect-[3/4]
+            overflow-hidden
+            rounded-lg
+            bg-ivory
+          "
+        >
+          <img
+            src={images[index]}
+            alt={name}
+            className={`
+              w-full
+              h-full
+              object-cover
+              object-center
+              transition-opacity
+              duration-300
+              ${
+                isTransitioning
+                  ? "opacity-80"
+                  : "opacity-100"
+              }
+            `}
+          />
+        </div>
+
         {/* RIGHT ARROW */}
         <button
           onClick={next}
@@ -173,7 +193,7 @@ export default function ProductGallery({
           disabled={isTransitioning}
           className="
             absolute
-            right-4
+            right-6
             top-1/2
             -translate-y-1/2
             z-20
@@ -191,15 +211,18 @@ export default function ProductGallery({
       </section>
 
       {/* COUNTER */}
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-center -mt-4">
         <div
           className="
-            px-4 py-1.5
+            px-4
+            py-1.5
             rounded-lg
-            text-sm font-medium
+            text-sm
+            font-medium
             text-gray-700
-            border border-gray-400/40
-            bg-transparent
+            border
+            border-gray-400/40
+            bg-white/80
             backdrop-blur-sm
           "
         >
