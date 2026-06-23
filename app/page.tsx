@@ -10,14 +10,23 @@ export default function Home(): React.JSX.Element {
       {/* HERO IMAGE */}
       <section className="flex justify-center pt-24 px-6">
         <div className="relative w-full max-w-3xl">
-          <Image
-            src="/avenor-hero2.jpg"
-            alt="AVENOR"
-            width={900}
-            height={1200}
-            priority
-            className="w-full h-auto object-contain"
-          />
+
+          {/* HERO IMAGE FADE */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false }}
+            transition={{ duration: 1.5 }}
+          >
+            <Image
+              src="/avenor-hero2.jpg"
+              alt="AVENOR"
+              width={900}
+              height={1200}
+              priority
+              className="w-full h-auto object-contain"
+            />
+          </motion.div>
 
           {/* AVENOR LOGO */}
           <div
@@ -134,11 +143,7 @@ export default function Home(): React.JSX.Element {
 
             <div className="pt-6 text-center">
               <h2
-                className="
-                  text-xl
-                  tracking-[0.2em]
-                  text-[#AF9685]
-                "
+                className="text-xl tracking-[0.2em] text-[#AF9685]"
                 style={{
                   fontFamily: '"Cormorant Garamond", serif',
                 }}
