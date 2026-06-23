@@ -125,8 +125,8 @@ export default function ProductGallery({
           justify-center
           items-center
           w-full
-          min-h-[60vh]
-          md:min-h-[72vh]
+          min-h-[55vh]
+          md:min-h-[65vh]
           bg-ivory
         "
         onTouchStart={onTouchStart}
@@ -217,7 +217,7 @@ export default function ProductGallery({
       </section>
 
       {/* COUNTER */}
-      <div className="flex justify-center -mt-4">
+      <div className="flex justify-center -mt-3">
         <div
           className="
             px-4
