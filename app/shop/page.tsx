@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function Shop() {
   return (
-    <main className="px-6 pt-9 pb-20 max-w-7xl mx-auto">
+    <main className="px-6 pt-11 pb-20 max-w-7xl mx-auto">
       <section className="flex justify-center items-start -mt-8">
         {products.map((p) => (
           <Link
