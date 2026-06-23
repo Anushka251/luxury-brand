@@ -1,3 +1,7 @@
+import { products } from "@/lib/products";
+import Link from "next/link";
+import Image from "next/image";
+
 export default function Shop() {
   return (
     <main className="px-6 pt-0 pb-20 max-w-7xl mx-auto">
@@ -9,6 +13,7 @@ export default function Shop() {
             scroll={true}
             className="group w-full max-w-sm"
           >
+            {/* PRODUCT IMAGE */}
             <div className="relative aspect-[3/4] overflow-hidden rounded-lg">
               <Image
                 src={p.coverImage}
@@ -24,6 +29,7 @@ export default function Shop() {
               />
             </div>
 
+            {/* PRODUCT DETAILS */}
             <div className="pt-6 text-center">
               <h2
                 className="
