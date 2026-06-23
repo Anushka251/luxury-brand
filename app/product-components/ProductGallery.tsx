@@ -125,7 +125,8 @@ export default function ProductGallery({
           justify-center
           items-center
           w-full
-          min-h-[72vh]
+          min-h-[60vh]
+          md:min-h-[72vh]
           bg-ivory
         "
         onTouchStart={onTouchStart}
@@ -139,11 +140,13 @@ export default function ProductGallery({
           disabled={isTransitioning}
           className="
             absolute
-            left-6
+            left-4
+            md:left-6
             top-1/2
             -translate-y-1/2
             z-20
-            text-5xl
+            text-4xl
+            md:text-5xl
             font-light
             text-charcoal
             opacity-70
@@ -160,7 +163,8 @@ export default function ProductGallery({
           className="
             relative
             w-full
-            max-w-lg
+            max-w-sm
+            md:max-w-lg
             aspect-[3/4]
             overflow-hidden
             rounded-lg
@@ -173,7 +177,7 @@ export default function ProductGallery({
             className={`
               w-full
               h-full
-              object-cover
+              object-contain
               object-center
               transition-opacity
               duration-300
@@ -193,11 +197,13 @@ export default function ProductGallery({
           disabled={isTransitioning}
           className="
             absolute
-            right-6
+            right-4
+            md:right-6
             top-1/2
             -translate-y-1/2
             z-20
-            text-5xl
+            text-4xl
+            md:text-5xl
             font-light
             text-charcoal
             opacity-70
