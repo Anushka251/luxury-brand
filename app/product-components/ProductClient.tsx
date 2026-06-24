@@ -19,7 +19,7 @@ export default function ProductClient({
   useEffect(() => {
     window.scrollTo({
       top: 0,
-      behavior: "instant",
+      behavior: "instant" as ScrollBehavior,
     });
   }, []);
 
@@ -40,7 +40,7 @@ export default function ProductClient({
   }, [addToCart, product, selectedSize]);
 
   return (
-    <div className="max-w-4xl mx-auto mt-16 px-6">
+    <div className="max-w-4xl mx-auto px-6">
       <ProductGallery
         images={product.images}
         name={product.name}
@@ -77,13 +77,18 @@ export default function ProductClient({
             )}
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 flex-wrap">
             {sizes.map((size) => (
               <button
                 key={size}
                 onClick={() => setSelectedSize(size)}
                 className={`
-                  text-sm px-4 py-2 border rounded-md transition
+                  text-sm
+                  px-4
+                  py-2
+                  border
+                  rounded-md
+                  transition
                   ${
                     selectedSize === size
                       ? "border-black text-black"
@@ -102,7 +107,13 @@ export default function ProductClient({
           onClick={addToBag}
           disabled={!selectedSize}
           className={`
-            mt-8 px-12 py-4 border transition font-medium tracking-widest
+            mt-8
+            px-12
+            py-4
+            border
+            transition
+            font-medium
+            tracking-widest
             ${
               selectedSize
                 ? "border-black hover:bg-black hover:text-white"
@@ -124,7 +135,7 @@ export default function ProductClient({
           </p>
         </div>
 
-        <div className="mt-8" />
+        <div className="h-12" />
       </div>
     </div>
   );
