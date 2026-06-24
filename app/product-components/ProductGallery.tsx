@@ -27,6 +27,7 @@ export default function ProductGallery({
 
   const minSwipeDistance = 50;
 
+  // Images 3,4,6,8
   const largeImage =
     [2, 3, 5, 7].includes(index);
 
@@ -160,51 +161,41 @@ export default function ProductGallery({
           ‹
         </button>
 
-        {/* FIXED IMAGE AREA */}
+        {/* IMAGE */}
         <div
           className="
             relative
             w-full
-            max-w-[450px]
-            h-[520px]
+            max-w-[260px]
+            md:max-w-sm
+            aspect-[3/4]
+            overflow-visible
+            bg-ivory
             flex
             items-center
             justify-center
           "
         >
-          <div
+          <img
+            src={images[index]}
+            alt={name}
             className={`
-              relative
-              overflow-hidden
-              rounded-lg
-              bg-ivory
+              object-contain
+              object-center
               transition-all
               duration-300
               ${
                 largeImage
-                  ? "w-[450px] h-[520px]"
-                  : "w-[340px] h-[460px]"
+                  ? "w-[110%] h-[110%]"
+                  : "w-full h-full"
+              }
+              ${
+                isTransitioning
+                  ? "opacity-80"
+                  : "opacity-100"
               }
             `}
-          >
-            <img
-              src={images[index]}
-              alt={name}
-              className={`
-                w-full
-                h-full
-                object-contain
-                object-center
-                transition-opacity
-                duration-300
-                ${
-                  isTransitioning
-                    ? "opacity-80"
-                    : "opacity-100"
-                }
-              `}
-            />
-          </div>
+          />
         </div>
 
         {/* RIGHT ARROW */}
