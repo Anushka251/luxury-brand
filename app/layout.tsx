@@ -1,4 +1,8 @@
-import { Geist, Geist_Mono, Cormorant_Garamond } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Cormorant_Garamond,
+} from "next/font/google";
 import "./globals.css";
 import LayoutWrapper from "./components/LayoutWrapper";
 import { CartProvider } from "./context/CartContext";
@@ -23,9 +27,9 @@ export const avenorFont = Cormorant_Garamond({
 });
 
 export const metadata = {
-  title: "Avenor",
+  title: "AVENOR",
   description:
-    "Avenor is a contemporary luxury house creating limited collections through intentional design, refined craftsmanship, and timeless elegance.",
+    "AVENOR is a contemporary fashion house exploring quiet luxury through refined craftsmanship, cultural artistry, and timeless design.",
   icons: {
     icon: "/icon.png",
   },
