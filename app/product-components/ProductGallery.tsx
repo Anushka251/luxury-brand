@@ -220,9 +220,9 @@ export default function ProductGallery({
         <p
           className="
             text-sm
-            font-light
             tracking-[0.25em]
-            text-[#AF9685]
+            text-[#8F7A68]
+            font-light
             select-none
           "
           style={{
