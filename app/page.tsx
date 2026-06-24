@@ -18,7 +18,7 @@ export default function Home(): React.JSX.Element {
             transition={{ duration: 1.5 }}
           >
             <Image
-              src="/avenor-logo.jpg"
+              src="/avenor-hero2.jpg"
               alt="AVENOR"
               width={900}
               height={1200}
