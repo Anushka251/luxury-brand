@@ -160,41 +160,51 @@ export default function ProductGallery({
           ‹
         </button>
 
-        {/* IMAGE */}
+        {/* FIXED IMAGE AREA */}
         <div
-          className={`
+          className="
             relative
             w-full
-            overflow-hidden
-            rounded-lg
-            bg-ivory
-            transition-all
-            duration-300
-            ${
-              largeImage
-                ? "max-w-[310px] md:max-w-[450px]"
-                : "max-w-[260px] md:max-w-sm"
-            }
-            aspect-[3/4]
-          `}
+            max-w-[450px]
+            h-[520px]
+            flex
+            items-center
+            justify-center
+          "
         >
-          <img
-            src={images[index]}
-            alt={name}
+          <div
             className={`
-              w-full
-              h-full
-              object-contain
-              object-center
-              transition-opacity
+              relative
+              overflow-hidden
+              rounded-lg
+              bg-ivory
+              transition-all
               duration-300
               ${
-                isTransitioning
-                  ? "opacity-80"
-                  : "opacity-100"
+                largeImage
+                  ? "w-[450px] h-[520px]"
+                  : "w-[340px] h-[460px]"
               }
             `}
-          />
+          >
+            <img
+              src={images[index]}
+              alt={name}
+              className={`
+                w-full
+                h-full
+                object-contain
+                object-center
+                transition-opacity
+                duration-300
+                ${
+                  isTransitioning
+                    ? "opacity-80"
+                    : "opacity-100"
+                }
+              `}
+            />
+          </div>
         </div>
 
         {/* RIGHT ARROW */}
