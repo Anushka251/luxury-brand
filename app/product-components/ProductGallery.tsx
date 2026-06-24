@@ -115,6 +115,9 @@ export default function ProductGallery({
     }, 180);
   }, [images.length, isTransitioning]);
 
+  const largeImage =
+    [2, 3, 5, 7].includes(index);
+
   return (
     <div className="w-full">
       <section
@@ -159,16 +162,20 @@ export default function ProductGallery({
 
         {/* IMAGE */}
         <div
-          className="
+          className={`
             relative
             w-full
             max-w-[260px]
             md:max-w-sm
-            aspect-[3/4]
             overflow-hidden
             rounded-lg
             bg-ivory
-          "
+            ${
+              largeImage
+                ? "aspect-[2.8/4]"
+                : "aspect-[3/4]"
+            }
+          `}
         >
           <img
             src={images[index]}
@@ -176,14 +183,13 @@ export default function ProductGallery({
             className={`
               w-full
               h-full
-              object-contain
               object-center
               transition-all
               duration-300
               ${
-                [2, 3, 5, 7].includes(index)
-                  ? "scale-110"
-                  : "scale-100"
+                largeImage
+                  ? "object-cover scale-105"
+                  : "object-contain"
               }
               ${
                 isTransitioning
