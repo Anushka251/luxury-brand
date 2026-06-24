@@ -27,10 +27,6 @@ export default function ProductGallery({
 
   const minSwipeDistance = 50;
 
-  // Images 3, 4, 6, and 8
-  const largeImage =
-    [2, 3, 5, 7].includes(index);
-
   useEffect(() => {
     images.forEach((src) => {
       const img = new window.Image();
@@ -129,67 +125,97 @@ export default function ProductGallery({
           items-center
           w-full
           min-h-[48vh]
-          md:min-h-[58vh]
+          md:min-h-[65vh]
           bg-ivory
         "
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* LEFT ARROW */}
-        <button
-          onClick={prev}
-          aria-label="Previous image"
-          disabled={isTransitioning}
+        {/* LEFT CONTROLS */}
+        <div
           className="
             absolute
-            left-4
+            left-2
             md:left-6
             top-1/2
             -translate-y-1/2
+            flex
+            flex-col
+            items-center
+            gap-4
             z-20
-            text-4xl
-            md:text-5xl
-            font-light
-            text-charcoal
-            opacity-70
-            hover:opacity-100
-            disabled:opacity-30
-            transition
           "
         >
-          ‹
-        </button>
+          <button
+            onClick={prev}
+            disabled={isTransitioning}
+            className="
+              text-3xl
+              text-gray-500
+              hover:text-black
+              transition
+              disabled:opacity-30
+            "
+          >
+            ↑
+          </button>
+
+          <p
+            className="
+              text-sm
+              text-gray-500
+              tracking-[0.15em]
+              font-light
+              select-none
+            "
+            style={{
+              fontFamily:
+                '"Cormorant Garamond", serif',
+            }}
+          >
+            {index + 1} / {images.length}
+          </p>
+
+          <button
+            onClick={next}
+            disabled={isTransitioning}
+            className="
+              text-3xl
+              text-gray-500
+              hover:text-black
+              transition
+              disabled:opacity-30
+            "
+          >
+            ↓
+          </button>
+        </div>
 
         {/* IMAGE */}
         <div
           className="
             relative
             w-full
-            max-w-[260px]
-            md:max-w-sm
+            max-w-[340px]
+            md:max-w-[500px]
+            lg:max-w-[550px]
             aspect-[3/4]
             overflow-hidden
             rounded-lg
             bg-ivory
-            flex
-            items-center
-            justify-center
           "
         >
           <img
             src={images[index]}
             alt={name}
             className={`
+              w-full
+              h-full
               object-contain
               object-center
-              transition-all
+              transition-opacity
               duration-300
-              ${
-                largeImage
-                  ? "w-[104%] h-[104%]"
-                  : "w-full h-full"
-              }
               ${
                 isTransitioning
                   ? "opacity-80"
@@ -198,54 +224,7 @@ export default function ProductGallery({
             `}
           />
         </div>
-
-        {/* RIGHT ARROW */}
-        <button
-          onClick={next}
-          aria-label="Next image"
-          disabled={isTransitioning}
-          className="
-            absolute
-            right-4
-            md:right-6
-            top-1/2
-            -translate-y-1/2
-            z-20
-            text-4xl
-            md:text-5xl
-            font-light
-            text-charcoal
-            opacity-70
-            hover:opacity-100
-            disabled:opacity-30
-            transition
-          "
-        >
-          ›
-        </button>
       </section>
-
-      {/* COUNTER */}
-      <div
-        className="flex justify-center"
-        style={{ marginTop: "1px" }}
-      >
-        <p
-          className="
-            text-gray-500
-            text-sm
-            tracking-[0.15em]
-            font-light
-            select-none
-          "
-          style={{
-            fontFamily:
-              '"Cormorant Garamond", serif',
-          }}
-        >
-          {index + 1} / {images.length}
-        </p>
-      </div>
     </div>
   );
 }
