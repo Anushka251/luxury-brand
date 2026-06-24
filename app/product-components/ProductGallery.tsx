@@ -219,16 +219,12 @@ export default function ProductGallery({
       <div className="flex justify-center -mt-3">
         <p
           className="
-            text-sm
-            tracking-[0.25em]
-            text-[#8F7A68]
-            font-light
+            text-base
+            font-medium
+            text-black/70
+            tracking-[0.15em]
             select-none
           "
-          style={{
-            fontFamily:
-              '"Cormorant Garamond", serif',
-          }}
         >
           {index + 1} / {images.length}
         </p>
