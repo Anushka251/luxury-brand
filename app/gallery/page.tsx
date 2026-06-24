@@ -1,6 +1,5 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 const images = [
@@ -15,13 +14,7 @@ const images = [
 ];
 
 export default function GalleryPage() {
-  const searchParams = useSearchParams();
-
-  const initial =
-    Number(searchParams.get("image")) || 0;
-
-  const [index, setIndex] =
-    useState(initial);
+  const [index, setIndex] = useState(0);
 
   const prev = () => {
     setIndex((i) =>
@@ -37,7 +30,6 @@ export default function GalleryPage() {
 
   return (
     <main className="fixed inset-0 bg-white z-50">
-      {/* LEFT */}
       <button
         onClick={prev}
         className="
@@ -52,7 +44,6 @@ export default function GalleryPage() {
         ‹
       </button>
 
-      {/* IMAGE */}
       <div className="h-screen flex items-center justify-center">
         <img
           src={images[index]}
@@ -64,7 +55,6 @@ export default function GalleryPage() {
         />
       </div>
 
-      {/* RIGHT */}
       <button
         onClick={next}
         className="
@@ -79,7 +69,6 @@ export default function GalleryPage() {
         ›
       </button>
 
-      {/* COUNTER */}
       <p
         className="
           absolute
@@ -92,7 +81,6 @@ export default function GalleryPage() {
         {index + 1} / {images.length}
       </p>
 
-      {/* CLOSE */}
       <a
         href="/product/crimson-rose"
         className="
