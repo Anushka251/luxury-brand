@@ -8,7 +8,7 @@ export default function Home(): React.JSX.Element {
   return (
     <main className="w-full bg-ivory">
       {/* HERO IMAGE */}
-      <section className="flex justify-center pt-24 px-4">
+      <section className="flex justify-center pt-2 px-4">
         <div className="relative w-full max-w-5xl">
           {/* HERO IMAGE */}
           <motion.div
