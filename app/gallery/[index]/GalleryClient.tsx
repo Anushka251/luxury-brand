@@ -12,7 +12,7 @@ export default function GalleryClient({
 }) {
   const [index, setIndex] = useState(
     Math.min(
-      Math.max(initialIndex || 0, 0),
+      Math.max(initialIndex, 0),
       images.length - 1
     )
   );
@@ -97,13 +97,9 @@ export default function GalleryClient({
           left-1/2
           -translate-x-1/2
           text-sm
-          text-gray-500
           tracking-[0.2em]
+          text-gray-500
         "
-        style={{
-          fontFamily:
-            '"Cormorant Garamond", serif',
-        }}
       >
         {index + 1} / {images.length}
       </p>
