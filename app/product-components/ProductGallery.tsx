@@ -27,7 +27,7 @@ export default function ProductGallery({
 
   const minSwipeDistance = 50;
 
-  // Images 3,4,6,8
+  // Images 3, 4, 6, and 8
   const largeImage =
     [2, 3, 5, 7].includes(index);
 
@@ -169,7 +169,8 @@ export default function ProductGallery({
             max-w-[260px]
             md:max-w-sm
             aspect-[3/4]
-            overflow-visible
+            overflow-hidden
+            rounded-lg
             bg-ivory
             flex
             items-center
@@ -186,7 +187,7 @@ export default function ProductGallery({
               duration-300
               ${
                 largeImage
-                  ? "w-[110%] h-[110%]"
+                  ? "w-[104%] h-[104%]"
                   : "w-full h-full"
               }
               ${
