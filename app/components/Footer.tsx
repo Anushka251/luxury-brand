@@ -59,7 +59,7 @@ export default function Footer() {
           </Link>
         </div>
 
-        {/* RIGHT (SOCIALS) */}
+        {/* RIGHT */}
         <div className="space-y-4">
           <a
             href="https://instagram.com/_anushka__meena_"
@@ -89,9 +89,22 @@ export default function Footer() {
       </div>
 
       {/* SIGNATURE */}
-      <div className="text-center mt-16 text-[10px] tracking-[0.3em] text-gray-400">
+      <div
+        className="
+          text-center
+          mt-24
+          text-[32px]
+          md:text-[42px]
+          tracking-[0.38em]
+          text-gray-500
+          font-light
+        "
+        style={{
+          fontFamily: '"Avenir Next", "Avenir", sans-serif',
+        }}
+      >
         AVENOR
-        <span className="text-[8px] align-top ml-1">
+        <span className="text-[12px] align-top ml-1">
           ™
         </span>
       </div>
