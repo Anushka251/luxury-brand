@@ -1,1 +1,109 @@
+"use client";
 
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+
+const images = [
+  "/products/crimson-rose/1.jpg",
+  "/products/crimson-rose/2.jpg",
+  "/products/crimson-rose/3.jpg",
+  "/products/crimson-rose/4.jpg",
+  "/products/crimson-rose/5.jpg",
+  "/products/crimson-rose/6.jpg",
+  "/products/crimson-rose/7.jpg",
+  "/products/crimson-rose/8.jpg",
+];
+
+export default function GalleryPage() {
+  const searchParams = useSearchParams();
+
+  const initial =
+    Number(searchParams.get("image")) || 0;
+
+  const [index, setIndex] =
+    useState(initial);
+
+  const prev = () => {
+    setIndex((i) =>
+      i === 0 ? images.length - 1 : i - 1
+    );
+  };
+
+  const next = () => {
+    setIndex((i) =>
+      i === images.length - 1 ? 0 : i + 1
+    );
+  };
+
+  return (
+    <main className="fixed inset-0 bg-white z-50">
+      {/* LEFT */}
+      <button
+        onClick={prev}
+        className="
+          absolute
+          left-8
+          top-1/2
+          -translate-y-1/2
+          text-6xl
+          font-light
+        "
+      >
+        ‹
+      </button>
+
+      {/* IMAGE */}
+      <div className="h-screen flex items-center justify-center">
+        <img
+          src={images[index]}
+          className="
+            max-w-[90vw]
+            max-h-[90vh]
+            object-contain
+          "
+        />
+      </div>
+
+      {/* RIGHT */}
+      <button
+        onClick={next}
+        className="
+          absolute
+          right-8
+          top-1/2
+          -translate-y-1/2
+          text-6xl
+          font-light
+        "
+      >
+        ›
+      </button>
+
+      {/* COUNTER */}
+      <p
+        className="
+          absolute
+          bottom-8
+          left-1/2
+          -translate-x-1/2
+          tracking-[0.2em]
+        "
+      >
+        {index + 1} / {images.length}
+      </p>
+
+      {/* CLOSE */}
+      <a
+        href="/product/crimson-rose"
+        className="
+          absolute
+          top-8
+          right-8
+          text-4xl
+        "
+      >
+        ×
+      </a>
+    </main>
+  );
+}
