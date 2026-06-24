@@ -178,8 +178,13 @@ export default function ProductGallery({
               h-full
               object-contain
               object-center
-              transition-opacity
+              transition-all
               duration-300
+              ${
+                [2, 3, 5, 7].includes(index)
+                  ? "scale-110"
+                  : "scale-100"
+              }
               ${
                 isTransitioning
                   ? "opacity-80"
