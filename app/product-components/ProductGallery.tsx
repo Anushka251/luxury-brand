@@ -220,14 +220,8 @@ export default function ProductGallery({
         className="flex justify-center"
         style={{ marginTop: "1px" }}
       >
-        <div
+        <p
           className="
-            px-3
-            py-1
-            rounded-full
-            bg-ivory/70
-            backdrop-blur-sm
-            border border-gray-200/50
             text-gray-500
             text-sm
             tracking-[0.15em]
@@ -240,7 +234,7 @@ export default function ProductGallery({
           }}
         >
           {index + 1} / {images.length}
-        </div>
+        </p>
       </div>
     </div>
   );
