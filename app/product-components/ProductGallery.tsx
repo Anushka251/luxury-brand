@@ -216,7 +216,7 @@ export default function ProductGallery({
       </section>
 
       {/* COUNTER */}
-      <div className="flex justify-center mt-1">
+      <div className="flex justify-center mt-0.5">
         <div
           className="
             px-3
