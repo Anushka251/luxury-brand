@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
 } from "react";
+import Link from "next/link";
 
 type Props = {
   images: string[];
@@ -162,7 +163,8 @@ export default function ProductGallery({
         </button>
 
         {/* IMAGE */}
-        <div
+        <Link
+          href={`/gallery?image=${index}`}
           className="
             relative
             w-full
@@ -175,6 +177,7 @@ export default function ProductGallery({
             flex
             items-center
             justify-center
+            cursor-zoom-in
           "
         >
           <img
@@ -197,7 +200,7 @@ export default function ProductGallery({
               }
             `}
           />
-        </div>
+        </Link>
 
         {/* RIGHT ARROW */}
         <button
