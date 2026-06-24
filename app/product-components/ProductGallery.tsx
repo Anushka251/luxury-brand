@@ -124,15 +124,15 @@ export default function ProductGallery({
           justify-center
           items-center
           w-full
-          min-h-[48vh]
-          md:min-h-[65vh]
+          min-h-[60vh]
+          lg:min-h-[72vh]
           bg-ivory
         "
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* LEFT CONTROLS */}
+        {/* LEFT PANEL */}
         <div
           className="
             absolute
@@ -143,7 +143,7 @@ export default function ProductGallery({
             flex
             flex-col
             items-center
-            gap-4
+            gap-5
             z-20
           "
         >
@@ -152,20 +152,21 @@ export default function ProductGallery({
             disabled={isTransitioning}
             className="
               text-3xl
+              font-light
               text-gray-500
               hover:text-black
               transition
               disabled:opacity-30
             "
           >
-            ↑
+            &lt;
           </button>
 
           <p
             className="
               text-sm
               text-gray-500
-              tracking-[0.15em]
+              tracking-[0.2em]
               font-light
               select-none
             "
@@ -182,13 +183,14 @@ export default function ProductGallery({
             disabled={isTransitioning}
             className="
               text-3xl
+              font-light
               text-gray-500
               hover:text-black
               transition
               disabled:opacity-30
             "
           >
-            ↓
+            &gt;
           </button>
         </div>
 
@@ -197,12 +199,13 @@ export default function ProductGallery({
           className="
             relative
             w-full
-            max-w-[340px]
-            md:max-w-[500px]
-            lg:max-w-[550px]
+            max-w-[380px]
+            md:max-w-[550px]
+            lg:max-w-[680px]
             aspect-[3/4]
-            overflow-hidden
-            rounded-lg
+            flex
+            items-center
+            justify-center
             bg-ivory
           "
         >
@@ -210,10 +213,11 @@ export default function ProductGallery({
             src={images[index]}
             alt={name}
             className={`
-              w-full
-              h-full
+              max-w-full
+              max-h-full
               object-contain
               object-center
+              cursor-pointer
               transition-opacity
               duration-300
               ${
