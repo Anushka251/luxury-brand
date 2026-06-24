@@ -27,6 +27,9 @@ export default function ProductGallery({
 
   const minSwipeDistance = 50;
 
+  const largeImage =
+    [2, 3, 5, 7].includes(index);
+
   useEffect(() => {
     images.forEach((src) => {
       const img = new window.Image();
@@ -159,16 +162,21 @@ export default function ProductGallery({
 
         {/* IMAGE */}
         <div
-          className="
+          className={`
             relative
             w-full
-            max-w-[260px]
-            md:max-w-sm
-            aspect-[3/4]
             overflow-hidden
             rounded-lg
             bg-ivory
-          "
+            transition-all
+            duration-300
+            ${
+              largeImage
+                ? "max-w-[310px] md:max-w-[450px]"
+                : "max-w-[260px] md:max-w-sm"
+            }
+            aspect-[3/4]
+          `}
         >
           <img
             src={images[index]}
@@ -178,13 +186,8 @@ export default function ProductGallery({
               h-full
               object-contain
               object-center
-              transition-all
+              transition-opacity
               duration-300
-              ${
-                [2, 3, 5, 7].includes(index)
-                  ? "scale-110"
-                  : "scale-100"
-              }
               ${
                 isTransitioning
                   ? "opacity-80"
