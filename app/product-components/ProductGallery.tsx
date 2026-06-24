@@ -177,7 +177,7 @@ export default function ProductGallery({
             flex
             items-center
             justify-center
-            cursor-zoom-in
+            cursor-pointer
           "
         >
           <img
