@@ -28,7 +28,7 @@ export default function ProductGallery({
 
   const minSwipeDistance = 50;
 
-  // Images 3, 4, 6, and 8
+  // Images 3,4,6,8
   const largeImage =
     [2, 3, 5, 7].includes(index);
 
@@ -164,7 +164,7 @@ export default function ProductGallery({
 
         {/* IMAGE */}
         <Link
-          href={`/gallery?image=${index}`}
+          href={`/gallery/${index}`}
           className="
             relative
             w-full
