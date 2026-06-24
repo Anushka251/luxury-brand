@@ -15,7 +15,6 @@ export default function ProductClient({
   const [selectedSize, setSelectedSize] =
     useState<string | null>(null);
 
-  // Scroll to top when product page opens
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -41,7 +40,7 @@ export default function ProductClient({
 
   return (
     <div className="max-w-7xl mx-auto -mt-2 px-4 lg:px-2">
-      <div className="flex flex-col lg:flex-row lg:items-start lg:gap-10">
+      <div className="flex flex-col lg:flex-row lg:items-start lg:gap-6">
 
         {/* LEFT: GALLERY */}
         <div className="lg:w-[62%]">
@@ -52,9 +51,9 @@ export default function ProductClient({
         </div>
 
         {/* RIGHT: DETAILS */}
-        <div className="mt-8 lg:mt-6 lg:w-[38%]">
+        <div className="mt-8 lg:mt-0 lg:w-[36%]">
           <h1
-            className="text-5xl font-light tracking-wide"
+            className="text-5xl lg:text-6xl font-light tracking-wide"
             style={{
               fontFamily:
                 '"Cormorant Garamond", serif',
@@ -73,6 +72,10 @@ export default function ProductClient({
 
           <p className="mt-6 text-gray-600 leading-8">
             {product.description}
+          </p>
+
+          <p className="mt-4 text-sm text-gray-500 leading-7">
+            Crafted in luminous dual-tone satin with embroidered detailing.
           </p>
 
           {/* SIZE SELECTOR */}
@@ -103,7 +106,7 @@ export default function ProductClient({
                     transition
                     ${
                       selectedSize === size
-                        ? "border-black text-black"
+                        ? "bg-black text-white border-black"
                         : "border-gray-300 text-gray-500 hover:border-black"
                     }
                   `}
@@ -128,7 +131,7 @@ export default function ProductClient({
               tracking-[0.2em]
               ${
                 selectedSize
-                  ? "border-black hover:bg-black hover:text-white"
+                  ? "border-[#AF9685] text-[#AF9685] hover:bg-[#AF9685] hover:text-white"
                   : "border-gray-300 text-gray-400 cursor-not-allowed"
               }
             `}
