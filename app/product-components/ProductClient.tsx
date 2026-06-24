@@ -40,11 +40,11 @@ export default function ProductClient({
   }, [addToCart, product, selectedSize]);
 
   return (
-    <div className="max-w-7xl mx-auto -mt-2 px-6">
-      <div className="flex flex-col lg:flex-row lg:items-start lg:gap-20">
-        
+    <div className="max-w-7xl mx-auto -mt-2 px-4 lg:px-2">
+      <div className="flex flex-col lg:flex-row lg:items-start lg:gap-10">
+
         {/* LEFT: GALLERY */}
-        <div className="lg:w-[55%]">
+        <div className="lg:w-[62%]">
           <ProductGallery
             images={product.images}
             name={product.name}
@@ -52,9 +52,9 @@ export default function ProductClient({
         </div>
 
         {/* RIGHT: DETAILS */}
-        <div className="mt-8 lg:mt-6 lg:w-[45%]">
+        <div className="mt-8 lg:mt-6 lg:w-[38%]">
           <h1
-            className="text-4xl font-light tracking-wide"
+            className="text-5xl font-light tracking-wide"
             style={{
               fontFamily:
                 '"Cormorant Garamond", serif',
@@ -63,21 +63,21 @@ export default function ProductClient({
             {product.name}
           </h1>
 
-          <p className="mt-4 text-xl">
+          <p className="mt-4 text-2xl">
             ₹{product.price.toLocaleString("en-IN")}
           </p>
 
-          <p className="mt-2 text-xs tracking-widest text-gray-500">
+          <p className="mt-2 text-xs tracking-[0.25em] text-gray-500">
             LIMITED TO {product.totalPieces} PIECES
           </p>
 
-          <p className="mt-6 text-muted">
+          <p className="mt-6 text-gray-600 leading-8">
             {product.description}
           </p>
 
           {/* SIZE SELECTOR */}
-          <div className="mt-8">
-            <div className="flex justify-between items-center mb-3">
+          <div className="mt-10">
+            <div className="flex justify-between items-center mb-4">
               <p className="text-xs tracking-widest text-gray-500">
                 SIZE
               </p>
@@ -125,7 +125,7 @@ export default function ProductClient({
               border
               transition
               font-medium
-              tracking-widest
+              tracking-[0.2em]
               ${
                 selectedSize
                   ? "border-black hover:bg-black hover:text-white"
@@ -138,11 +138,11 @@ export default function ProductClient({
 
           {/* DETAILS */}
           <div className="mt-12 border-t pt-8">
-            <p className="text-xs tracking-widest text-gray-500 mb-4">
+            <p className="text-xs tracking-[0.25em] text-gray-500 mb-4">
               DESIGN
             </p>
 
-            <p className="text-sm text-gray-600 leading-7 whitespace-pre-line">
+            <p className="text-sm text-gray-600 leading-8 whitespace-pre-line">
               {product.detailDescription}
             </p>
           </div>
