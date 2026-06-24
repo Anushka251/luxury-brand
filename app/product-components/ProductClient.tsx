@@ -40,7 +40,8 @@ export default function ProductClient({
   }, [addToCart, product, selectedSize]);
 
   return (
-    <div className="max-w-4xl mx-auto px-6">
+    <div className="max-w-4xl mx-auto -mt-1 px-6">
+      
       <ProductGallery
         images={product.images}
         name={product.name}
