@@ -64,11 +64,11 @@ export default function ProductClient({
 
           <h1
             className="
-              text-4xl
-              md:text-5xl
+              text-5xl
+              md:text-6xl
               font-light
               leading-none
-              tracking-[0.05em]
+              tracking-[0.04em]
             "
             style={{
               fontFamily:
@@ -79,8 +79,7 @@ export default function ProductClient({
           </h1>
 
           <p className="mt-8 text-3xl font-light">
-            ₹
-            {product.price.toLocaleString("en-IN")}
+            ₹{product.price.toLocaleString("en-IN")}
           </p>
 
           <p className="mt-3 text-xs tracking-[0.3em] text-gray-500">
@@ -94,7 +93,7 @@ export default function ProductClient({
               DESCRIPTION
             </p>
 
-            <p className="text-gray-600 leading-8">
+            <p className="text-gray-600 leading-9">
               {product.description}
             </p>
           </div>
@@ -102,11 +101,13 @@ export default function ProductClient({
           {/* SIZE */}
 
           <div className="mt-12">
+
             <p className="text-xs tracking-[0.3em] text-gray-400 mb-6">
               SELECT SIZE
             </p>
 
             <div className="flex gap-3 flex-wrap">
+
               {sizes.map((size) => (
                 <button
                   key={size}
@@ -117,19 +118,21 @@ export default function ProductClient({
                     w-14
                     h-14
                     border
-                    transition
+                    transition-all
+                    duration-300
                     text-sm
                     tracking-wider
                     ${
                       selectedSize === size
                         ? "bg-black text-white border-black"
-                        : "border-gray-300 hover:border-black"
+                        : "border-gray-300 hover:border-black hover:bg-gray-50"
                     }
                   `}
                 >
                   {size}
                 </button>
               ))}
+
             </div>
 
             {!selectedSize && (
@@ -137,6 +140,7 @@ export default function ProductClient({
                 Select your size.
               </p>
             )}
+
           </div>
 
           {/* ADD TO BAG */}
@@ -150,7 +154,8 @@ export default function ProductClient({
               py-5
               tracking-[0.25em]
               border
-              transition
+              transition-all
+              duration-300
               ${
                 selectedSize
                   ? "border-black hover:bg-black hover:text-white"
@@ -170,7 +175,7 @@ export default function ProductClient({
 
       {/* DESIGN SECTION */}
 
-      <div className="mt-28 border-t pt-20 pb-24">
+      <div className="mt-20 border-t pt-16 pb-24">
 
         <p className="text-xs tracking-[0.35em] text-gray-400 text-center mb-6">
           DESIGN
@@ -178,11 +183,11 @@ export default function ProductClient({
 
         <h2
           className="
-            text-4xl
-            md:text-6xl
+            text-5xl
+            md:text-7xl
             font-light
             text-center
-            mb-14
+            mb-12
           "
           style={{
             fontFamily:
@@ -192,7 +197,8 @@ export default function ProductClient({
           Crafted with intention.
         </h2>
 
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-2xl mx-auto">
+
           <p
             className="
               text-lg
@@ -204,6 +210,7 @@ export default function ProductClient({
           >
             {product.detailDescription}
           </p>
+
         </div>
 
       </div>
