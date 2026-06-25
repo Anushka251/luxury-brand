@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 
 export default function AddressPage() {
-  const [addresses, setAddresses] = useState<any[]>([]);
+  const [addresses, setAddresses] =
+    useState<any[]>([]);
 
   const [form, setForm] = useState({
     name: "",
@@ -15,20 +16,34 @@ export default function AddressPage() {
     pincode: "",
   });
 
-  // LOAD
   useEffect(() => {
     const load = () => {
-      const saved = localStorage.getItem("addresses");
-      if (saved) setAddresses(JSON.parse(saved));
+      const saved =
+        localStorage.getItem(
+          "addresses"
+        );
+
+      if (saved) {
+        setAddresses(
+          JSON.parse(saved)
+        );
+      }
     };
 
     load();
-    window.addEventListener("focus", load);
 
-    return () => window.removeEventListener("focus", load);
+    window.addEventListener(
+      "focus",
+      load
+    );
+
+    return () =>
+      window.removeEventListener(
+        "focus",
+        load
+      );
   }, []);
 
-  // VALIDATION
   const isValid =
     form.name &&
     form.phone.length === 10 &&
@@ -37,10 +52,11 @@ export default function AddressPage() {
     form.state &&
     form.pincode.length === 6;
 
-  // ADD ADDRESS
   const addAddress = () => {
     if (!isValid) {
-      alert("Please fill all required fields correctly");
+      alert(
+        "Please fill all fields correctly."
+      );
       return;
     }
 
@@ -49,10 +65,17 @@ export default function AddressPage() {
       ...form,
     };
 
-    const updated = [...addresses, newAddress];
+    const updated = [
+      ...addresses,
+      newAddress,
+    ];
 
     setAddresses(updated);
-    localStorage.setItem("addresses", JSON.stringify(updated));
+
+    localStorage.setItem(
+      "addresses",
+      JSON.stringify(updated)
+    );
 
     setForm({
       name: "",
@@ -65,131 +88,305 @@ export default function AddressPage() {
     });
   };
 
-  const deleteAddress = (id: string) => {
-    const updated = addresses.filter((a) => a.id !== id);
+  const deleteAddress = (
+    id: string
+  ) => {
+    const updated =
+      addresses.filter(
+        (a) => a.id !== id
+      );
+
     setAddresses(updated);
-    localStorage.setItem("addresses", JSON.stringify(updated));
+
+    localStorage.setItem(
+      "addresses",
+      JSON.stringify(updated)
+    );
   };
 
   return (
-    <main className="px-12 py-32 max-w-4xl mx-auto">
-      <h1 className="text-3xl mb-10 tracking-widest">ADDRESS</h1>
+    <main className="max-w-5xl mx-auto px-8 md:px-12 py-24">
+
+      <div className="mb-16">
+        <p className="text-xs tracking-[0.35em] text-gray-400 mb-4">
+          AVENOR CLIENT
+        </p>
+
+        <h1 className="text-5xl font-light tracking-[0.12em]">
+          ADDRESS BOOK
+        </h1>
+
+        <p className="text-gray-500 mt-4">
+          Manage your delivery locations.
+        </p>
+      </div>
 
       {/* FORM */}
-      <div className="space-y-4 mb-12">
-        
+
+      <div className="space-y-8 mb-20">
+
         <input
-          className="w-full border p-3"
           placeholder="Full Name"
           value={form.name}
           onChange={(e) =>
-            setForm({ ...form, name: e.target.value })
+            setForm({
+              ...form,
+              name: e.target.value,
+            })
           }
+          className="
+            w-full
+            border-b
+            border-gray-300
+            py-4
+            text-lg
+            bg-transparent
+            focus:outline-none
+            focus:border-black
+          "
         />
 
         <input
-          className="w-full border p-3"
           placeholder="Phone Number"
           value={form.phone}
           onChange={(e) =>
             setForm({
               ...form,
-              phone: e.target.value.replace(/\D/g, ""),
+              phone:
+                e.target.value.replace(
+                  /\D/g,
+                  ""
+                ),
             })
           }
+          className="
+            w-full
+            border-b
+            border-gray-300
+            py-4
+            text-lg
+            bg-transparent
+            focus:outline-none
+            focus:border-black
+          "
         />
 
         <textarea
-          className="w-full border p-3"
-          placeholder="Address Line"
+          placeholder="Address"
+          rows={3}
           value={form.address}
           onChange={(e) =>
-            setForm({ ...form, address: e.target.value })
+            setForm({
+              ...form,
+              address:
+                e.target.value,
+            })
           }
+          className="
+            w-full
+            border-b
+            border-gray-300
+            py-4
+            text-lg
+            bg-transparent
+            resize-none
+            focus:outline-none
+            focus:border-black
+          "
         />
 
         <input
-          className="w-full border p-3"
           placeholder="Landmark (Optional)"
           value={form.landmark}
           onChange={(e) =>
-            setForm({ ...form, landmark: e.target.value })
+            setForm({
+              ...form,
+              landmark:
+                e.target.value,
+            })
           }
+          className="
+            w-full
+            border-b
+            border-gray-300
+            py-4
+            text-lg
+            bg-transparent
+            focus:outline-none
+            focus:border-black
+          "
         />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-2 gap-8">
+
           <input
-            className="border p-3"
             placeholder="City"
             value={form.city}
             onChange={(e) =>
-              setForm({ ...form, city: e.target.value })
+              setForm({
+                ...form,
+                city:
+                  e.target.value,
+              })
             }
+            className="
+              border-b
+              border-gray-300
+              py-4
+              text-lg
+              bg-transparent
+              focus:outline-none
+              focus:border-black
+            "
           />
 
           <input
-            className="border p-3"
             placeholder="State"
             value={form.state}
             onChange={(e) =>
-              setForm({ ...form, state: e.target.value })
+              setForm({
+                ...form,
+                state:
+                  e.target.value,
+              })
             }
+            className="
+              border-b
+              border-gray-300
+              py-4
+              text-lg
+              bg-transparent
+              focus:outline-none
+              focus:border-black
+            "
           />
+
         </div>
 
         <input
-          className="w-full border p-3"
           placeholder="Postal Code"
           value={form.pincode}
           onChange={(e) =>
             setForm({
               ...form,
-              pincode: e.target.value.replace(/\D/g, ""),
+              pincode:
+                e.target.value.replace(
+                  /\D/g,
+                  ""
+                ),
             })
           }
+          className="
+            w-full
+            border-b
+            border-gray-300
+            py-4
+            text-lg
+            bg-transparent
+            focus:outline-none
+            focus:border-black
+          "
         />
 
         <button
           onClick={addAddress}
-          className="bg-black text-white px-6 py-3 tracking-widest disabled:opacity-50"
           disabled={!isValid}
+          className="
+            mt-6
+            px-10
+            py-4
+            border
+            border-black
+            tracking-[0.2em]
+            hover:bg-black
+            hover:text-white
+            transition
+            disabled:opacity-40
+          "
         >
           SAVE ADDRESS
         </button>
+
       </div>
 
-      {/* LIST */}
-      <div className="space-y-6">
+      {/* SAVED ADDRESSES */}
+
+      <div>
+
+        <p className="text-xs tracking-[0.3em] text-gray-400 mb-10">
+          SAVED ADDRESSES
+        </p>
+
         {addresses.length === 0 && (
-          <p className="text-sm text-gray-500">
-            No saved addresses
+          <p className="text-gray-500">
+            No saved addresses.
           </p>
         )}
 
-        {addresses.map((addr) => (
-          <div
-            key={addr.id}
-            className="border p-4 flex justify-between"
-          >
-            <div className="text-sm">
-              <p className="font-medium">{addr.name}</p>
-              <p>{addr.phone}</p>
-              <p>{addr.address}</p>
-              {addr.landmark && <p>{addr.landmark}</p>}
-              <p>
-                {addr.city}, {addr.state} - {addr.pincode}
-              </p>
-            </div>
+        <div className="space-y-10">
 
-            <button
-              onClick={() => deleteAddress(addr.id)}
-              className="text-xs underline"
+          {addresses.map((addr) => (
+            <div
+              key={addr.id}
+              className="
+                border-b
+                pb-8
+                flex
+                justify-between
+                items-start
+              "
             >
-              REMOVE
-            </button>
-          </div>
-        ))}
+              <div className="space-y-2">
+
+                <p className="text-lg">
+                  {addr.name}
+                </p>
+
+                <p className="text-gray-500">
+                  {addr.phone}
+                </p>
+
+                <p>
+                  {addr.address}
+                </p>
+
+                {addr.landmark && (
+                  <p>
+                    {addr.landmark}
+                  </p>
+                )}
+
+                <p>
+                  {addr.city},{" "}
+                  {addr.state} —{" "}
+                  {addr.pincode}
+                </p>
+
+              </div>
+
+              <button
+                onClick={() =>
+                  deleteAddress(
+                    addr.id
+                  )
+                }
+                className="
+                  text-xs
+                  tracking-[0.2em]
+                  text-gray-500
+                  hover:text-black
+                "
+              >
+                REMOVE
+              </button>
+
+            </div>
+          ))}
+
+        </div>
+
       </div>
+
     </main>
   );
 }
