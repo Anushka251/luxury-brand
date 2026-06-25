@@ -11,6 +11,7 @@ export default function AccountPage() {
   const { data: session, status } =
     useSession();
 
+  // Loading state
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -21,6 +22,7 @@ export default function AccountPage() {
     );
   }
 
+  // Not signed in
   if (!session) {
     return (
       <main className="min-h-screen flex items-center justify-center px-6">
@@ -55,21 +57,37 @@ export default function AccountPage() {
     );
   }
 
+  const hour = new Date().getHours();
+
+  const greeting =
+    hour < 12
+      ? "GOOD MORNING"
+      : hour < 18
+      ? "GOOD AFTERNOON"
+      : "GOOD EVENING";
+
   return (
     <main className="max-w-5xl mx-auto px-8 md:px-12 py-24">
 
-      {/* HEADER */}
+      {/* Greeting */}
+      <div className="mb-6">
+        <p className="text-xs tracking-[0.35em] text-gray-400">
+          {greeting}
+        </p>
+      </div>
+
+      {/* Header */}
       <div className="mb-20">
         <p className="text-sm tracking-[0.4em] text-gray-400 mb-4">
           AVENOR CLIENT
         </p>
 
-        <h1 className="text-5xl font-light tracking-[0.15em]">
+        <h1 className="text-5xl md:text-6xl font-light tracking-[0.12em]">
           MY ACCOUNT
         </h1>
       </div>
 
-      {/* PROFILE */}
+      {/* User */}
       <div className="mb-20">
         <h2 className="text-3xl font-light mb-3">
           {session.user?.name}
@@ -80,8 +98,8 @@ export default function AccountPage() {
         </p>
       </div>
 
-      {/* ACCOUNT STATS */}
-      <div className="grid grid-cols-3 gap-6 mb-20 border-y py-10">
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-6 border-y py-10 mb-20">
 
         <div>
           <p className="text-xs tracking-[0.3em] text-gray-400 mb-2">
@@ -95,7 +113,7 @@ export default function AccountPage() {
 
         <div>
           <p className="text-xs tracking-[0.3em] text-gray-400 mb-2">
-            ADDRESSES
+            ADDRESS
           </p>
 
           <p className="text-3xl font-light">
@@ -112,9 +130,35 @@ export default function AccountPage() {
             2026
           </p>
         </div>
+
       </div>
 
-      {/* QUICK ACCESS */}
+      {/* Latest Order */}
+      <Link
+        href="/account/orders"
+        className="
+          block
+          border
+          p-8
+          mb-20
+          hover:shadow-sm
+          transition
+        "
+      >
+        <p className="text-xs tracking-[0.3em] text-gray-400 mb-5">
+          LATEST ORDER
+        </p>
+
+        <h3 className="text-2xl font-light mb-2">
+          Crimson Rose
+        </h3>
+
+        <p className="text-gray-500">
+          View your latest purchase
+        </p>
+      </Link>
+
+      {/* Navigation */}
       <div className="space-y-8 text-sm tracking-[0.25em] mb-20">
 
         <Link
@@ -173,15 +217,16 @@ export default function AccountPage() {
         >
           LOGOUT
         </button>
+
       </div>
 
-      {/* BRAND MESSAGE */}
-      <div className="pt-16 text-center">
-        <p className="text-gray-400 tracking-[0.3em] text-sm mb-4">
-          AVENOR MEMBER
+      {/* Brand Message */}
+      <div className="pt-12 text-center">
+        <p className="text-gray-400 tracking-[0.35em] text-sm mb-5">
+          PRIVATE CLIENT
         </p>
 
-        <p className="text-gray-500 max-w-md mx-auto leading-8">
+        <p className="text-gray-500 leading-8 max-w-md mx-auto">
           Access future collections,
           limited releases, and
           private client experiences.
