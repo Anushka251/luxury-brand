@@ -2,38 +2,24 @@
 
 import Link from "next/link";
 import { useCart } from "@/app/context/CartContext";
-import {
-  useSession,
-  signOut,
-} from "next-auth/react";
-import {
-  useState,
-  useRef,
-  useEffect,
-} from "react";
-import {
-  motion,
-  AnimatePresence,
-} from "framer-motion";
+import { useSession, signOut } from "next-auth/react";
+import { useState, useRef, useEffect } from "react";
+import { motion } from "framer-motion";
 
 export default function Navbar(): React.JSX.Element {
   const { cart } = useCart();
+  const { data: session } = useSession();
 
-  const { data: session } =
-    useSession();
+  const [open, setOpen] = useState(false);
 
-  const [open, setOpen] =
-    useState(false);
-
-  const menuRef =
-    useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const count = cart.reduce(
-    (sum, item) =>
-      sum + item.quantity,
+    (sum, item) => sum + item.quantity,
     0
   );
 
+  // Close menu when clicking outside
   useEffect(() => {
     function handleClickOutside(
       event: PointerEvent
@@ -62,104 +48,109 @@ export default function Navbar(): React.JSX.Element {
   }, []);
 
   return (
-    <motion.nav
-      initial={{
-        opacity: 0,
-        y: -20,
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-      }}
-      transition={{
-        duration: 0.8,
-      }}
-      className="
-        fixed
-        top-0
-        left-0
-        w-full
-        px-6
-        md:px-12
-        py-4
-        flex
-        justify-between
-        items-center
-        bg-ivory
-        border-b
-        border-gray-100
-        z-50
-      "
-    >
-      {/* LOGO */}
-      <Link
-        href="/home"
+    <>
+      {/* Invisible Overlay */}
+      {open && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
+      <motion.nav
+        initial={{
+          opacity: 0,
+          y: -20,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+        transition={{
+          duration: 1,
+        }}
         className="
-          hover:opacity-70
-          transition
+          fixed
+          top-0
+          left-0
+          w-full
+          px-6
+          md:px-12
+          py-3
+          flex
+          justify-between
+          items-center
+          bg-ivory
+          z-50
         "
       >
-        <span
-          className="
-            text-lg
-            md:text-xl
-            tracking-[0.38em]
-            font-light
-            text-black
-          "
+        {/* LOGO */}
+        <Link
+          href="/home"
+          className="hover:opacity-80 transition"
         >
-          AVENOR
-        </span>
-      </Link>
+          <span
+            className="
+              text-charcoal
+              text-lg
+              tracking-[0.32em]
+              font-light
+            "
+          >
+            AVENOR
+          </span>
+        </Link>
 
-      {/* MENU */}
-      <div
-        ref={menuRef}
-        className="relative"
-      >
-        <button
-          onClick={() =>
-            setOpen(!open)
-          }
-          aria-label="Menu"
-          className="
-            relative
-            w-10
-            h-10
-            flex
-            flex-col
-            justify-center
-            items-center
-            gap-[5px]
-          "
+        {/* MENU */}
+        <div
+          ref={menuRef}
+          className="relative flex items-center"
         >
-          <span className="w-5 h-[1px] bg-black" />
-          <span className="w-5 h-[1px] bg-black" />
-          <span className="w-5 h-[1px] bg-black" />
+          <button
+            type="button"
+            aria-label="Toggle menu"
+            onClick={() =>
+              setOpen((prev) => !prev)
+            }
+            className="
+              relative
+              flex
+              flex-col
+              justify-center
+              items-center
+              w-10
+              h-10
+              touch-manipulation
+              select-none
+            "
+          >
+            <div className="w-5 h-[1.5px] bg-black mb-1"></div>
+            <div className="w-5 h-[1.5px] bg-black mb-1"></div>
+            <div className="w-5 h-[1.5px] bg-black"></div>
 
-          {count > 0 && (
-            <span
-              className="
-                absolute
-                -top-1
-                -right-1
-                min-w-[18px]
-                h-[18px]
-                rounded-full
-                bg-black
-                text-white
-                text-[10px]
-                flex
-                items-center
-                justify-center
-              "
-            >
-              {count}
-            </span>
-          )}
-        </button>
+            {count > 0 && (
+              <span
+                className="
+                  absolute
+                  -top-1
+                  -right-1
+                  min-w-[18px]
+                  h-[18px]
+                  px-1
+                  rounded-full
+                  bg-black
+                  text-white
+                  text-[10px]
+                  flex
+                  items-center
+                  justify-center
+                "
+              >
+                {count}
+              </span>
+            )}
+          </button>
 
-        <AnimatePresence>
           {open && (
             <motion.div
               initial={{
@@ -170,24 +161,25 @@ export default function Navbar(): React.JSX.Element {
                 opacity: 1,
                 y: 0,
               }}
-              exit={{
-                opacity: 0,
-                y: -10,
-              }}
               transition={{
                 duration: 0.2,
               }}
               className="
                 absolute
-                top-14
+                top-12
                 right-0
-                min-w-[220px]
+                z-50
                 bg-white
                 border
                 border-gray-200
-                shadow-lg
-                py-3
-                z-50
+                shadow-xl
+                p-4
+                flex
+                flex-col
+                gap-1
+                min-w-[180px]
+                text-xs
+                tracking-widest
               "
             >
               <Link
@@ -196,12 +188,11 @@ export default function Navbar(): React.JSX.Element {
                   setOpen(false)
                 }
                 className="
-                  block
-                  px-8
-                  py-4
-                  text-xs
-                  tracking-[0.25em]
-                  hover:opacity-60
+                  w-full
+                  px-3
+                  py-3
+                  rounded
+                  hover:bg-gray-100
                   transition
                 "
               >
@@ -214,12 +205,11 @@ export default function Navbar(): React.JSX.Element {
                   setOpen(false)
                 }
                 className="
-                  block
-                  px-8
-                  py-4
-                  text-xs
-                  tracking-[0.25em]
-                  hover:opacity-60
+                  w-full
+                  px-3
+                  py-3
+                  rounded
+                  hover:bg-gray-100
                   transition
                 "
               >
@@ -234,12 +224,11 @@ export default function Navbar(): React.JSX.Element {
                       setOpen(false)
                     }
                     className="
-                      block
-                      px-8
-                      py-4
-                      text-xs
-                      tracking-[0.25em]
-                      hover:opacity-60
+                      w-full
+                      px-3
+                      py-3
+                      rounded
+                      hover:bg-gray-100
                       transition
                     "
                   >
@@ -247,6 +236,7 @@ export default function Navbar(): React.JSX.Element {
                   </Link>
 
                   <button
+                    type="button"
                     onClick={() => {
                       setOpen(false);
 
@@ -256,14 +246,12 @@ export default function Navbar(): React.JSX.Element {
                       });
                     }}
                     className="
-                      block
                       w-full
                       text-left
-                      px-8
-                      py-4
-                      text-xs
-                      tracking-[0.25em]
-                      hover:opacity-60
+                      px-3
+                      py-3
+                      rounded
+                      hover:bg-gray-100
                       transition
                     "
                   >
@@ -277,12 +265,11 @@ export default function Navbar(): React.JSX.Element {
                     setOpen(false)
                   }
                   className="
-                    block
-                    px-8
-                    py-4
-                    text-xs
-                    tracking-[0.25em]
-                    hover:opacity-60
+                    w-full
+                    px-3
+                    py-3
+                    rounded
+                    hover:bg-gray-100
                     transition
                   "
                 >
@@ -291,8 +278,8 @@ export default function Navbar(): React.JSX.Element {
               )}
             </motion.div>
           )}
-        </AnimatePresence>
-      </div>
-    </motion.nav>
+        </div>
+      </motion.nav>
+    </>
   );
 }
