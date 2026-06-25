@@ -57,7 +57,6 @@ export default function CheckoutPage() {
     }
 
     try {
-      // Save checkout data for payment-success page
       localStorage.setItem(
         "pendingOrder",
         JSON.stringify({
@@ -126,168 +125,275 @@ export default function CheckoutPage() {
   };
 
   return (
-    <main className="max-w-6xl mx-auto px-8 py-24 grid md:grid-cols-2 gap-20">
-      {/* ADDRESS SECTION */}
-      <section>
-        <h2 className="text-xl mb-6 tracking-widest">
-          SELECT ADDRESS
-        </h2>
+    <main className="max-w-7xl mx-auto px-8 md:px-12 py-24">
 
-        <div className="space-y-4">
-          {addresses.map((addr) => (
-            <div
-              key={addr.id}
-              onClick={() =>
-                setSelectedAddress(addr)
-              }
-              className={`border p-4 cursor-pointer ${
-                selectedAddress?.id ===
-                addr.id
-                  ? "border-black"
-                  : "border-gray-300"
-              }`}
-            >
-              <p>{addr.name}</p>
+      {/* HEADER */}
+      <div className="mb-20">
+        <p className="text-xs tracking-[0.35em] text-gray-400 mb-4">
+          AVENOR CLIENT
+        </p>
 
-              <p className="text-sm">
-                {addr.address}
-              </p>
+        <h1 className="text-5xl font-light tracking-[0.12em]">
+          CHECKOUT
+        </h1>
 
-              <p className="text-xs text-gray-500">
-                {addr.city},{" "}
-                {addr.state} -{" "}
-                {addr.pincode}
-              </p>
-            </div>
-          ))}
-        </div>
+        <p className="text-gray-500 mt-4">
+          Review your order and complete your purchase.
+        </p>
+      </div>
 
-        <button
-          onClick={handleAddNew}
-          className="mt-6 text-sm underline"
-        >
-          + ADD NEW ADDRESS
-        </button>
-      </section>
+      <div className="grid lg:grid-cols-[1fr_430px] gap-24">
 
-      {/* ORDER SUMMARY */}
-      <section>
-        <h2 className="text-2xl mb-6">
-          Order Summary
-        </h2>
+        {/* ADDRESS */}
+        <section>
 
-        {cart.map((item) => (
-          <div
-            key={`${item.id}-${item.size}`}
-            className="flex gap-4 border-b py-4"
-          >
-            {/* PRODUCT IMAGE */}
-            <div className="relative w-20 h-28 flex-shrink-0">
-              <Image
-                src={item.image}
-                alt={item.name}
-                fill
-                className="object-cover"
-              />
-            </div>
+          <p className="text-xs tracking-[0.25em] text-gray-400 mb-8">
+            DELIVERY ADDRESS
+          </p>
 
-            {/* PRODUCT DETAILS */}
-            <div className="flex-1">
-              <p className="text-sm font-medium">
-                {item.name}
-              </p>
+          <div className="space-y-6">
 
-              {item.size && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Size: {item.size}
+            {addresses.map((addr) => (
+              <div
+                key={addr.id}
+                onClick={() =>
+                  setSelectedAddress(addr)
+                }
+                className={`
+                  border-b
+                  pb-6
+                  cursor-pointer
+                  transition
+                  ${
+                    selectedAddress?.id ===
+                    addr.id
+                      ? "border-black"
+                      : "border-gray-300"
+                  }
+                `}
+              >
+                <p className="text-lg">
+                  {addr.name}
                 </p>
-              )}
 
-              <p className="text-sm mt-1">
-                ₹
-                {item.price.toLocaleString()}
-              </p>
+                <p className="text-gray-500 mt-2">
+                  {addr.phone}
+                </p>
 
-              {/* QUANTITY */}
-              <div className="flex items-center gap-3 mt-3">
-                <button
-                  onClick={() =>
-                    updateQuantity(
-                      item.id,
-                      item.size,
-                      item.quantity - 1
-                    )
-                  }
-                  className="border px-2 py-1"
-                >
-                  −
-                </button>
+                <p className="mt-4">
+                  {addr.address}
+                </p>
 
-                <span>
-                  {item.quantity}
-                </span>
+                {addr.landmark && (
+                  <p>
+                    {addr.landmark}
+                  </p>
+                )}
 
-                <button
-                  onClick={() =>
-                    updateQuantity(
-                      item.id,
-                      item.size,
-                      item.quantity + 1
-                    )
-                  }
-                  className="border px-2 py-1"
-                >
-                  +
-                </button>
+                <p className="mt-2 text-gray-500">
+                  {addr.city}, {addr.state}
+                </p>
+
+                <p className="text-gray-500">
+                  {addr.pincode}
+                </p>
+              </div>
+            ))}
+
+          </div>
+
+          <button
+            onClick={handleAddNew}
+            className="
+              mt-10
+              text-xs
+              tracking-[0.25em]
+              text-gray-500
+              hover:text-black
+            "
+          >
+            + ADD NEW ADDRESS
+          </button>
+
+        </section>
+
+        {/* ORDER SUMMARY */}
+        <section>
+
+          <p className="text-xs tracking-[0.25em] text-gray-400 mb-8">
+            ORDER SUMMARY
+          </p>
+
+          <div className="space-y-12">
+
+            {cart.map((item) => (
+              <div
+                key={`${item.id}-${item.size}`}
+                className="
+                  flex
+                  gap-6
+                  border-b
+                  pb-10
+                "
+              >
+
+                <div className="relative w-[120px] h-[160px] flex-shrink-0">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+
+                <div className="flex-1">
+
+                  <p className="text-2xl font-light">
+                    {item.name}
+                  </p>
+
+                  {item.size && (
+                    <p className="text-gray-500 mt-3">
+                      Size {item.size}
+                    </p>
+                  )}
+
+                  <p className="text-xl font-light mt-6">
+                    ₹
+                    {item.price.toLocaleString(
+                      "en-IN"
+                    )}
+                  </p>
+
+                  <div className="flex items-center gap-4 mt-8">
+
+                    <button
+                      onClick={() =>
+                        updateQuantity(
+                          item.id,
+                          item.size,
+                          item.quantity - 1
+                        )
+                      }
+                      className="
+                        w-9
+                        h-9
+                        border
+                        flex
+                        items-center
+                        justify-center
+                      "
+                    >
+                      −
+                    </button>
+
+                    <span>
+                      {item.quantity}
+                    </span>
+
+                    <button
+                      onClick={() =>
+                        updateQuantity(
+                          item.id,
+                          item.size,
+                          item.quantity + 1
+                        )
+                      }
+                      className="
+                        w-9
+                        h-9
+                        border
+                        flex
+                        items-center
+                        justify-center
+                      "
+                    >
+                      +
+                    </button>
+
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      removeFromCart(
+                        item.id,
+                        item.size
+                      )
+                    }
+                    className="
+                      mt-6
+                      text-xs
+                      tracking-[0.2em]
+                      text-gray-500
+                      hover:text-black
+                    "
+                  >
+                    REMOVE
+                  </button>
+
+                </div>
+
+                <div>
+                  <p className="text-xl font-light">
+                    ₹
+                    {(
+                      item.price *
+                      item.quantity
+                    ).toLocaleString(
+                      "en-IN"
+                    )}
+                  </p>
+                </div>
+
+              </div>
+            ))}
+
+          </div>
+
+          <div className="mt-16 pt-10 border-t">
+
+            <div className="flex justify-between items-end mb-10">
+
+              <div>
+                <p className="text-xs tracking-[0.25em] text-gray-400 mb-3">
+                  ORDER TOTAL
+                </p>
+
+                <p className="text-4xl font-light">
+                  ₹
+                  {total.toLocaleString(
+                    "en-IN"
+                  )}
+                </p>
               </div>
 
-              {/* REMOVE */}
-              <button
-                onClick={() =>
-                  removeFromCart(
-                    item.id,
-                    item.size
-                  )
+            </div>
+
+            <button
+              onClick={handlePayment}
+              disabled={!selectedAddress}
+              className={`
+                w-full
+                py-5
+                tracking-[0.3em]
+                border
+                transition
+                ${
+                  selectedAddress
+                    ? "border-black hover:bg-black hover:text-white"
+                    : "border-gray-300 text-gray-400 cursor-not-allowed"
                 }
-                className="text-xs underline mt-3"
-              >
-                Remove
-              </button>
-            </div>
+              `}
+            >
+              COMPLETE PURCHASE
+            </button>
 
-            {/* ITEM TOTAL */}
-            <div className="text-sm font-medium">
-              ₹
-              {(
-                item.price *
-                item.quantity
-              ).toLocaleString()}
-            </div>
           </div>
-        ))}
 
-        <hr className="my-6" />
+        </section>
 
-        <div className="flex justify-between text-lg">
-          <span>Total</span>
+      </div>
 
-          <span>
-            ₹{total.toLocaleString()}
-          </span>
-        </div>
-
-        <button
-          onClick={handlePayment}
-          disabled={!selectedAddress}
-          className={`w-full mt-8 py-4 text-white ${
-            selectedAddress
-              ? "bg-black hover:opacity-80"
-              : "bg-gray-300 cursor-not-allowed"
-          }`}
-        >
-          PAY NOW
-        </button>
-      </section>
     </main>
   );
 }
