@@ -6,12 +6,60 @@ import {
   signOut,
 } from "next-auth/react";
 import Link from "next/link";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 export default function AccountPage() {
   const { data: session, status } =
     useSession();
 
-  // Loading state
+  const [latestOrder, setLatestOrder] =
+    useState<any>(null);
+
+  useEffect(() => {
+    const fetchLatestOrder =
+      async () => {
+        if (
+          !session?.user?.email
+        )
+          return;
+
+        try {
+          const res = await fetch(
+            "/api/latest-order",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+              body: JSON.stringify({
+                email:
+                  session.user.email,
+              }),
+            }
+          );
+
+          const data =
+            await res.json();
+
+          if (data.success) {
+            setLatestOrder(
+              data.order
+            );
+          }
+        } catch (error) {
+          console.error(
+            error
+          );
+        }
+      };
+
+    fetchLatestOrder();
+  }, [session]);
+
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -22,7 +70,6 @@ export default function AccountPage() {
     );
   }
 
-  // Not signed in
   if (!session) {
     return (
       <main className="min-h-screen flex items-center justify-center px-6">
@@ -38,7 +85,8 @@ export default function AccountPage() {
           <button
             onClick={() =>
               signIn("google", {
-                callbackUrl: "/account",
+                callbackUrl:
+                  "/account",
               })
             }
             className="
@@ -57,7 +105,8 @@ export default function AccountPage() {
     );
   }
 
-  const hour = new Date().getHours();
+  const hour =
+    new Date().getHours();
 
   const greeting =
     hour < 12
@@ -107,7 +156,7 @@ export default function AccountPage() {
           </p>
 
           <p className="text-3xl font-light">
-            1
+            {latestOrder ? 1 : 0}
           </p>
         </div>
 
@@ -134,29 +183,82 @@ export default function AccountPage() {
       </div>
 
       {/* Latest Order */}
-      <Link
-        href="/account/orders"
-        className="
-          block
-          border
-          p-8
-          mb-20
-          hover:shadow-sm
-          transition
-        "
-      >
-        <p className="text-xs tracking-[0.3em] text-gray-400 mb-5">
-          LATEST ORDER
-        </p>
+      {latestOrder && (
+        <Link
+          href="/account/orders"
+          className="
+            block
+            border
+            p-8
+            mb-20
+            hover:shadow-sm
+            transition
+          "
+        >
+          <p className="text-xs tracking-[0.3em] text-gray-400 mb-6">
+            LATEST ORDER
+          </p>
 
-        <h3 className="text-2xl font-light mb-2">
-          Crimson Rose
-        </h3>
+          <div className="flex gap-6 items-center">
 
-        <p className="text-gray-500">
-          View your latest purchase
-        </p>
-      </Link>
+            {latestOrder.items?.[0]
+              ?.image && (
+              <img
+                src={
+                  latestOrder
+                    .items[0]
+                    .image
+                }
+                alt={
+                  latestOrder
+                    .items[0]
+                    .name
+                }
+                className="
+                  w-28
+                  h-36
+                  object-cover
+                "
+              />
+            )}
+
+            <div>
+              <h3 className="text-2xl font-light">
+                {
+                  latestOrder
+                    .items[0]
+                    ?.name
+                }
+              </h3>
+
+              {latestOrder
+                .items[0]
+                ?.size && (
+                <p className="text-gray-500 mt-2">
+                  Size:{" "}
+                  {
+                    latestOrder
+                      .items[0]
+                      .size
+                  }
+                </p>
+              )}
+
+              <p className="text-gray-500 mt-2">
+                ₹
+                {latestOrder.total?.toLocaleString(
+                  "en-IN"
+                )}
+              </p>
+
+              <p className="text-sm text-gray-400 mt-4">
+                View latest purchase
+              </p>
+            </div>
+
+          </div>
+        </Link>
+      )}
 
       {/* Navigation */}
       <div className="space-y-8 text-sm tracking-[0.25em] mb-20">
@@ -203,7 +305,8 @@ export default function AccountPage() {
         <button
           onClick={() =>
             signOut({
-              callbackUrl: "/home",
+              callbackUrl:
+                "/home",
             })
           }
           className="
@@ -220,7 +323,7 @@ export default function AccountPage() {
 
       </div>
 
-      {/* Brand Message */}
+      {/* Footer Message */}
       <div className="pt-12 text-center">
         <p className="text-gray-400 tracking-[0.35em] text-sm mb-5">
           PRIVATE CLIENT
