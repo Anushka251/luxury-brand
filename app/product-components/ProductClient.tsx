@@ -44,9 +44,12 @@ export default function ProductClient({
 
   return (
     <div className="max-w-7xl mx-auto -mt-2 px-4 lg:px-2">
+
+      {/* TOP SECTION */}
+
       <div className="flex flex-col lg:flex-row lg:items-start lg:gap-10">
 
-        {/* LEFT: GALLERY */}
+        {/* GALLERY */}
 
         <div className="lg:w-[62%]">
           <ProductGallery
@@ -55,7 +58,7 @@ export default function ProductClient({
           />
         </div>
 
-        {/* RIGHT: DETAILS */}
+        {/* PRODUCT DETAILS */}
 
         <div className="mt-8 lg:mt-4 lg:w-[38%] lg:sticky lg:top-28">
 
@@ -93,7 +96,6 @@ export default function ProductClient({
           {/* DESCRIPTION */}
 
           <div className="mt-12 border-t pt-8">
-
             <p className="text-xs tracking-[0.3em] text-gray-400 mb-5">
               DESCRIPTION
             </p>
@@ -101,7 +103,6 @@ export default function ProductClient({
             <p className="text-gray-600 leading-8">
               {product.description}
             </p>
-
           </div>
 
           {/* SIZE */}
@@ -113,7 +114,6 @@ export default function ProductClient({
             </p>
 
             <div className="flex gap-3 flex-wrap">
-
               {sizes.map((size) => (
                 <button
                   key={size}
@@ -137,7 +137,6 @@ export default function ProductClient({
                   {size}
                 </button>
               ))}
-
             </div>
 
             {!selectedSize && (
@@ -170,29 +169,50 @@ export default function ProductClient({
             ADD TO BAG
           </button>
 
-          {/* DESIGN */}
-
-          <div className="mt-14 border-t pt-8">
-
-            <p className="text-xs tracking-[0.3em] text-gray-400 mb-5">
-              DESIGN
-            </p>
-
-            <p className="text-sm text-gray-600 leading-8 whitespace-pre-line">
-              {product.detailDescription}
-            </p>
-
-          </div>
-
           <div className="mt-12 text-xs text-gray-400 tracking-[0.2em]">
             QUIET LUXURY • LIMITED DROP
           </div>
 
-          <div className="h-12" />
+        </div>
+      </div>
+
+      {/* FULL WIDTH DESIGN SECTION */}
+
+      <div className="mt-28 border-t pt-16 pb-20">
+
+        <p className="text-xs tracking-[0.35em] text-gray-400 mb-10">
+          DESIGN
+        </p>
+
+        <div className="grid lg:grid-cols-2 gap-16">
+
+          <div>
+            <h2
+              className="text-4xl md:text-5xl font-light leading-tight"
+              style={{
+                fontFamily:
+                  '"Cormorant Garamond", serif',
+              }}
+            >
+              Crafted with intention.
+            </h2>
+          </div>
+
+          <div>
+            <p className="
+              text-gray-600
+              leading-9
+              text-lg
+              whitespace-pre-line
+            ">
+              {product.detailDescription}
+            </p>
+          </div>
 
         </div>
 
       </div>
+
     </div>
   );
 }
