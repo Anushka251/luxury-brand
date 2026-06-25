@@ -24,27 +24,23 @@ export default function BagPage() {
   );
 
   return (
-    <main className="max-w-6xl mx-auto px-8 md:px-12 py-24">
+    <main className="max-w-5xl mx-auto px-6 md:px-10 py-24">
 
       {/* HEADER */}
 
-      <div className="mb-20">
-        <p className="text-xs tracking-[0.35em] text-gray-400 mb-4">
-          AVENOR CLIENT
-        </p>
-
-        <h1 className="text-5xl font-light tracking-[0.12em]">
-          YOUR BAG
+      <div className="mb-16">
+        <h1 className="text-5xl font-light mb-4">
+          Your Bag
         </h1>
 
-        <p className="text-gray-500 mt-4">
+        <p className="text-gray-500">
           Review your selected pieces.
         </p>
       </div>
 
       {cart.length === 0 ? (
         <div className="py-20">
-          <p className="text-gray-500 mb-10">
+          <p className="text-gray-500 mb-8">
             Your bag is currently empty.
           </p>
 
@@ -52,6 +48,7 @@ export default function BagPage() {
             href="/shop"
             className="
               border
+              border-black
               px-8
               py-4
               tracking-[0.2em]
@@ -65,18 +62,18 @@ export default function BagPage() {
         </div>
       ) : (
         <>
-          <div className="space-y-20">
+          <div className="space-y-16">
 
             {cart.map((item) => (
               <div
                 key={`${item.id}-${item.size}`}
                 className="
-                  border-b
-                  pb-16
                   flex
                   flex-col
                   md:flex-row
-                  gap-10
+                  gap-8
+                  border-b
+                  pb-12
                 "
               >
 
@@ -84,8 +81,9 @@ export default function BagPage() {
 
                 <Link
                   href={`/product/${item.slug}`}
+                  className="flex-shrink-0"
                 >
-                  <div className="relative w-[240px] h-[320px] overflow-hidden">
+                  <div className="relative w-[240px] h-[320px] md:w-[280px] md:h-[380px]">
                     <Image
                       src={item.image}
                       alt={item.name}
@@ -97,103 +95,105 @@ export default function BagPage() {
 
                 {/* DETAILS */}
 
-                <div className="flex-1">
+                <div className="flex flex-col justify-between flex-1">
 
-                  <Link
-                    href={`/product/${item.slug}`}
-                  >
-                    <h2 className="text-3xl font-light hover:opacity-70 transition">
-                      {item.name}
-                    </h2>
-                  </Link>
+                  <div>
+                    <Link
+                      href={`/product/${item.slug}`}
+                    >
+                      <h2 className="text-4xl font-light hover:opacity-70 transition">
+                        {item.name}
+                      </h2>
+                    </Link>
 
-                  {item.size && (
-                    <p className="text-gray-500 mt-4">
-                      Size {item.size}
-                    </p>
-                  )}
-
-                  <p className="text-2xl font-light mt-8">
-                    ₹
-                    {item.price.toLocaleString(
-                      "en-IN"
+                    {item.size && (
+                      <p className="text-gray-500 mt-4">
+                        Size {item.size}
+                      </p>
                     )}
-                  </p>
 
-                  {/* QUANTITY */}
+                    <p className="text-2xl font-light mt-8">
+                      ₹
+                      {item.price.toLocaleString(
+                        "en-IN"
+                      )}
+                    </p>
+                  </div>
 
-                  <div className="flex items-center gap-5 mt-10">
+                  <div>
+
+                    <div className="flex items-center gap-5 mb-8">
+
+                      <button
+                        onClick={() =>
+                          updateQuantity(
+                            item.id,
+                            item.size,
+                            item.quantity - 1
+                          )
+                        }
+                        className="
+                          w-10
+                          h-10
+                          border
+                          flex
+                          items-center
+                          justify-center
+                        "
+                      >
+                        −
+                      </button>
+
+                      <span className="text-lg">
+                        {item.quantity}
+                      </span>
+
+                      <button
+                        onClick={() =>
+                          updateQuantity(
+                            item.id,
+                            item.size,
+                            item.quantity + 1
+                          )
+                        }
+                        className="
+                          w-10
+                          h-10
+                          border
+                          flex
+                          items-center
+                          justify-center
+                        "
+                      >
+                        +
+                      </button>
+
+                    </div>
 
                     <button
                       onClick={() =>
-                        updateQuantity(
+                        removeFromCart(
                           item.id,
-                          item.size,
-                          item.quantity - 1
+                          item.size
                         )
                       }
                       className="
-                        w-10
-                        h-10
-                        border
-                        flex
-                        items-center
-                        justify-center
+                        text-xs
+                        tracking-[0.2em]
+                        text-gray-500
+                        hover:text-black
                       "
                     >
-                      −
-                    </button>
-
-                    <span className="text-lg">
-                      {item.quantity}
-                    </span>
-
-                    <button
-                      onClick={() =>
-                        updateQuantity(
-                          item.id,
-                          item.size,
-                          item.quantity + 1
-                        )
-                      }
-                      className="
-                        w-10
-                        h-10
-                        border
-                        flex
-                        items-center
-                        justify-center
-                      "
-                    >
-                      +
+                      REMOVE
                     </button>
 
                   </div>
 
-                  <button
-                    onClick={() =>
-                      removeFromCart(
-                        item.id,
-                        item.size
-                      )
-                    }
-                    className="
-                      mt-10
-                      text-xs
-                      tracking-[0.2em]
-                      text-gray-500
-                      hover:text-black
-                    "
-                  >
-                    REMOVE
-                  </button>
-
                 </div>
 
-                {/* TOTAL */}
+                {/* ITEM TOTAL */}
 
                 <div className="md:text-right">
-
                   <p className="text-2xl font-light">
                     ₹
                     {(
@@ -203,7 +203,6 @@ export default function BagPage() {
                       "en-IN"
                     )}
                   </p>
-
                 </div>
 
               </div>
@@ -213,11 +212,11 @@ export default function BagPage() {
 
           {/* SUMMARY */}
 
-          <div className="mt-20 border-t pt-12 flex flex-col md:flex-row justify-between gap-10">
+          <div className="mt-16 border-t pt-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
 
             <div>
-              <p className="text-xs tracking-[0.25em] text-gray-400 mb-4">
-                ORDER TOTAL
+              <p className="text-xs tracking-[0.25em] text-gray-400 mb-3">
+                TOTAL
               </p>
 
               <p className="text-4xl font-light">
@@ -231,7 +230,7 @@ export default function BagPage() {
             <div className="flex flex-col items-start md:items-end">
 
               {!session && (
-                <p className="text-sm text-gray-500 mb-5">
+                <p className="text-sm text-gray-500 mb-4">
                   Sign in to continue.
                 </p>
               )}
@@ -240,13 +239,12 @@ export default function BagPage() {
                 <Link href="/checkout">
                   <button
                     className="
-                      border
-                      border-black
+                      bg-black
+                      text-white
                       px-10
                       py-4
                       tracking-[0.25em]
-                      hover:bg-black
-                      hover:text-white
+                      hover:opacity-90
                       transition
                     "
                   >
@@ -257,13 +255,12 @@ export default function BagPage() {
                 <Link href="/auth">
                   <button
                     className="
-                      border
-                      border-black
+                      bg-black
+                      text-white
                       px-10
                       py-4
                       tracking-[0.25em]
-                      hover:bg-black
-                      hover:text-white
+                      hover:opacity-90
                       transition
                     "
                   >
