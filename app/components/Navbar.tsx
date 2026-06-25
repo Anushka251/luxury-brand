@@ -4,13 +4,19 @@ import Link from "next/link";
 import { useCart } from "@/app/context/CartContext";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+} from "framer-motion";
 
 export default function Navbar(): React.JSX.Element {
   const { cart } = useCart();
-  const { data: session } = useSession();
 
-  const [open, setOpen] = useState(false);
+  const { data: session } =
+    useSession();
+
+  const [open, setOpen] =
+    useState(false);
 
   const menuRef =
     useRef<HTMLDivElement>(null);
@@ -50,20 +56,26 @@ export default function Navbar(): React.JSX.Element {
 
   return (
     <>
-      {open && (
-        <div
-          className="
-            fixed
-            inset-0
-            bg-black/5
-            backdrop-blur-sm
-            z-40
-          "
-          onClick={() =>
-            setOpen(false)
-          }
-        />
-      )}
+      {/* Overlay */}
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="
+              fixed
+              inset-0
+              bg-black/5
+              z-40
+            "
+            onClick={() =>
+              setOpen(false)
+            }
+          />
+        )}
+      </AnimatePresence>
 
       <motion.nav
         initial={{
@@ -88,8 +100,9 @@ export default function Navbar(): React.JSX.Element {
           flex
           justify-between
           items-center
-          bg-ivory/95
-          backdrop-blur-md
+          bg-ivory
+          border-b
+          border-gray-100
           z-50
         "
       >
@@ -164,7 +177,6 @@ export default function Navbar(): React.JSX.Element {
           </button>
 
           <AnimatePresence>
-
             {open && (
               <motion.div
                 initial={{
@@ -187,11 +199,10 @@ export default function Navbar(): React.JSX.Element {
                   top-14
                   right-0
                   min-w-[220px]
-                  bg-white/95
-                  backdrop-blur-md
+                  bg-white
                   border
                   border-gray-200
-                  shadow-2xl
+                  shadow-xl
                   py-4
                   z-50
                 "
@@ -297,9 +308,7 @@ export default function Navbar(): React.JSX.Element {
                 )}
               </motion.div>
             )}
-
           </AnimatePresence>
-
         </div>
       </motion.nav>
     </>
