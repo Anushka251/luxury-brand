@@ -231,7 +231,7 @@ export default function ProductGallery({
       {/* COUNTER */}
       <div
         className="flex justify-center"
-        style={{ marginTop: "1px" }}
+        style={{ marginTop: "-4px" }}
       >
         <p
           className="
