@@ -5,7 +5,7 @@ export default function PoliciesPage() {
       {/* HEADER */}
 
       <p className="text-xs tracking-[0.35em] text-gray-400 mb-6">
-        INFORMATION
+        HOUSE POLICIES
       </p>
 
       <h1
@@ -20,9 +20,32 @@ export default function PoliciesPage() {
         POLICIES
       </h1>
 
-      <div className="space-y-20">
+      {/* INTRO */}
 
-        {/* PRODUCTION */}
+      <div className="max-w-4xl mb-24">
+        <p
+          className="
+            text-2xl
+            md:text-3xl
+            font-light
+            leading-relaxed
+            text-gray-800
+          "
+          style={{
+            fontFamily:
+              '"Cormorant Garamond", serif',
+          }}
+        >
+          Every Avenor garment is created in
+          limited quantities with an emphasis on
+          craftsmanship, intention, and enduring
+          design.
+        </p>
+      </div>
+
+      {/* POLICY SECTIONS */}
+
+      <div className="space-y-20">
 
         <section className="grid lg:grid-cols-[220px_1fr] gap-12">
           <p className="text-xs tracking-[0.3em] text-gray-400">
@@ -30,15 +53,14 @@ export default function PoliciesPage() {
           </p>
 
           <p className="text-lg text-gray-600 leading-9">
-            All Avenor pieces are crafted in limited
-            quantities and produced on a made-to-order
-            basis. Each garment is carefully prepared
-            in-house with attention to detail,
-            construction, and finish.
+            Avenor pieces are produced in limited
+            quantities and many garments are
+            prepared on a made-to-order basis.
+            Every piece is carefully finished with
+            attention to construction, materials,
+            and detail.
           </p>
         </section>
-
-        {/* PAYMENT */}
 
         <section className="grid lg:grid-cols-[220px_1fr] gap-12">
           <p className="text-xs tracking-[0.3em] text-gray-400">
@@ -46,30 +68,24 @@ export default function PoliciesPage() {
           </p>
 
           <p className="text-lg text-gray-600 leading-9">
-            Orders are processed only after full
-            payment has been received. We currently
-            do not offer Cash on Delivery as every
-            piece is produced specifically for each
-            order.
+            Orders are confirmed only after full
+            payment has been successfully received.
+            Cash on Delivery is not currently
+            available.
           </p>
         </section>
-
-        {/* SHIPPING */}
 
         <section className="grid lg:grid-cols-[220px_1fr] gap-12">
           <p className="text-xs tracking-[0.3em] text-gray-400">
-            SHIPPING
+            AVAILABILITY
           </p>
 
           <p className="text-lg text-gray-600 leading-9">
-            Production and dispatch generally require
-            7–14 business days. Once your order has
-            been shipped, tracking information will
-            be provided via email.
+            Product availability is limited.
+            Certain pieces may not be restocked
+            after a collection has sold out.
           </p>
         </section>
-
-        {/* PRODUCT */}
 
         <section className="grid lg:grid-cols-[220px_1fr] gap-12">
           <p className="text-xs tracking-[0.3em] text-gray-400">
@@ -77,16 +93,13 @@ export default function PoliciesPage() {
           </p>
 
           <p className="text-lg text-gray-600 leading-9">
-            Due to lighting conditions, photography,
-            screen calibration, and device displays,
-            colours may appear slightly different
-            from the final garment. Such variations
-            are considered a natural characteristic
-            of the materials and craftsmanship used.
+            Variations in colour, texture, and
+            appearance may occur because of
+            photography, lighting conditions,
+            display settings, and the natural
+            characteristics of materials.
           </p>
         </section>
-
-        {/* PRIVACY */}
 
         <section className="grid lg:grid-cols-[220px_1fr] gap-12">
           <p className="text-xs tracking-[0.3em] text-gray-400">
@@ -94,19 +107,15 @@ export default function PoliciesPage() {
           </p>
 
           <p className="text-lg text-gray-600 leading-9">
-            Customer information including name,
-            email address, phone number, and
-            shipping details is collected solely
-            for processing orders, providing
-            support, and improving the customer
-            experience. Avenor does not sell or
-            share customer information except when
+            Customer information is collected
+            solely for order processing, client
+            services, and communication regarding
+            purchases. Personal information is
+            never sold or shared except where
             required to fulfil orders or comply
             with legal obligations.
           </p>
         </section>
-
-        {/* TERMS */}
 
         <section className="grid lg:grid-cols-[220px_1fr] gap-12">
           <p className="text-xs tracking-[0.3em] text-gray-400">
@@ -114,13 +123,13 @@ export default function PoliciesPage() {
           </p>
 
           <p className="text-lg text-gray-600 leading-9">
-            Product availability, pricing, and
-            specifications may be updated without
-            notice. Avenor reserves the right to
-            refuse or cancel orders in cases of
-            pricing errors, suspected fraudulent
-            activity, or circumstances beyond our
-            reasonable control.
+            Product specifications, pricing,
+            availability, and policies may be
+            updated without notice. Avenor
+            reserves the right to refuse or cancel
+            orders resulting from pricing errors,
+            fraudulent activity, or circumstances
+            beyond reasonable control.
           </p>
         </section>
 
@@ -136,8 +145,8 @@ export default function PoliciesPage() {
 
         <p
           className="
-            text-2xl
-            md:text-3xl
+            text-3xl
+            md:text-4xl
             font-light
             leading-relaxed
             max-w-3xl
@@ -150,12 +159,13 @@ export default function PoliciesPage() {
         >
           By accessing this website and placing
           an order, you acknowledge and agree
-          to the policies outlined above.
+          to the policies and client service
+          standards outlined by Avenor.
         </p>
 
         <p className="mt-12 text-gray-500">
-          For questions regarding your order,
-          shipping, or policies, please contact
+          Questions regarding your order or our
+          policies may be directed to
         </p>
 
         <a
