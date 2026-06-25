@@ -45,13 +45,6 @@ export default function Footer() {
           </Link>
 
           <Link
-            href="/privacy"
-            className="block hover:text-black transition"
-          >
-            PRIVACY
-          </Link>
-
-          <Link
             href="/terms"
             className="block hover:text-black transition"
           >
