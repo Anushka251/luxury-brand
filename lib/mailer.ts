@@ -10,11 +10,20 @@ export const transporter = nodemailer.createTransport({
   },
 });
 
+interface OrderItem {
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+  size?: string;
+  slug?: string;
+}
+
 interface OrderEmailProps {
   customerEmail: string;
   customerName: string;
   orderNumber: string;
-  items: any[];
+  items: OrderItem[];
   total: number;
 }
 
@@ -26,30 +35,64 @@ export async function sendOrderConfirmationEmail({
   total,
 }: OrderEmailProps) {
   const itemsHtml = items
-    .map(
-      (item) => `
+    .map((item) => {
+      const imageUrl = item.image?.startsWith("http")
+        ? item.image
+        : `https://avenorcollection.com${item.image}`;
+
+      const productUrl = item.slug
+        ? `https://avenorcollection.com/product/${item.slug}`
+        : "https://avenorcollection.com/shop";
+
+      return `
         <tr>
           <td style="padding:16px 0;border-bottom:1px solid #e5e5e5;">
-            <table width="100%">
+            <table width="100%" cellpadding="0" cellspacing="0">
               <tr>
-                <td width="90">
-                  <img
-                    src="${item.image}"
-                    alt="${item.name}"
-                    width="80"
-                    style="display:block;border-radius:4px;"
-                  />
+
+                <td width="90" valign="top">
+                  <a
+                    href="${productUrl}"
+                    target="_blank"
+                    style="text-decoration:none;"
+                  >
+                    <img
+                      src="${imageUrl}"
+                      alt="${item.name}"
+                      width="80"
+                      style="
+                        display:block;
+                        width:80px;
+                        height:110px;
+                        object-fit:cover;
+                        border-radius:4px;
+                        border:1px solid #eeeeee;
+                      "
+                    />
+                  </a>
                 </td>
 
-                <td style="padding-left:16px;">
-                  <p style="
-                    margin:0;
-                    font-size:14px;
-                    color:#111;
-                    font-weight:500;
-                  ">
-                    ${item.name}
-                  </p>
+                <td
+                  valign="top"
+                  style="padding-left:16px;"
+                >
+                  <a
+                    href="${productUrl}"
+                    target="_blank"
+                    style="
+                      text-decoration:none;
+                      color:#111111;
+                    "
+                  >
+                    <p style="
+                      margin:0;
+                      font-size:14px;
+                      color:#111;
+                      font-weight:500;
+                    ">
+                      ${item.name}
+                    </p>
+                  </a>
 
                   ${
                     item.size
@@ -74,21 +117,27 @@ export async function sendOrderConfirmationEmail({
                   </p>
                 </td>
 
-                <td align="right" style="
-                  color:#111;
-                  font-size:14px;
-                  font-weight:500;
-                ">
+                <td
+                  valign="top"
+                  align="right"
+                  style="
+                    color:#111;
+                    font-size:14px;
+                    font-weight:500;
+                    white-space:nowrap;
+                  "
+                >
                   ₹${(
                     item.price * item.quantity
                   ).toLocaleString()}
                 </td>
+
               </tr>
             </table>
           </td>
         </tr>
-      `
-    )
+      `;
+    })
     .join("");
 
   await transporter.sendMail({
@@ -287,10 +336,13 @@ export async function sendOrderConfirmationEmail({
                 </tr>
 
                 <tr>
-                  <td align="center" style="
-                    padding-top:50px;
-                    border-top:1px solid #eeeeee;
-                  ">
+                  <td
+                    align="center"
+                    style="
+                      padding-top:50px;
+                      border-top:1px solid #eeeeee;
+                    "
+                  >
                     <p style="
                       margin:0;
                       font-size:12px;
