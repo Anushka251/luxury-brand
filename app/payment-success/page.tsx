@@ -7,11 +7,22 @@ interface OrderData {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
-  address: string;
+
+  address: {
+    name: string;
+    phone: string;
+    address: string;
+    city: string;
+    state: string;
+    pincode: string;
+  };
+
   total: number;
+
   cart: {
     name: string;
     slug: string;
+    size?: string;
     image?: string;
     images?: string[];
   }[];
@@ -20,6 +31,7 @@ interface OrderData {
 export default function PaymentSuccessPage() {
   const [orderId, setOrderId] = useState("");
   const [loading, setLoading] = useState(true);
+
   const [orderData, setOrderData] =
     useState<OrderData | null>(null);
 
@@ -115,28 +127,21 @@ export default function PaymentSuccessPage() {
           if (
             parsedOrder.customerEmail
           ) {
-            try {
-              await fetch(
-                "/api/cart",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type":
-                      "application/json",
-                  },
-                  body: JSON.stringify({
-                    email:
-                      parsedOrder.customerEmail,
-                    cart: [],
-                  }),
-                }
-              );
-            } catch (error) {
-              console.error(
-                "Failed to clear cart:",
-                error
-              );
-            }
+            await fetch(
+              "/api/cart",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type":
+                    "application/json",
+                },
+                body: JSON.stringify({
+                  email:
+                    parsedOrder.customerEmail,
+                  cart: [],
+                }),
+              }
+            );
           }
 
           localStorage.removeItem(
@@ -156,15 +161,18 @@ export default function PaymentSuccessPage() {
     saveOrder();
   }, []);
 
+  const item =
+    orderData?.cart?.[0];
+
   const productImage =
-    orderData?.cart?.[0]?.image ||
-    orderData?.cart?.[0]?.images?.[0];
+    item?.image ||
+    item?.images?.[0];
 
   return (
     <main className="min-h-screen bg-[#f7f5f2] py-24 px-6">
       <div className="max-w-3xl mx-auto">
 
-        {/* Header */}
+        {/* HEADER */}
         <div className="text-center mb-14">
           <p className="tracking-[0.4em] text-sm mb-4">
             AVENOR
@@ -186,7 +194,7 @@ export default function PaymentSuccessPage() {
         ) : (
           <div className="space-y-8">
 
-            {/* Order Number */}
+            {/* ORDER NUMBER */}
             <div className="bg-white border p-8">
               <p className="text-sm text-gray-500 uppercase tracking-widest">
                 Order Number
@@ -198,49 +206,67 @@ export default function PaymentSuccessPage() {
               </p>
             </div>
 
-            {/* Product */}
-            {orderData?.cart?.[0] && (
+            {/* PRODUCT */}
+            {item && (
               <Link
-                href={`/product/${orderData.cart[0].slug}`}
-                className="block bg-white border p-6 hover:shadow-md transition"
+                href={`/product/${item.slug}`}
+                className="
+                  block
+                  bg-white
+                  border
+                  p-6
+                  hover:shadow-md
+                  transition
+                "
               >
                 <p className="text-sm text-gray-500 uppercase tracking-widest mb-5">
                   Ordered Item
                 </p>
 
-                <div className="flex gap-5 items-center">
+                <div className="flex gap-6 items-center">
                   {productImage && (
                     <img
                       src={productImage}
-                      alt={
-                        orderData.cart[0].name
-                      }
-                      className="w-28 h-36 object-cover"
+                      alt={item.name}
+                      className="
+                        w-32
+                        h-44
+                        object-cover
+                      "
                     />
                   )}
 
                   <div>
-                    <h2 className="text-xl">
-                      {
-                        orderData.cart[0]
-                          .name
-                      }
+                    <h2 className="text-2xl font-light">
+                      {item.name}
                     </h2>
 
-                    <p className="text-sm text-gray-500 mt-2">
+                    {item.size && (
+                      <p className="text-gray-500 mt-2">
+                        Size: {item.size}
+                      </p>
+                    )}
+
+                    <p className="mt-4 text-lg">
+                      ₹
+                      {orderData?.total?.toLocaleString(
+                        "en-IN"
+                      )}
+                    </p>
+
+                    <p className="text-sm text-gray-500 mt-3">
                       Tap to view product
                     </p>
 
-                    <p className="mt-4 font-medium">
-                      ₹
-                      {orderData.total?.toLocaleString()}
+                    <p className="text-sm text-gray-400 mt-2">
+                      Limited to 12 pieces.
                     </p>
                   </div>
                 </div>
               </Link>
             )}
 
-            {/* Shipping Address */}
+            {/* SHIPPING */}
             <div className="bg-white border p-8">
               <p className="text-sm text-gray-500 uppercase tracking-widest mb-5">
                 Shipping Address
@@ -248,24 +274,30 @@ export default function PaymentSuccessPage() {
 
               <div className="space-y-2 text-gray-700">
                 <p className="font-medium">
-                  {
-                    orderData?.customerName
-                  }
+                  {orderData?.address?.name}
                 </p>
 
                 <p>
-                  {
-                    orderData?.customerPhone
-                  }
+                  {orderData?.address?.phone}
                 </p>
 
-                <p className="whitespace-pre-line">
-                  {orderData?.address}
+                <p>
+                  {orderData?.address?.address}
+                </p>
+
+                <p>
+                  {orderData?.address?.city},
+                  {" "}
+                  {orderData?.address?.state}
+                </p>
+
+                <p>
+                  {orderData?.address?.pincode}
                 </p>
               </div>
             </div>
 
-            {/* Payment */}
+            {/* PAYMENT */}
             <div className="bg-white border p-8">
               <p className="text-sm text-gray-500 uppercase tracking-widest">
                 Total Paid
@@ -273,7 +305,9 @@ export default function PaymentSuccessPage() {
 
               <p className="text-3xl font-light mt-3">
                 ₹
-                {orderData?.total?.toLocaleString()}
+                {orderData?.total?.toLocaleString(
+                  "en-IN"
+                )}
               </p>
 
               <p className="text-green-700 mt-2 text-sm">
@@ -281,24 +315,44 @@ export default function PaymentSuccessPage() {
               </p>
             </div>
 
-            {/* Email */}
+            {/* EMAIL */}
             <p className="text-center text-gray-500">
               A confirmation email will
               be sent shortly.
             </p>
 
-            {/* Buttons */}
+            {/* BUTTONS */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Link
                 href="/shop"
-                className="border px-8 py-4 text-center tracking-widest text-sm hover:bg-black hover:text-white transition"
+                className="
+                  border
+                  px-8
+                  py-4
+                  text-center
+                  tracking-widest
+                  text-sm
+                  hover:bg-black
+                  hover:text-white
+                  transition
+                "
               >
                 CONTINUE SHOPPING
               </Link>
 
               <Link
                 href="/account/orders"
-                className="bg-black text-white px-8 py-4 text-center tracking-widest text-sm hover:opacity-90 transition"
+                className="
+                  bg-black
+                  text-white
+                  px-8
+                  py-4
+                  text-center
+                  tracking-widest
+                  text-sm
+                  hover:opacity-90
+                  transition
+                "
               >
                 VIEW ORDERS
               </Link>
