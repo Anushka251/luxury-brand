@@ -1,10 +1,27 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
+
+interface OrderData {
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  address: string;
+  total: number;
+  cart: {
+    name: string;
+    slug: string;
+    image?: string;
+    images?: string[];
+  }[];
+}
 
 export default function PaymentSuccessPage() {
   const [orderId, setOrderId] = useState("");
   const [loading, setLoading] = useState(true);
+  const [orderData, setOrderData] =
+    useState<OrderData | null>(null);
 
   useEffect(() => {
     const saveOrder = async () => {
@@ -17,19 +34,28 @@ export default function PaymentSuccessPage() {
         setOrderId(cashfreeOrderId);
 
         const pendingOrder =
-          localStorage.getItem("pendingOrder");
+          localStorage.getItem(
+            "pendingOrder"
+          );
 
         if (!pendingOrder) {
           setLoading(false);
           return;
         }
 
-        const orderData = JSON.parse(pendingOrder);
+        const parsedOrder =
+          JSON.parse(pendingOrder);
 
-        // Prevent duplicate order creation
-        const duplicateKey = `saved_order_${cashfreeOrderId}`;
+        setOrderData(parsedOrder);
 
-        if (localStorage.getItem(duplicateKey)) {
+        const duplicateKey =
+          `saved_order_${cashfreeOrderId}`;
+
+        if (
+          localStorage.getItem(
+            duplicateKey
+          )
+        ) {
           setLoading(false);
           return;
         }
@@ -37,37 +63,44 @@ export default function PaymentSuccessPage() {
         const orderNumber =
           "ORD-" + Date.now();
 
-        const res = await fetch("/api/orders", {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            orderNumber,
-            cashfreeOrderId,
+        const res = await fetch(
+          "/api/orders",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify({
+              orderNumber,
+              cashfreeOrderId,
 
-            customerEmail:
-              orderData.customerEmail,
+              customerEmail:
+                parsedOrder.customerEmail,
 
-            customerName:
-              orderData.customerName,
+              customerName:
+                parsedOrder.customerName,
 
-            customerPhone:
-              orderData.customerPhone,
+              customerPhone:
+                parsedOrder.customerPhone,
 
-            shippingAddress:
-              orderData.address,
+              shippingAddress:
+                parsedOrder.address,
 
-            items: orderData.cart,
+              items:
+                parsedOrder.cart,
 
-            total: orderData.total,
+              total:
+                parsedOrder.total,
 
-            paymentStatus: "PAID",
-          }),
-        });
+              paymentStatus:
+                "PAID",
+            }),
+          }
+        );
 
-        const data = await res.json();
+        const data =
+          await res.json();
 
         if (data.success) {
           localStorage.setItem(
@@ -75,33 +108,37 @@ export default function PaymentSuccessPage() {
             "true"
           );
 
-          // Clear guest cart
-          localStorage.removeItem("cart");
+          localStorage.removeItem(
+            "cart"
+          );
 
-          // Clear logged-in user's DB cart
-          if (orderData.customerEmail) {
+          if (
+            parsedOrder.customerEmail
+          ) {
             try {
-              await fetch("/api/cart", {
-                method: "POST",
-                headers: {
-                  "Content-Type":
-                    "application/json",
-                },
-                body: JSON.stringify({
-                  email:
-                    orderData.customerEmail,
-                  cart: [],
-                }),
-              });
+              await fetch(
+                "/api/cart",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type":
+                      "application/json",
+                  },
+                  body: JSON.stringify({
+                    email:
+                      parsedOrder.customerEmail,
+                    cart: [],
+                  }),
+                }
+              );
             } catch (error) {
               console.error(
-                "Failed to clear DB cart:",
+                "Failed to clear cart:",
                 error
               );
             }
           }
 
-          // Remove pending order
           localStorage.removeItem(
             "pendingOrder"
           );
@@ -119,39 +156,161 @@ export default function PaymentSuccessPage() {
     saveOrder();
   }, []);
 
-  return (
-    <main className="max-w-3xl mx-auto py-32 px-8">
-      <h1 className="text-4xl font-light mb-6">
-        Payment Successful
-      </h1>
+  const productImage =
+    orderData?.cart?.[0]?.image ||
+    orderData?.cart?.[0]?.images?.[0];
 
-      {loading ? (
-        <p>Processing your order...</p>
-      ) : (
-        <>
-          <p className="mb-8">
-            Thank you for your order.
+  return (
+    <main className="min-h-screen bg-[#f7f5f2] py-24 px-6">
+      <div className="max-w-3xl mx-auto">
+
+        {/* Header */}
+        <div className="text-center mb-14">
+          <p className="tracking-[0.4em] text-sm mb-4">
+            AVENOR
           </p>
 
-          <div className="border p-6">
-            <p className="text-sm text-gray-500">
-              Order Number
+          <h1 className="text-5xl font-light mb-4">
+            Payment Successful
+          </h1>
+
+          <p className="text-gray-600">
+            Thank you for your order.
+          </p>
+        </div>
+
+        {loading ? (
+          <div className="text-center text-gray-500">
+            Processing your order...
+          </div>
+        ) : (
+          <div className="space-y-8">
+
+            {/* Order Number */}
+            <div className="bg-white border p-8">
+              <p className="text-sm text-gray-500 uppercase tracking-widest">
+                Order Number
+              </p>
+
+              <p className="text-2xl font-light mt-3 break-all">
+                {orderId ||
+                  "Order ID unavailable"}
+              </p>
+            </div>
+
+            {/* Product */}
+            {orderData?.cart?.[0] && (
+              <Link
+                href={`/product/${orderData.cart[0].slug}`}
+                className="block bg-white border p-6 hover:shadow-md transition"
+              >
+                <p className="text-sm text-gray-500 uppercase tracking-widest mb-5">
+                  Ordered Item
+                </p>
+
+                <div className="flex gap-5 items-center">
+                  {productImage && (
+                    <img
+                      src={productImage}
+                      alt={
+                        orderData.cart[0].name
+                      }
+                      className="w-28 h-36 object-cover"
+                    />
+                  )}
+
+                  <div>
+                    <h2 className="text-xl">
+                      {
+                        orderData.cart[0]
+                          .name
+                      }
+                    </h2>
+
+                    <p className="text-sm text-gray-500 mt-2">
+                      Tap to view product
+                    </p>
+
+                    <p className="mt-4 font-medium">
+                      ₹
+                      {orderData.total?.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            )}
+
+            {/* Shipping Address */}
+            <div className="bg-white border p-8">
+              <p className="text-sm text-gray-500 uppercase tracking-widest mb-5">
+                Shipping Address
+              </p>
+
+              <div className="space-y-2 text-gray-700">
+                <p className="font-medium">
+                  {
+                    orderData?.customerName
+                  }
+                </p>
+
+                <p>
+                  {
+                    orderData?.customerPhone
+                  }
+                </p>
+
+                <p className="whitespace-pre-line">
+                  {orderData?.address}
+                </p>
+              </div>
+            </div>
+
+            {/* Payment */}
+            <div className="bg-white border p-8">
+              <p className="text-sm text-gray-500 uppercase tracking-widest">
+                Total Paid
+              </p>
+
+              <p className="text-3xl font-light mt-3">
+                ₹
+                {orderData?.total?.toLocaleString()}
+              </p>
+
+              <p className="text-green-700 mt-2 text-sm">
+                Payment Completed
+              </p>
+            </div>
+
+            {/* Email */}
+            <p className="text-center text-gray-500">
+              A confirmation email will
+              be sent shortly.
             </p>
 
-            <p className="text-lg font-medium mt-2">
-              {orderId ||
-                "Order ID not available"}
-            </p>
-          </div>
+            {/* Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <Link
+                href="/shop"
+                className="border px-8 py-4 text-center tracking-widest text-sm hover:bg-black hover:text-white transition"
+              >
+                CONTINUE SHOPPING
+              </Link>
 
-          <div className="mt-8">
-            <p className="text-sm text-gray-600">
-              A confirmation email
-              will be sent to you shortly.
+              <Link
+                href="/account/orders"
+                className="bg-black text-white px-8 py-4 text-center tracking-widest text-sm hover:opacity-90 transition"
+              >
+                VIEW ORDERS
+              </Link>
+            </div>
+
+            <p className="text-center text-sm text-gray-400 tracking-wider pt-8">
+              Quiet Luxury. Limited Pieces.
             </p>
+
           </div>
-        </>
-      )}
+        )}
+      </div>
     </main>
   );
 }
