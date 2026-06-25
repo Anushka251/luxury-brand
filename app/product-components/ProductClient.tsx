@@ -36,18 +36,14 @@ export default function ProductClient({
       slug: product.id,
       size: selectedSize,
     });
-  }, [
-    addToCart,
-    product,
-    selectedSize,
-  ]);
+  }, [addToCart, product, selectedSize]);
 
   return (
-    <div className="max-w-7xl mx-auto -mt-2 px-4 lg:px-2">
+    <div className="max-w-7xl mx-auto px-4 lg:px-2">
 
-      {/* TOP SECTION */}
+      {/* PRODUCT SECTION */}
 
-      <div className="flex flex-col lg:flex-row lg:items-start lg:gap-10">
+      <div className="flex flex-col lg:flex-row lg:items-start lg:gap-12">
 
         {/* GALLERY */}
 
@@ -58,7 +54,7 @@ export default function ProductClient({
           />
         </div>
 
-        {/* PRODUCT DETAILS */}
+        {/* DETAILS */}
 
         <div className="mt-8 lg:mt-4 lg:w-[38%] lg:sticky lg:top-28">
 
@@ -84,9 +80,7 @@ export default function ProductClient({
 
           <p className="mt-8 text-3xl font-light">
             ₹
-            {product.price.toLocaleString(
-              "en-IN"
-            )}
+            {product.price.toLocaleString("en-IN")}
           </p>
 
           <p className="mt-3 text-xs tracking-[0.3em] text-gray-500">
@@ -108,7 +102,6 @@ export default function ProductClient({
           {/* SIZE */}
 
           <div className="mt-12">
-
             <p className="text-xs tracking-[0.3em] text-gray-400 mb-6">
               SELECT SIZE
             </p>
@@ -144,7 +137,6 @@ export default function ProductClient({
                 Select your size.
               </p>
             )}
-
           </div>
 
           {/* ADD TO BAG */}
@@ -176,39 +168,42 @@ export default function ProductClient({
         </div>
       </div>
 
-      {/* FULL WIDTH DESIGN SECTION */}
+      {/* DESIGN SECTION */}
 
-      <div className="mt-28 border-t pt-16 pb-20">
+      <div className="mt-28 border-t pt-20 pb-24">
 
-        <p className="text-xs tracking-[0.35em] text-gray-400 mb-10">
+        <p className="text-xs tracking-[0.35em] text-gray-400 text-center mb-6">
           DESIGN
         </p>
 
-        <div className="grid lg:grid-cols-2 gap-16">
+        <h2
+          className="
+            text-4xl
+            md:text-6xl
+            font-light
+            text-center
+            mb-14
+          "
+          style={{
+            fontFamily:
+              '"Cormorant Garamond", serif',
+          }}
+        >
+          Crafted with intention.
+        </h2>
 
-          <div>
-            <h2
-              className="text-4xl md:text-5xl font-light leading-tight"
-              style={{
-                fontFamily:
-                  '"Cormorant Garamond", serif',
-              }}
-            >
-              Crafted with intention.
-            </h2>
-          </div>
-
-          <div>
-            <p className="
-              text-gray-600
-              leading-9
+        <div className="max-w-3xl mx-auto">
+          <p
+            className="
               text-lg
+              text-gray-600
+              leading-10
               whitespace-pre-line
-            ">
-              {product.detailDescription}
-            </p>
-          </div>
-
+              text-center
+            "
+          >
+            {product.detailDescription}
+          </p>
         </div>
 
       </div>
