@@ -97,10 +97,12 @@ export default function Footer() {
           md:text-[42px]
           tracking-[0.38em]
           text-gray-500
-          font-light
+          font-normal
+          antialiased
         "
         style={{
-          fontFamily: '"Avenir Next", "Avenir", sans-serif',
+          fontFamily:
+            '"Avenir Next", "Avenir", sans-serif',
         }}
       >
         AVENOR
