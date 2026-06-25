@@ -1,57 +1,188 @@
 export default function ShippingPage() {
   return (
-    <div className="px-12 py-28 max-w-3xl mx-auto text-sm leading-8 text-gray-700">
-      <h1 className="text-3xl tracking-[0.2em] mb-12 font-light">
+    <main className="max-w-6xl mx-auto px-8 md:px-12 py-24">
+
+      {/* HEADER */}
+
+      <p className="text-xs tracking-[0.35em] text-gray-400 mb-6">
+        CLIENT SERVICES
+      </p>
+
+      <h1
+        className="
+          text-5xl
+          md:text-7xl
+          font-light
+          tracking-[0.12em]
+          mb-20
+        "
+      >
         SHIPPING
       </h1>
 
-      <p className="mb-6">
-        Every Avenor piece is crafted in limited quantities and prepared
-        with care. As many of our garments are made to order, production
-        begins once an order has been successfully placed.
-      </p>
+      {/* INTRO */}
 
-      <p className="can you mb-6">
-        Orders are typically processed and dispatched within 7–14 business
-        days. During collection launches or periods of increased demand,
-        processing times may be slightly extended.
-      </p>
+      <div className="max-w-4xl mb-24">
+        <p
+          className="
+            text-2xl
+            md:text-3xl
+            font-light
+            leading-relaxed
+            text-gray-800
+          "
+          style={{
+            fontFamily:
+              '"Cormorant Garamond", serif',
+          }}
+        >
+          Every Avenor piece is prepared with
+          intention, crafted in limited quantities,
+          and delivered with exceptional care.
+        </p>
+      </div>
 
-      <p className="mb-6">
-        Once your order has been shipped, you will receive a confirmation
-        email containing tracking information so you can follow your
-        package throughout its journey.
-      </p>
+      {/* SECTIONS */}
 
-      <p className="mb-6">
-        Delivery times vary depending on destination, courier service,
-        customs procedures, and local conditions. While we strive to meet
-        estimated timelines, Avenor is not responsible for delays caused
-        by circumstances beyond our control.
-      </p>
+      <div className="space-y-20">
 
-      <p className="mb-6">
-        Customers are responsible for ensuring that shipping information
-        provided at checkout is accurate and complete. Avenor cannot be
-        held responsible for delays or failed deliveries resulting from
-        incorrect address details.
-      </p>
+        <section className="grid lg:grid-cols-[220px_1fr] gap-12">
+          <p className="text-xs tracking-[0.3em] text-gray-400">
+            PRODUCTION
+          </p>
 
-      <p className="mb-6">
-        International orders may be subject to customs duties, taxes, or
-        import charges imposed by the destination country. Such charges,
-        where applicable, are the responsibility of the customer.
-      </p>
+          <p className="text-lg text-gray-600 leading-9">
+            Every Avenor piece is crafted in limited
+            quantities and prepared with care. As
+            many garments are made to order,
+            production begins once an order has
+            been successfully placed.
+          </p>
+        </section>
 
-      <p>
-        For any shipping-related enquiries, please contact us at{" "}
+        <section className="grid lg:grid-cols-[220px_1fr] gap-12">
+          <p className="text-xs tracking-[0.3em] text-gray-400">
+            PROCESSING
+          </p>
+
+          <p className="text-lg text-gray-600 leading-9">
+            Orders are typically processed and
+            dispatched within 7–14 business days.
+            During collection launches or periods
+            of increased demand, processing times
+            may be slightly extended.
+          </p>
+        </section>
+
+        <section className="grid lg:grid-cols-[220px_1fr] gap-12">
+          <p className="text-xs tracking-[0.3em] text-gray-400">
+            TRACKING
+          </p>
+
+          <p className="text-lg text-gray-600 leading-9">
+            Once your order has been shipped,
+            you will receive a confirmation email
+            containing tracking information so
+            that you may follow your package
+            throughout its journey.
+          </p>
+        </section>
+
+        <section className="grid lg:grid-cols-[220px_1fr] gap-12">
+          <p className="text-xs tracking-[0.3em] text-gray-400">
+            DELIVERY
+          </p>
+
+          <p className="text-lg text-gray-600 leading-9">
+            Delivery times vary depending on
+            destination, courier services,
+            customs procedures, and local
+            conditions. While we strive to meet
+            estimated timelines, Avenor cannot
+            be responsible for delays caused by
+            circumstances beyond our control.
+          </p>
+        </section>
+
+        <section className="grid lg:grid-cols-[220px_1fr] gap-12">
+          <p className="text-xs tracking-[0.3em] text-gray-400">
+            ADDRESS
+          </p>
+
+          <p className="text-lg text-gray-600 leading-9">
+            Customers are responsible for ensuring
+            that shipping information provided at
+            checkout is accurate and complete.
+            Avenor cannot be held responsible for
+            delays or failed deliveries resulting
+            from incorrect address details.
+          </p>
+        </section>
+
+        <section className="grid lg:grid-cols-[220px_1fr] gap-12">
+          <p className="text-xs tracking-[0.3em] text-gray-400">
+            INTERNATIONAL
+          </p>
+
+          <p className="text-lg text-gray-600 leading-9">
+            International orders may be subject to
+            customs duties, taxes, or import
+            charges imposed by the destination
+            country. Such charges, where
+            applicable, remain the responsibility
+            of the customer.
+          </p>
+        </section>
+
+      </div>
+
+      {/* FOOTER */}
+
+      <div className="mt-28 pt-16 border-t text-center">
+
+        <p className="text-xs tracking-[0.35em] text-gray-400 mb-6">
+          CLIENT SERVICES
+        </p>
+
+        <p
+          className="
+            text-3xl
+            md:text-4xl
+            font-light
+            leading-relaxed
+            max-w-3xl
+            mx-auto
+          "
+          style={{
+            fontFamily:
+              '"Cormorant Garamond", serif',
+          }}
+        >
+          Thoughtfully prepared.
+          <br />
+          Carefully delivered.
+        </p>
+
+        <p className="mt-12 text-gray-500">
+          For shipping-related enquiries, please contact
+        </p>
+
         <a
           href="mailto:support@avenorcollection.com"
-          className="underline"
+          className="
+            mt-3
+            inline-block
+            text-black
+            tracking-[0.2em]
+            hover:opacity-60
+            transition
+          "
         >
           support@avenorcollection.com
-        </a>.
-      </p>
-    </div>
+        </a>
+
+      </div>
+
+    </main>
   );
 }
