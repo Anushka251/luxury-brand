@@ -1,37 +1,52 @@
 "use client";
 
-import { useSession, signIn, signOut } from "next-auth/react";
+import {
+  useSession,
+  signIn,
+  signOut,
+} from "next-auth/react";
 import Link from "next/link";
 
 export default function AccountPage() {
-  const { data: session, status } = useSession();
+  const { data: session, status } =
+    useSession();
 
-  // ✅ WAIT FOR SESSION (prevents flicker)
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-sm tracking-widest animate-pulse">
+        <div className="text-sm tracking-[0.4em] animate-pulse">
           AVENOR
         </div>
       </div>
     );
   }
 
-  // NOT LOGGED IN
   if (!session) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
+      <main className="min-h-screen flex items-center justify-center px-6">
         <div className="text-center space-y-6">
-          <h1 className="text-2xl tracking-widest">MY ACCOUNT</h1>
+          <h1 className="text-2xl tracking-[0.3em]">
+            MY ACCOUNT
+          </h1>
+
           <p className="text-sm text-gray-500">
-            Sign in to access your account
+            Sign in to access your account.
           </p>
 
           <button
             onClick={() =>
-              signIn("google", { callbackUrl: "/account" })
+              signIn("google", {
+                callbackUrl: "/account",
+              })
             }
-            className="bg-black text-white px-10 py-3 tracking-widest"
+            className="
+              bg-black
+              text-white
+              px-10
+              py-4
+              tracking-[0.25em]
+              text-sm
+            "
           >
             LOGIN
           </button>
@@ -40,51 +55,139 @@ export default function AccountPage() {
     );
   }
 
-  // LOGGED IN
   return (
-    <main className="px-12 py-32 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-light tracking-widest mb-16">
-        MY ACCOUNT
-      </h1>
+    <main className="max-w-5xl mx-auto px-8 md:px-12 py-24">
 
-      {/* USER INFO */}
-      <div className="mb-16 space-y-2">
-        <p className="text-lg">{session.user?.name}</p>
-        <p className="text-sm text-gray-500">
+      {/* HEADER */}
+      <div className="mb-20">
+        <p className="text-sm tracking-[0.4em] text-gray-400 mb-4">
+          AVENOR CLIENT
+        </p>
+
+        <h1 className="text-5xl font-light tracking-[0.15em]">
+          MY ACCOUNT
+        </h1>
+      </div>
+
+      {/* PROFILE */}
+      <div className="mb-20">
+        <h2 className="text-3xl font-light mb-3">
+          {session.user?.name}
+        </h2>
+
+        <p className="text-gray-500 text-lg">
           {session.user?.email}
         </p>
       </div>
 
-      {/* MENU */}
-      <div className="space-y-6 text-sm tracking-widest">
+      {/* ACCOUNT STATS */}
+      <div className="grid grid-cols-3 gap-6 mb-20 border-y py-10">
+
+        <div>
+          <p className="text-xs tracking-[0.3em] text-gray-400 mb-2">
+            ORDERS
+          </p>
+
+          <p className="text-3xl font-light">
+            1
+          </p>
+        </div>
+
+        <div>
+          <p className="text-xs tracking-[0.3em] text-gray-400 mb-2">
+            ADDRESSES
+          </p>
+
+          <p className="text-3xl font-light">
+            1
+          </p>
+        </div>
+
+        <div>
+          <p className="text-xs tracking-[0.3em] text-gray-400 mb-2">
+            MEMBER
+          </p>
+
+          <p className="text-3xl font-light">
+            2026
+          </p>
+        </div>
+      </div>
+
+      {/* QUICK ACCESS */}
+      <div className="space-y-8 text-sm tracking-[0.25em] mb-20">
+
         <Link
           href="/account/orders"
-          className="block hover:opacity-70 transition"
+          className="
+            block
+            border-b
+            pb-4
+            hover:opacity-60
+            transition
+          "
         >
           ORDERS
         </Link>
 
         <Link
           href="/account/address"
-          className="block hover:opacity-70 transition"
+          className="
+            block
+            border-b
+            pb-4
+            hover:opacity-60
+            transition
+          "
         >
           ADDRESS
         </Link>
 
         <Link
           href="/account/change-password"
-          className="block hover:opacity-70 transition"
+          className="
+            block
+            border-b
+            pb-4
+            hover:opacity-60
+            transition
+          "
         >
           CHANGE PASSWORD
         </Link>
 
         <button
-          onClick={() => signOut({ callbackUrl: "/home" })}
-          className="block hover:opacity-70 transition text-left"
+          onClick={() =>
+            signOut({
+              callbackUrl: "/home",
+            })
+          }
+          className="
+            block
+            border-b
+            pb-4
+            text-left
+            hover:opacity-60
+            transition
+          "
         >
           LOGOUT
         </button>
       </div>
+
+      {/* BRAND MESSAGE */}
+      <div className="pt-16 text-center">
+        <p className="text-gray-400 tracking-[0.3em] text-sm mb-4">
+          AVENOR MEMBER
+        </p>
+
+        <p className="text-gray-500 max-w-md mx-auto leading-8">
+          Access future collections,
+          limited releases, and
+          private client experiences.
+        </p>
+      </div>
+
     </main>
   );
 }
