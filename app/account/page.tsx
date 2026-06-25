@@ -51,9 +51,7 @@ export default function AccountPage() {
             );
           }
         } catch (error) {
-          console.error(
-            error
-          );
+          console.error(error);
         }
       };
 
@@ -126,8 +124,8 @@ export default function AccountPage() {
       </div>
 
       {/* Header */}
-      <div className="mb-20">
-        <p className="text-sm tracking-[0.4em] text-gray-400 mb-4">
+      <div className="mb-16">
+        <p className="text-sm tracking-[0.35em] text-gray-400 mb-4">
           AVENOR CLIENT
         </p>
 
@@ -137,18 +135,18 @@ export default function AccountPage() {
       </div>
 
       {/* User */}
-      <div className="mb-20">
-        <h2 className="text-3xl font-light mb-3">
+      <div className="mb-16">
+        <h2 className="text-3xl font-light mb-2">
           {session.user?.name}
         </h2>
 
-        <p className="text-gray-500 text-lg">
+        <p className="text-gray-500">
           {session.user?.email}
         </p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-6 border-y py-10 mb-20">
+      <div className="grid grid-cols-3 gap-6 border-y py-10 mb-16">
 
         <div>
           <p className="text-xs tracking-[0.3em] text-gray-400 mb-2">
@@ -183,123 +181,120 @@ export default function AccountPage() {
       </div>
 
       {/* Latest Order */}
-      {latestOrder && (
-        <Link
-          href="/account/orders"
-          className="
-            block
-            border
-            p-8
-            mb-20
-            hover:shadow-sm
-            transition
-          "
-        >
-          <p className="text-xs tracking-[0.3em] text-gray-400 mb-6">
-            LATEST ORDER
-          </p>
+      {latestOrder &&
+        latestOrder.items?.[0] && (
+          <Link
+            href="/account/orders"
+            className="
+              block
+              border
+              mb-16
+              overflow-hidden
+              hover:shadow-sm
+              transition
+            "
+          >
+            <div className="grid md:grid-cols-[220px_1fr]">
 
-          <div className="flex gap-6 items-center">
-
-            {latestOrder.items?.[0]
-              ?.image && (
               <img
                 src={
-                  latestOrder
-                    .items[0]
+                  latestOrder.items[0]
                     .image
                 }
                 alt={
-                  latestOrder
-                    .items[0]
+                  latestOrder.items[0]
                     .name
                 }
                 className="
-                  w-28
-                  h-36
+                  w-full
+                  h-[280px]
                   object-cover
                 "
               />
-            )}
 
-            <div>
-              <h3 className="text-2xl font-light">
-                {
-                  latestOrder
-                    .items[0]
-                    ?.name
-                }
-              </h3>
-
-              {latestOrder
-                .items[0]
-                ?.size && (
-                <p className="text-gray-500 mt-2">
-                  Size:{" "}
-                  {
-                    latestOrder
-                      .items[0]
-                      .size
-                  }
+              <div className="p-8 flex flex-col justify-center">
+                <p className="text-xs tracking-[0.3em] text-gray-400 mb-4">
+                  LATEST ORDER
                 </p>
-              )}
 
-              <p className="text-gray-500 mt-2">
-                ₹
-                {latestOrder.total?.toLocaleString(
-                  "en-IN"
+                <h3 className="text-3xl font-light mb-3">
+                  {
+                    latestOrder.items[0]
+                      .name
+                  }
+                </h3>
+
+                {latestOrder.items[0]
+                  ?.size && (
+                  <p className="text-gray-500 mb-2">
+                    Size:{" "}
+                    {
+                      latestOrder
+                        .items[0]
+                        .size
+                    }
+                  </p>
                 )}
-              </p>
 
-              <p className="text-sm text-gray-400 mt-4">
-                View latest purchase
-              </p>
+                <p className="text-xl mb-4">
+                  ₹
+                  {latestOrder.total?.toLocaleString(
+                    "en-IN"
+                  )}
+                </p>
+
+                <p className="text-sm text-gray-400 tracking-wider">
+                  VIEW ORDER →
+                </p>
+              </div>
+
             </div>
-
-          </div>
-        </Link>
-      )}
+          </Link>
+        )}
 
       {/* Navigation */}
-      <div className="space-y-8 text-sm tracking-[0.25em] mb-20">
+      <div className="space-y-7 text-sm tracking-[0.25em]">
 
         <Link
           href="/account/orders"
           className="
-            block
+            flex justify-between
             border-b
             pb-4
             hover:opacity-60
             transition
           "
         >
-          ORDERS
+          <span>ORDERS</span>
+          <span>→</span>
         </Link>
 
         <Link
           href="/account/address"
           className="
-            block
+            flex justify-between
             border-b
             pb-4
             hover:opacity-60
             transition
           "
         >
-          ADDRESS
+          <span>ADDRESS</span>
+          <span>→</span>
         </Link>
 
         <Link
           href="/account/change-password"
           className="
-            block
+            flex justify-between
             border-b
             pb-4
             hover:opacity-60
             transition
           "
         >
-          CHANGE PASSWORD
+          <span>CHANGE PASSWORD</span>
+          <span>→</span>
         </Link>
 
         <button
@@ -310,29 +305,30 @@ export default function AccountPage() {
             })
           }
           className="
-            block
+            flex
+            justify-between
+            w-full
+            text-left
             border-b
             pb-4
-            text-left
             hover:opacity-60
             transition
           "
         >
-          LOGOUT
+          <span>LOGOUT</span>
+          <span>→</span>
         </button>
 
       </div>
 
-      {/* Footer Message */}
-      <div className="pt-12 text-center">
-        <p className="text-gray-400 tracking-[0.35em] text-sm mb-5">
-          PRIVATE CLIENT
+      {/* Signature */}
+      <div className="pt-16 border-t mt-20 text-center">
+        <p className="text-xs tracking-[0.35em] text-gray-400">
+          AVENOR
         </p>
 
-        <p className="text-gray-500 leading-8 max-w-md mx-auto">
-          Access future collections,
-          limited releases, and
-          private client experiences.
+        <p className="mt-4 text-sm text-gray-500">
+          Quiet Luxury. Limited Pieces.
         </p>
       </div>
 
