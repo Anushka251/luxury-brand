@@ -15,7 +15,6 @@ export default function ProductClient({
   const [selectedSize, setSelectedSize] =
     useState<string | null>(null);
 
-  // Scroll to top when product page opens
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -37,13 +36,18 @@ export default function ProductClient({
       slug: product.id,
       size: selectedSize,
     });
-  }, [addToCart, product, selectedSize]);
+  }, [
+    addToCart,
+    product,
+    selectedSize,
+  ]);
 
   return (
     <div className="max-w-7xl mx-auto -mt-2 px-4 lg:px-2">
       <div className="flex flex-col lg:flex-row lg:items-start lg:gap-10">
 
         {/* LEFT: GALLERY */}
+
         <div className="lg:w-[62%]">
           <ProductGallery
             images={product.images}
@@ -52,9 +56,21 @@ export default function ProductClient({
         </div>
 
         {/* RIGHT: DETAILS */}
-        <div className="mt-8 lg:mt-6 lg:w-[38%]">
+
+        <div className="mt-8 lg:mt-4 lg:w-[38%] lg:sticky lg:top-28">
+
+          <p className="text-xs tracking-[0.35em] text-gray-400 mb-4">
+            AVENOR COLLECTION
+          </p>
+
           <h1
-            className="text-5xl font-light tracking-wide"
+            className="
+              text-4xl
+              md:text-5xl
+              font-light
+              leading-none
+              tracking-[0.05em]
+            "
             style={{
               fontFamily:
                 '"Cormorant Garamond", serif',
@@ -63,69 +79,87 @@ export default function ProductClient({
             {product.name}
           </h1>
 
-          <p className="mt-4 text-2xl">
-            ₹{product.price.toLocaleString("en-IN")}
+          <p className="mt-8 text-3xl font-light">
+            ₹
+            {product.price.toLocaleString(
+              "en-IN"
+            )}
           </p>
 
-          <p className="mt-2 text-xs tracking-[0.25em] text-gray-500">
+          <p className="mt-3 text-xs tracking-[0.3em] text-gray-500">
             LIMITED TO {product.totalPieces} PIECES
           </p>
 
-          <p className="mt-6 text-gray-600 leading-8">
-            {product.description}
-          </p>
+          {/* DESCRIPTION */}
 
-          {/* SIZE SELECTOR */}
-          <div className="mt-10">
-            <div className="flex justify-between items-center mb-4">
-              <p className="text-xs tracking-widest text-gray-500">
-                SIZE
-              </p>
+          <div className="mt-12 border-t pt-8">
 
-              {!selectedSize && (
-                <span className="text-xs text-gray-400">
-                  Select a size
-                </span>
-              )}
-            </div>
+            <p className="text-xs tracking-[0.3em] text-gray-400 mb-5">
+              DESCRIPTION
+            </p>
 
-            <div className="flex gap-4 flex-wrap">
+            <p className="text-gray-600 leading-8">
+              {product.description}
+            </p>
+
+          </div>
+
+          {/* SIZE */}
+
+          <div className="mt-12">
+
+            <p className="text-xs tracking-[0.3em] text-gray-400 mb-6">
+              SELECT SIZE
+            </p>
+
+            <div className="flex gap-3 flex-wrap">
+
               {sizes.map((size) => (
                 <button
                   key={size}
-                  onClick={() => setSelectedSize(size)}
+                  onClick={() =>
+                    setSelectedSize(size)
+                  }
                   className={`
-                    text-sm
-                    px-4
-                    py-2
+                    w-14
+                    h-14
                     border
-                    rounded-md
                     transition
+                    text-sm
+                    tracking-wider
                     ${
                       selectedSize === size
-                        ? "border-black text-black"
-                        : "border-gray-300 text-gray-500 hover:border-black"
+                        ? "bg-black text-white border-black"
+                        : "border-gray-300 hover:border-black"
                     }
                   `}
                 >
                   {size}
                 </button>
               ))}
+
             </div>
+
+            {!selectedSize && (
+              <p className="mt-4 text-xs text-gray-400">
+                Select your size.
+              </p>
+            )}
+
           </div>
 
           {/* ADD TO BAG */}
+
           <button
             onClick={addToBag}
             disabled={!selectedSize}
             className={`
-              mt-8
-              px-12
-              py-4
+              w-full
+              mt-12
+              py-5
+              tracking-[0.25em]
               border
               transition
-              font-medium
-              tracking-[0.2em]
               ${
                 selectedSize
                   ? "border-black hover:bg-black hover:text-white"
@@ -136,19 +170,28 @@ export default function ProductClient({
             ADD TO BAG
           </button>
 
-          {/* DETAILS */}
-          <div className="mt-12 border-t pt-8">
-            <p className="text-xs tracking-[0.25em] text-gray-500 mb-4">
+          {/* DESIGN */}
+
+          <div className="mt-14 border-t pt-8">
+
+            <p className="text-xs tracking-[0.3em] text-gray-400 mb-5">
               DESIGN
             </p>
 
             <p className="text-sm text-gray-600 leading-8 whitespace-pre-line">
               {product.detailDescription}
             </p>
+
+          </div>
+
+          <div className="mt-12 text-xs text-gray-400 tracking-[0.2em]">
+            QUIET LUXURY • LIMITED DROP
           </div>
 
           <div className="h-12" />
+
         </div>
+
       </div>
     </div>
   );
