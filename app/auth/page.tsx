@@ -1,125 +1,170 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function AuthPage() {
+export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
-    setError("");
+  const router = useRouter();
 
-    if (!email || !password) {
-      setError("Please enter your email and password");
+  const handleSignup = async () => {
+    const res = await fetch("/api/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      alert(data.error);
       return;
     }
 
-    setLoading(true);
+    alert("Account created successfully.");
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-
-    if (res?.error) {
-      setError(
-        "Your details don’t seem to match. Try again or reset your password."
-      );
-      setLoading(false);
-      return;
-    }
-
-    window.location.href = "/account";
-  };
-
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-
-    await signIn("google", {
-      callbackUrl: "/account",
-      redirect: true,
-    });
+    router.push("/login");
   };
 
   return (
-    <main className="px-12 py-32 max-w-md mx-auto space-y-8">
+    <main className="max-w-xl mx-auto px-8 py-24">
 
-      <h1 className="text-2xl tracking-widest text-center">
-        AVENOR
+      {/* Header */}
+
+      <p className="text-xs tracking-[0.35em] text-gray-400 mb-5">
+        AVENOR CLIENT
+      </p>
+
+      <h1
+        className="
+          text-5xl
+          md:text-6xl
+          font-light
+          tracking-[0.08em]
+          mb-5
+        "
+      >
+        CREATE ACCOUNT
       </h1>
 
-      {/* GOOGLE LOGIN */}
-      <button
-        onClick={handleGoogleLogin}
-        disabled={loading}
-        className="w-full border py-3 tracking-widest hover:bg-black hover:text-white transition disabled:opacity-50"
-      >
-        {loading ? "PLEASE WAIT..." : "CONTINUE WITH GOOGLE"}
-      </button>
+      <p className="text-gray-500 leading-8 mb-16">
+        Create your Avenor account to access your orders,
+        saved addresses, future collections and exclusive
+        client releases.
+      </p>
 
-      <div className="text-center text-xs text-gray-400">
-        OR
-      </div>
+      {/* Email */}
 
-      {/* EMAIL LOGIN */}
-      <div className="space-y-4">
+      <div className="mb-12">
+
+        <label className="block text-xs tracking-[0.3em] text-gray-400 mb-4">
+          EMAIL
+        </label>
 
         <input
           type="email"
-          className="w-full border p-3"
-          placeholder="Email"
+          placeholder="you@example.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={loading}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
+          className="
+            w-full
+            border-0
+            border-b
+            border-gray-300
+            bg-transparent
+            py-4
+            outline-none
+            text-lg
+            focus:border-black
+            transition
+          "
         />
+
+      </div>
+
+      {/* Password */}
+
+      <div className="mb-16">
+
+        <label className="block text-xs tracking-[0.3em] text-gray-400 mb-4">
+          PASSWORD
+        </label>
 
         <input
           type="password"
-          className="w-full border p-3"
-          placeholder="Password"
+          placeholder="Create a password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={loading}
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
+          className="
+            w-full
+            border-0
+            border-b
+            border-gray-300
+            bg-transparent
+            py-4
+            outline-none
+            text-lg
+            focus:border-black
+            transition
+          "
         />
 
-        {/* ERROR MESSAGE */}
-        {error && (
-          <p className="text-xs text-red-500 text-center">
-            {error}
-          </p>
-        )}
-
-        {/* FORGOT PASSWORD */}
-        <div className="text-right">
-          <Link
-            href="/forgot-password"
-            className="text-xs text-gray-500 hover:text-black underline"
-          >
-            Forgot Password?
-          </Link>
-        </div>
-
-        <button
-          onClick={handleLogin}
-          disabled={loading}
-          className="w-full bg-black text-white py-3 tracking-widest disabled:opacity-50"
-        >
-          {loading ? "LOGGING IN..." : "LOGIN"}
-        </button>
       </div>
 
-      {/* SIGNUP */}
-      <p className="text-xs text-center text-gray-500">
-        Don’t have an account?{" "}
-        <Link href="/signup" className="underline">
-          CREATE ONE
+      {/* Button */}
+
+      <button
+        onClick={handleSignup}
+        className="
+          w-full
+          border
+          border-black
+          py-5
+          tracking-[0.3em]
+          hover:bg-black
+          hover:text-white
+          transition-all
+          duration-300
+        "
+      >
+        CREATE ACCOUNT
+      </button>
+
+      {/* Login */}
+
+      <div className="mt-10 text-center">
+
+        <p className="text-sm text-gray-500">
+          Already have an account?
+        </p>
+
+        <Link
+          href="/login"
+          className="
+            inline-block
+            mt-4
+            tracking-[0.25em]
+            text-sm
+            hover:opacity-60
+            transition
+          "
+        >
+          LOGIN
         </Link>
-      </p>
+
+      </div>
 
     </main>
   );
