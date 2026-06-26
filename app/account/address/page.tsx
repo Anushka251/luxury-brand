@@ -1,8 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 export default function AddressPage() {
+  const { data: session } = useSession();
+  
   const [addresses, setAddresses] =
     useState<any[]>([]);
 
@@ -17,32 +20,28 @@ export default function AddressPage() {
   });
 
   useEffect(() => {
-    const load = () => {
-      const saved =
-        localStorage.getItem(
-          "addresses"
-        );
+  const loadAddresses = async () => {
+    if (!session?.user?.email) return;
 
-      if (saved) {
-        setAddresses(
-          JSON.parse(saved)
-        );
-      }
-    };
-
-    load();
-
-    window.addEventListener(
-      "focus",
-      load
-    );
-
-    return () =>
-      window.removeEventListener(
-        "focus",
-        load
+    try {
+      const res = await fetch(
+        `/api/address?email=${encodeURIComponent(
+          session.user.email
+        )}`
       );
-  }, []);
+
+      const data = await res.json();
+
+      if (data.success) {
+        setAddresses(data.addresses);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  loadAddresses();
+}, [session]);
 
   const isValid =
     form.name &&
@@ -52,13 +51,46 @@ export default function AddressPage() {
     form.state &&
     form.pincode.length === 6;
 
-  const addAddress = () => {
-    if (!isValid) {
-      alert(
-        "Please fill all fields correctly."
-      );
-      return;
+  const addAddress = async () => {
+  if (!isValid || !session?.user?.email) {
+    alert("Please fill all fields correctly.");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/address", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: session.user.email,
+        ...form,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      setAddresses(data.addresses);
+
+      setForm({
+        name: "",
+        phone: "",
+        address: "",
+        landmark: "",
+        city: "",
+        state: "",
+        pincode: "",
+      });
+    } else {
+      alert(data.message || "Failed to save address.");
     }
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong.");
+  }
+};
 
     const newAddress = {
       id: Date.now().toString(),
@@ -88,21 +120,28 @@ export default function AddressPage() {
     });
   };
 
-  const deleteAddress = (
-    id: string
-  ) => {
-    const updated =
-      addresses.filter(
-        (a) => a.id !== id
-      );
+  const deleteAddress = async (id: string) => {
+  try {
+    const res = await fetch("/api/address", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id }),
+    });
 
-    setAddresses(updated);
+    const data = await res.json();
 
-    localStorage.setItem(
-      "addresses",
-      JSON.stringify(updated)
-    );
-  };
+    if (data.success) {
+      setAddresses(data.addresses);
+    } else {
+      alert(data.message || "Failed to delete address.");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong.");
+  }
+};
 
   return (
     <main className="max-w-5xl mx-auto px-8 md:px-12 py-24">
