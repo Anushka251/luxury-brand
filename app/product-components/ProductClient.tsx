@@ -1,6 +1,11 @@
 "use client";
 
-import { useCallback, useState, useEffect } from "react";
+import Link from "next/link";
+import {
+  useCallback,
+  useState,
+  useEffect,
+} from "react";
 import { useCart } from "@/app/context/CartContext";
 import { Product } from "@/lib/products";
 import ProductGallery from "./ProductGallery";
@@ -22,7 +27,13 @@ export default function ProductClient({
     });
   }, []);
 
-  const sizes = ["XS", "S", "M", "L", "XL"];
+  const sizes = [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+  ];
 
   const addToBag = useCallback(() => {
     if (!selectedSize) return;
@@ -36,15 +47,17 @@ export default function ProductClient({
       slug: product.id,
       size: selectedSize,
     });
-  }, [addToCart, product, selectedSize]);
+  }, [
+    addToCart,
+    product,
+    selectedSize,
+  ]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-2">
-
       {/* PRODUCT SECTION */}
 
       <div className="flex flex-col lg:flex-row lg:items-start lg:gap-12">
-
         {/* GALLERY */}
 
         <div className="lg:w-[62%]">
@@ -57,7 +70,6 @@ export default function ProductClient({
         {/* DETAILS */}
 
         <div className="mt-8 lg:mt-4 lg:w-[38%] lg:sticky lg:top-28">
-
           <p className="text-xs tracking-[0.35em] text-gray-400 mb-4">
             AVENOR COLLECTION
           </p>
@@ -79,7 +91,10 @@ export default function ProductClient({
           </h1>
 
           <p className="mt-8 text-3xl font-light">
-            ₹{product.price.toLocaleString("en-IN")}
+            ₹
+            {product.price.toLocaleString(
+              "en-IN"
+            )}
           </p>
 
           <p className="mt-3 text-xs tracking-[0.3em] text-gray-500">
@@ -101,17 +116,35 @@ export default function ProductClient({
           {/* SIZE */}
 
           <div className="mt-12">
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-xs tracking-[0.3em] text-gray-400">
+                SELECT SIZE
+              </p>
 
-            <p className="text-xs tracking-[0.3em] text-gray-400 mb-6">
-              SELECT SIZE
-            </p>
+              <Link
+                href="/size-chart"
+                className="
+                  text-[11px]
+                  tracking-[0.25em]
+                  uppercase
+                  text-gray-400
+                  hover:text-black
+                  transition
+                "
+              >
+                Size Chart
+              </Link>
+            </div>
 
             <div className="flex gap-3 flex-wrap">
-
               {sizes.map((size) => (
                 <button
                   key={size}
-                  onClick={() => setSelectedSize(size)}
+                  onClick={() =>
+                    setSelectedSize(
+                      size
+                    )
+                  }
                   className={`
                     w-14
                     h-14
@@ -121,7 +154,8 @@ export default function ProductClient({
                     text-sm
                     tracking-wider
                     ${
-                      selectedSize === size
+                      selectedSize ===
+                      size
                         ? "bg-black text-white border-black"
                         : "border-gray-300 hover:border-black hover:bg-gray-50"
                     }
@@ -130,7 +164,6 @@ export default function ProductClient({
                   {size}
                 </button>
               ))}
-
             </div>
 
             {!selectedSize && (
@@ -138,7 +171,6 @@ export default function ProductClient({
                 Select your size.
               </p>
             )}
-
           </div>
 
           {/* ADD TO BAG */}
@@ -163,14 +195,12 @@ export default function ProductClient({
           >
             ADD TO BAG
           </button>
-
         </div>
       </div>
 
       {/* DESIGN SECTION */}
 
       <div className="mt-28 border-t pt-20 pb-28">
-
         <p className="text-xs tracking-[0.35em] text-gray-400 text-center mb-6">
           DESIGN
         </p>
@@ -192,7 +222,6 @@ export default function ProductClient({
         </h2>
 
         <div className="max-w-xl mx-auto">
-
           <p
             className="
               text-lg
@@ -210,11 +239,8 @@ export default function ProductClient({
               QUIET LUXURY • CONTEMPORARY FASHION • LIMITED DROP
             </p>
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 }
