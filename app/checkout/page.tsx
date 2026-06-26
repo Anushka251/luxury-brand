@@ -23,17 +23,35 @@ export default function CheckoutPage() {
 
   const router = useRouter();
 
-  const [addresses, setAddresses] = useState<any[]>([]);
+  const [addresses, setAddresses] =
+    useState<any[]>([]);
+
   const [selectedAddress, setSelectedAddress] =
     useState<any>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("addresses");
+    const loadAddresses = async () => {
+      if (!session?.user?.email) return;
 
-    if (saved) {
-      setAddresses(JSON.parse(saved));
-    }
-  }, []);
+      try {
+        const res = await fetch(
+          `/api/address?email=${encodeURIComponent(
+            session.user.email
+          )}`
+        );
+
+        const data = await res.json();
+
+        if (data.success) {
+          setAddresses(data.addresses);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadAddresses();
+  }, [session]);
 
   const total = cart.reduce(
     (sum, item) =>
@@ -42,11 +60,6 @@ export default function CheckoutPage() {
   );
 
   const handleAddNew = () => {
-    localStorage.setItem(
-      "checkout_redirect",
-      "true"
-    );
-
     router.push("/account/address");
   };
 
@@ -126,7 +139,6 @@ export default function CheckoutPage() {
 
   return (
     <main className="max-w-7xl mx-auto px-8 md:px-12 py-24">
-
       {/* HEADER */}
       <div className="mb-20">
         <p className="text-xs tracking-[0.35em] text-gray-400 mb-4">
@@ -143,16 +155,13 @@ export default function CheckoutPage() {
       </div>
 
       <div className="grid lg:grid-cols-[1fr_430px] gap-24">
-
         {/* ADDRESS */}
         <section>
-
           <p className="text-xs tracking-[0.25em] text-gray-400 mb-8">
             DELIVERY ADDRESS
           </p>
 
           <div className="space-y-6">
-
             {addresses.map((addr) => (
               <div
                 key={addr.id}
@@ -199,7 +208,6 @@ export default function CheckoutPage() {
                 </p>
               </div>
             ))}
-
           </div>
 
           <button
@@ -214,18 +222,15 @@ export default function CheckoutPage() {
           >
             + ADD NEW ADDRESS
           </button>
-
         </section>
 
         {/* ORDER SUMMARY */}
         <section>
-
           <p className="text-xs tracking-[0.25em] text-gray-400 mb-8">
             ORDER SUMMARY
           </p>
 
           <div className="space-y-12">
-
             {cart.map((item) => (
               <div
                 key={`${item.id}-${item.size}`}
@@ -236,7 +241,6 @@ export default function CheckoutPage() {
                   pb-10
                 "
               >
-
                 <div className="relative w-[120px] h-[160px] flex-shrink-0">
                   <Image
                     src={item.image}
@@ -247,7 +251,6 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="flex-1">
-
                   <p className="text-2xl font-light">
                     {item.name}
                   </p>
@@ -266,7 +269,6 @@ export default function CheckoutPage() {
                   </p>
 
                   <div className="flex items-center gap-4 mt-8">
-
                     <button
                       onClick={() =>
                         updateQuantity(
@@ -310,7 +312,6 @@ export default function CheckoutPage() {
                     >
                       +
                     </button>
-
                   </div>
 
                   <button
@@ -330,7 +331,6 @@ export default function CheckoutPage() {
                   >
                     REMOVE
                   </button>
-
                 </div>
 
                 <div>
@@ -344,16 +344,12 @@ export default function CheckoutPage() {
                     )}
                   </p>
                 </div>
-
               </div>
             ))}
-
           </div>
 
           <div className="mt-16 pt-10 border-t">
-
             <div className="flex justify-between items-end mb-10">
-
               <div>
                 <p className="text-xs tracking-[0.25em] text-gray-400 mb-3">
                   ORDER TOTAL
@@ -366,7 +362,6 @@ export default function CheckoutPage() {
                   )}
                 </p>
               </div>
-
             </div>
 
             <button
@@ -387,13 +382,9 @@ export default function CheckoutPage() {
             >
               COMPLETE PURCHASE
             </button>
-
           </div>
-
         </section>
-
       </div>
-
     </main>
   );
 }
