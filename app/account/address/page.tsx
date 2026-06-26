@@ -318,7 +318,7 @@ export default function AddressPage() {
         <div className="space-y-10">
           {addresses.map((addr) => (
             <div
-              key={addr.id}
+              key={addr._id}
               className="
                 border-b
                 pb-8
@@ -352,7 +352,7 @@ export default function AddressPage() {
               </div>
 
               <button
-                onClick={() => deleteAddress(addr.id)}
+                onClick={() => deleteAddress(addr._id)}
                 className="
                   text-xs
                   tracking-[0.2em]
