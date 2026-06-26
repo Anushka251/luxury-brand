@@ -5,8 +5,11 @@ import { useState } from "react";
 import Link from "next/link";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
 
   const [loading, setLoading] =
     useState(false);
@@ -59,7 +62,6 @@ export default function LoginPage() {
 
   return (
     <main className="max-w-xl mx-auto px-8 py-24">
-
       {/* Header */}
 
       <p className="text-xs tracking-[0.35em] text-gray-400 mb-5">
@@ -88,9 +90,7 @@ export default function LoginPage() {
       {/* Google */}
 
       <button
-        onClick={
-          handleGoogleLogin
-        }
+        onClick={handleGoogleLogin}
         disabled={loading}
         className="
           w-full
@@ -112,7 +112,6 @@ export default function LoginPage() {
       </button>
 
       <div className="flex items-center mb-10">
-
         <div className="flex-1 border-t" />
 
         <p className="px-5 text-xs tracking-[0.3em] text-gray-400">
@@ -120,13 +119,11 @@ export default function LoginPage() {
         </p>
 
         <div className="flex-1 border-t" />
-
       </div>
 
       {/* Email */}
 
       <div className="mb-12">
-
         <label className="block text-xs tracking-[0.3em] text-gray-400 mb-4">
           EMAIL
         </label>
@@ -154,13 +151,11 @@ export default function LoginPage() {
             transition
           "
         />
-
       </div>
 
       {/* Password */}
 
       <div className="mb-4">
-
         <label className="block text-xs tracking-[0.3em] text-gray-400 mb-4">
           PASSWORD
         </label>
@@ -188,7 +183,7 @@ export default function LoginPage() {
             transition
           "
         />
-              </div>
+      </div>
 
       {/* Error */}
 
@@ -201,7 +196,6 @@ export default function LoginPage() {
       {/* Forgot Password */}
 
       <div className="flex justify-end mb-12">
-
         <Link
           href="/forgot-password"
           className="
@@ -213,7 +207,6 @@ export default function LoginPage() {
         >
           Forgot Password?
         </Link>
-
       </div>
 
       {/* Login Button */}
@@ -242,7 +235,6 @@ export default function LoginPage() {
       {/* Signup */}
 
       <div className="mt-10 text-center">
-
         <p className="text-sm text-gray-500">
           Don't have an account?
         </p>
@@ -260,9 +252,7 @@ export default function LoginPage() {
         >
           CREATE ACCOUNT
         </Link>
-
       </div>
-
     </main>
   );
 }
