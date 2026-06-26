@@ -18,6 +18,9 @@ export default function AccountPage() {
   const [latestOrder, setLatestOrder] =
     useState<any>(null);
 
+  const [orderCount, setOrderCount] =
+    useState(0);
+
   const [addressCount, setAddressCount] =
     useState(0);
 
@@ -37,13 +40,20 @@ export default function AccountPage() {
         const orderData =
           await orderRes.json();
 
-        if (
-          orderData.success &&
-          orderData.orders.length > 0
-        ) {
-          setLatestOrder(
-            orderData.orders[0]
+        if (orderData.success) {
+          setOrderCount(
+            orderData.orders.length
           );
+
+          if (
+            orderData.orders.length > 0
+          ) {
+            setLatestOrder(
+              orderData.orders[0]
+            );
+          } else {
+            setLatestOrder(null);
+          }
         }
 
         // Addresses
@@ -164,7 +174,7 @@ export default function AccountPage() {
           </p>
 
           <p className="text-3xl font-light">
-            {latestOrder ? 1 : 0}
+            {orderCount}
           </p>
         </div>
 
