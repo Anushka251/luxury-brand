@@ -29,26 +29,20 @@ export default function AccountPage() {
       try {
         // Latest order
         const orderRes = await fetch(
-          "/api/latest-order",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            body: JSON.stringify({
-              email:
-                session.user.email,
-            }),
-          }
+          `/api/orders?email=${encodeURIComponent(
+            session.user.email
+          )}`
         );
 
         const orderData =
           await orderRes.json();
 
-        if (orderData.success) {
+        if (
+          orderData.success &&
+          orderData.orders.length > 0
+        ) {
           setLatestOrder(
-            orderData.order
+            orderData.orders[0]
           );
         }
 
