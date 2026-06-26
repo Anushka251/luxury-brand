@@ -92,33 +92,7 @@ export default function AddressPage() {
   }
 };
 
-    const newAddress = {
-      id: Date.now().toString(),
-      ...form,
-    };
 
-    const updated = [
-      ...addresses,
-      newAddress,
-    ];
-
-    setAddresses(updated);
-
-    localStorage.setItem(
-      "addresses",
-      JSON.stringify(updated)
-    );
-
-    setForm({
-      name: "",
-      phone: "",
-      address: "",
-      landmark: "",
-      city: "",
-      state: "",
-      pincode: "",
-    });
-  };
 
   const deleteAddress = async (id: string) => {
   try {
