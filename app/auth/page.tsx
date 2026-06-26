@@ -188,3 +188,81 @@ export default function LoginPage() {
             transition
           "
         />
+              </div>
+
+      {/* Error */}
+
+      {error && (
+        <p className="mb-6 text-sm text-red-500">
+          {error}
+        </p>
+      )}
+
+      {/* Forgot Password */}
+
+      <div className="flex justify-end mb-12">
+
+        <Link
+          href="/forgot-password"
+          className="
+            text-sm
+            text-gray-500
+            hover:text-black
+            transition
+          "
+        >
+          Forgot Password?
+        </Link>
+
+      </div>
+
+      {/* Login Button */}
+
+      <button
+        onClick={handleLogin}
+        disabled={loading}
+        className="
+          w-full
+          border
+          border-black
+          py-5
+          tracking-[0.3em]
+          hover:bg-black
+          hover:text-white
+          transition-all
+          duration-300
+          disabled:opacity-50
+        "
+      >
+        {loading
+          ? "LOGGING IN..."
+          : "LOGIN"}
+      </button>
+
+      {/* Signup */}
+
+      <div className="mt-10 text-center">
+
+        <p className="text-sm text-gray-500">
+          Don't have an account?
+        </p>
+
+        <Link
+          href="/signup"
+          className="
+            inline-block
+            mt-4
+            tracking-[0.25em]
+            text-sm
+            hover:opacity-60
+            transition
+          "
+        >
+          CREATE ACCOUNT
+        </Link>
+
+      </div>
+
+    </main>
+  );
+}
