@@ -1,29 +1,24 @@
-import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/mongodb";
+import { NextRequest, NextResponse } from "next/server";
+import connectDB from "@/lib/mongodb";
 import Address from "@/models/Address";
 
-export async function GET(req: Request) {
+// GET
+export async function GET(req: NextRequest) {
   try {
     await connectDB();
 
-    const { searchParams } = new URL(req.url);
-
-    const email = searchParams.get("email");
+    const email =
+      req.nextUrl.searchParams.get("email");
 
     if (!email) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Email is required",
-        },
-        {
-          status: 400,
-        }
-      );
+      return NextResponse.json({
+        success: false,
+        message: "Email is required.",
+      });
     }
 
     const addresses = await Address.find({
-      customerEmail: email,
+      email,
     }).sort({
       createdAt: -1,
     });
@@ -33,112 +28,83 @@ export async function GET(req: Request) {
       addresses,
     });
   } catch (error) {
-    console.error(
-      "Fetch addresses error:",
-      error
-    );
+    console.error(error);
 
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          "Failed to fetch addresses",
-      },
-      {
-        status: 500,
-      }
-    );
+    return NextResponse.json({
+      success: false,
+      message: "Failed to load addresses.",
+    });
   }
 }
-export async function POST(req: Request) {
+
+// POST
+export async function POST(req: NextRequest) {
   try {
     await connectDB();
 
     const body = await req.json();
 
-    if (!body.customerEmail) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Customer email is required",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
+    await Address.create(body);
 
-    const address = await Address.create({
-      customerEmail: body.customerEmail,
-
-      name: body.name,
-      phone: body.phone,
-      address: body.address,
-      landmark: body.landmark || "",
-      city: body.city,
-      state: body.state,
-      pincode: body.pincode,
+    const addresses = await Address.find({
+      email: body.email,
+    }).sort({
+      createdAt: -1,
     });
 
     return NextResponse.json({
       success: true,
-      address,
+      addresses,
     });
   } catch (error) {
-    console.error(
-      "Save address error:",
-      error
-    );
+    console.error(error);
 
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to save address",
-      },
-      {
-        status: 500,
-      }
-    );
+    return NextResponse.json({
+      success: false,
+      message: "Failed to save address.",
+    });
   }
 }
-export async function DELETE(req: Request) {
+
+// DELETE
+export async function DELETE(
+  req: NextRequest
+) {
   try {
     await connectDB();
 
-    const body = await req.json();
+    const { id } = await req.json();
 
-    if (!body.id) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Address ID is required",
-        },
-        {
-          status: 400,
-        }
-      );
+    const address =
+      await Address.findById(id);
+
+    if (!address) {
+      return NextResponse.json({
+        success: false,
+        message: "Address not found.",
+      });
     }
 
-    await Address.findByIdAndDelete(body.id);
+    const email = address.email;
+
+    await Address.findByIdAndDelete(id);
+
+    const addresses = await Address.find({
+      email,
+    }).sort({
+      createdAt: -1,
+    });
 
     return NextResponse.json({
       success: true,
-      message: "Address deleted successfully",
+      addresses,
     });
   } catch (error) {
-    console.error(
-      "Delete address error:",
-      error
-    );
+    console.error(error);
 
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to delete address",
-      },
-      {
-        status: 500,
-      }
-    );
+    return NextResponse.json({
+      success: false,
+      message: "Failed to delete address.",
+    });
   }
 }
