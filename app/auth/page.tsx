@@ -1,38 +1,61 @@
 "use client";
 
+import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function SignupPage() {
+export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const router = useRouter();
+  const [loading, setLoading] =
+    useState(false);
 
-  const handleSignup = async () => {
-    const res = await fetch("/api/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    });
+  const [error, setError] =
+    useState("");
 
-    const data = await res.json();
+  const handleLogin = async () => {
+    setError("");
 
-    if (data.error) {
-      alert(data.error);
+    if (!email || !password) {
+      setError(
+        "Please enter your email and password."
+      );
       return;
     }
 
-    alert("Account created successfully.");
+    setLoading(true);
 
-    router.push("/login");
+    const res = await signIn(
+      "credentials",
+      {
+        email,
+        password,
+        redirect: false,
+      }
+    );
+
+    if (res?.error) {
+      setError(
+        "Incorrect email or password."
+      );
+
+      setLoading(false);
+      return;
+    }
+
+    window.location.href =
+      "/account";
   };
+
+  const handleGoogleLogin =
+    async () => {
+      setLoading(true);
+
+      await signIn("google", {
+        callbackUrl: "/account",
+      });
+    };
 
   return (
     <main className="max-w-xl mx-auto px-8 py-24">
@@ -52,14 +75,53 @@ export default function SignupPage() {
           mb-5
         "
       >
-        CREATE ACCOUNT
+        LOGIN
       </h1>
 
       <p className="text-gray-500 leading-8 mb-16">
-        Create your Avenor account to access your orders,
-        saved addresses, future collections and exclusive
-        client releases.
+        Sign in to access your
+        orders, saved addresses,
+        future collections and
+        exclusive client releases.
       </p>
+
+      {/* Google */}
+
+      <button
+        onClick={
+          handleGoogleLogin
+        }
+        disabled={loading}
+        className="
+          w-full
+          border
+          border-black
+          py-5
+          tracking-[0.3em]
+          hover:bg-black
+          hover:text-white
+          transition-all
+          duration-300
+          mb-10
+          disabled:opacity-50
+        "
+      >
+        {loading
+          ? "PLEASE WAIT..."
+          : "CONTINUE WITH GOOGLE"}
+      </button>
+
+      <div className="flex items-center mb-10">
+
+        <div className="flex-1 border-t" />
+
+        <p className="px-5 text-xs tracking-[0.3em] text-gray-400">
+          OR
+        </p>
+
+        <div className="flex-1 border-t" />
+
+      </div>
 
       {/* Email */}
 
@@ -73,8 +135,11 @@ export default function SignupPage() {
           type="email"
           placeholder="you@example.com"
           value={email}
+          disabled={loading}
           onChange={(e) =>
-            setEmail(e.target.value)
+            setEmail(
+              e.target.value
+            )
           }
           className="
             w-full
@@ -94,7 +159,7 @@ export default function SignupPage() {
 
       {/* Password */}
 
-      <div className="mb-16">
+      <div className="mb-4">
 
         <label className="block text-xs tracking-[0.3em] text-gray-400 mb-4">
           PASSWORD
@@ -102,10 +167,13 @@ export default function SignupPage() {
 
         <input
           type="password"
-          placeholder="Create a password"
+          placeholder="Your password"
           value={password}
+          disabled={loading}
           onChange={(e) =>
-            setPassword(e.target.value)
+            setPassword(
+              e.target.value
+            )
           }
           className="
             w-full
@@ -120,52 +188,3 @@ export default function SignupPage() {
             transition
           "
         />
-
-      </div>
-
-      {/* Button */}
-
-      <button
-        onClick={handleSignup}
-        className="
-          w-full
-          border
-          border-black
-          py-5
-          tracking-[0.3em]
-          hover:bg-black
-          hover:text-white
-          transition-all
-          duration-300
-        "
-      >
-        CREATE ACCOUNT
-      </button>
-
-      {/* Login */}
-
-      <div className="mt-10 text-center">
-
-        <p className="text-sm text-gray-500">
-          Already have an account?
-        </p>
-
-        <Link
-          href="/login"
-          className="
-            inline-block
-            mt-4
-            tracking-[0.25em]
-            text-sm
-            hover:opacity-60
-            transition
-          "
-        >
-          LOGIN
-        </Link>
-
-      </div>
-
-    </main>
-  );
-}
