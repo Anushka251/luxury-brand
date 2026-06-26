@@ -5,9 +5,8 @@ import { useSession } from "next-auth/react";
 
 export default function AddressPage() {
   const { data: session } = useSession();
-  
-  const [addresses, setAddresses] =
-    useState<any[]>([]);
+
+  const [addresses, setAddresses] = useState<any[]>([]);
 
   const [form, setForm] = useState({
     name: "",
@@ -20,28 +19,28 @@ export default function AddressPage() {
   });
 
   useEffect(() => {
-  const loadAddresses = async () => {
-    if (!session?.user?.email) return;
+    const loadAddresses = async () => {
+      if (!session?.user?.email) return;
 
-    try {
-      const res = await fetch(
-        `/api/address?email=${encodeURIComponent(
-          session.user.email
-        )}`
-      );
+      try {
+        const res = await fetch(
+          `/api/address?email=${encodeURIComponent(
+            session.user.email
+          )}`
+        );
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (data.success) {
-        setAddresses(data.addresses);
+        if (data.success) {
+          setAddresses(data.addresses);
+        }
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    };
 
-  loadAddresses();
-}, [session]);
+    loadAddresses();
+  }, [session]);
 
   const isValid =
     form.name &&
@@ -52,74 +51,71 @@ export default function AddressPage() {
     form.pincode.length === 6;
 
   const addAddress = async () => {
-  if (!isValid || !session?.user?.email) {
-    alert("Please fill all fields correctly.");
-    return;
-  }
-
-  try {
-    const res = await fetch("/api/address", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: session.user.email,
-        ...form,
-      }),
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      setAddresses(data.addresses);
-
-      setForm({
-        name: "",
-        phone: "",
-        address: "",
-        landmark: "",
-        city: "",
-        state: "",
-        pincode: "",
-      });
-    } else {
-      alert(data.message || "Failed to save address.");
+    if (!isValid || !session?.user?.email) {
+      alert("Please fill all fields correctly.");
+      return;
     }
-  } catch (error) {
-    console.error(error);
-    alert("Something went wrong.");
-  }
-};
 
+    try {
+      const res = await fetch("/api/address", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: session.user.email,
+          ...form,
+        }),
+      });
 
+      const data = await res.json();
+
+      if (data.success) {
+        setAddresses(data.addresses);
+
+        setForm({
+          name: "",
+          phone: "",
+          address: "",
+          landmark: "",
+          city: "",
+          state: "",
+          pincode: "",
+        });
+      } else {
+        alert(data.message || "Failed to save address.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong.");
+    }
+  };
 
   const deleteAddress = async (id: string) => {
-  try {
-    const res = await fetch("/api/address", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id }),
-    });
+    try {
+      const res = await fetch("/api/address", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (data.success) {
-      setAddresses(data.addresses);
-    } else {
-      alert(data.message || "Failed to delete address.");
+      if (data.success) {
+        setAddresses(data.addresses);
+      } else {
+        alert(data.message || "Failed to delete address.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong.");
     }
-  } catch (error) {
-    console.error(error);
-    alert("Something went wrong.");
-  }
-};
+  };
 
   return (
     <main className="max-w-5xl mx-auto px-8 md:px-12 py-24">
-
       <div className="mb-16">
         <p className="text-xs tracking-[0.35em] text-gray-400 mb-4">
           AVENOR CLIENT
@@ -137,7 +133,6 @@ export default function AddressPage() {
       {/* FORM */}
 
       <div className="space-y-8 mb-20">
-
         <input
           placeholder="Full Name"
           value={form.name}
@@ -165,11 +160,7 @@ export default function AddressPage() {
           onChange={(e) =>
             setForm({
               ...form,
-              phone:
-                e.target.value.replace(
-                  /\D/g,
-                  ""
-                ),
+              phone: e.target.value.replace(/\D/g, ""),
             })
           }
           className="
@@ -191,8 +182,7 @@ export default function AddressPage() {
           onChange={(e) =>
             setForm({
               ...form,
-              address:
-                e.target.value,
+              address: e.target.value,
             })
           }
           className="
@@ -214,8 +204,7 @@ export default function AddressPage() {
           onChange={(e) =>
             setForm({
               ...form,
-              landmark:
-                e.target.value,
+              landmark: e.target.value,
             })
           }
           className="
@@ -231,15 +220,13 @@ export default function AddressPage() {
         />
 
         <div className="grid md:grid-cols-2 gap-8">
-
           <input
             placeholder="City"
             value={form.city}
             onChange={(e) =>
               setForm({
                 ...form,
-                city:
-                  e.target.value,
+                city: e.target.value,
               })
             }
             className="
@@ -259,8 +246,7 @@ export default function AddressPage() {
             onChange={(e) =>
               setForm({
                 ...form,
-                state:
-                  e.target.value,
+                state: e.target.value,
               })
             }
             className="
@@ -273,7 +259,6 @@ export default function AddressPage() {
               focus:border-black
             "
           />
-
         </div>
 
         <input
@@ -282,11 +267,7 @@ export default function AddressPage() {
           onChange={(e) =>
             setForm({
               ...form,
-              pincode:
-                e.target.value.replace(
-                  /\D/g,
-                  ""
-                ),
+              pincode: e.target.value.replace(/\D/g, ""),
             })
           }
           className="
@@ -319,13 +300,11 @@ export default function AddressPage() {
         >
           SAVE ADDRESS
         </button>
-
       </div>
 
       {/* SAVED ADDRESSES */}
 
       <div>
-
         <p className="text-xs tracking-[0.3em] text-gray-400 mb-10">
           SAVED ADDRESSES
         </p>
@@ -337,7 +316,6 @@ export default function AddressPage() {
         )}
 
         <div className="space-y-10">
-
           {addresses.map((addr) => (
             <div
               key={addr.id}
@@ -350,7 +328,6 @@ export default function AddressPage() {
               "
             >
               <div className="space-y-2">
-
                 <p className="text-lg">
                   {addr.name}
                 </p>
@@ -370,19 +347,12 @@ export default function AddressPage() {
                 )}
 
                 <p>
-                  {addr.city},{" "}
-                  {addr.state} —{" "}
-                  {addr.pincode}
+                  {addr.city}, {addr.state} — {addr.pincode}
                 </p>
-
               </div>
 
               <button
-                onClick={() =>
-                  deleteAddress(
-                    addr.id
-                  )
-                }
+                onClick={() => deleteAddress(addr.id)}
                 className="
                   text-xs
                   tracking-[0.2em]
@@ -392,14 +362,10 @@ export default function AddressPage() {
               >
                 REMOVE
               </button>
-
             </div>
           ))}
-
         </div>
-
       </div>
-
     </main>
   );
 }
