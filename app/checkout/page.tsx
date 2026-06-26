@@ -130,10 +130,10 @@ export default function CheckoutPage() {
             
             {addresses.map((addr) => (
               <div
-                key={addr.id}
+                key={addr._id}
                 onClick={() => setSelectedAddress(addr)}
                 className={`border-b pb-6 cursor-pointer transition ${
-                  selectedAddress?.id === addr.id
+                  selectedAddress?._id === addr._id
                     ? "border-black"
                     : "border-gray-300"
                 }`}
