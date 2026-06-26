@@ -18,44 +18,62 @@ export default function AccountPage() {
   const [latestOrder, setLatestOrder] =
     useState<any>(null);
 
-  useEffect(() => {
-    const fetchLatestOrder =
-      async () => {
-        if (
-          !session?.user?.email
-        )
-          return;
+  const [addressCount, setAddressCount] =
+    useState(0);
 
-        try {
-          const res = await fetch(
-            "/api/latest-order",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type":
-                  "application/json",
-              },
-              body: JSON.stringify({
-                email:
-                  session.user.email,
-              }),
-            }
+  useEffect(() => {
+    const loadAccount = async () => {
+      if (!session?.user?.email)
+        return;
+
+      try {
+        // Latest order
+        const orderRes = await fetch(
+          "/api/latest-order",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify({
+              email:
+                session.user.email,
+            }),
+          }
+        );
+
+        const orderData =
+          await orderRes.json();
+
+        if (orderData.success) {
+          setLatestOrder(
+            orderData.order
+          );
+        }
+
+        // Addresses
+        const addressRes =
+          await fetch(
+            `/api/address?email=${encodeURIComponent(
+              session.user.email
+            )}`
           );
 
-          const data =
-            await res.json();
+        const addressData =
+          await addressRes.json();
 
-          if (data.success) {
-            setLatestOrder(
-              data.order
-            );
-          }
-        } catch (error) {
-          console.error(error);
+        if (addressData.success) {
+          setAddressCount(
+            addressData.addresses.length
+          );
         }
-      };
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-    fetchLatestOrder();
+    loadAccount();
   }, [session]);
 
   if (status === "loading") {
@@ -115,7 +133,6 @@ export default function AccountPage() {
 
   return (
     <main className="max-w-5xl mx-auto px-8 md:px-12 py-24">
-
       {/* Greeting */}
       <div className="mb-6">
         <p className="text-xs tracking-[0.35em] text-gray-400">
@@ -147,7 +164,6 @@ export default function AccountPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-6 border-y py-10 mb-16">
-
         <div>
           <p className="text-xs tracking-[0.3em] text-gray-400 mb-2">
             ORDERS
@@ -164,7 +180,7 @@ export default function AccountPage() {
           </p>
 
           <p className="text-3xl font-light">
-            1
+            {addressCount}
           </p>
         </div>
 
@@ -177,7 +193,6 @@ export default function AccountPage() {
             2026
           </p>
         </div>
-
       </div>
 
       {/* Latest Order */}
@@ -195,7 +210,6 @@ export default function AccountPage() {
             "
           >
             <div className="grid md:grid-cols-[220px_1fr]">
-
               <img
                 src={
                   latestOrder.items[0]
@@ -247,14 +261,12 @@ export default function AccountPage() {
                   VIEW ORDER →
                 </p>
               </div>
-
             </div>
           </Link>
         )}
 
       {/* Navigation */}
       <div className="space-y-7 text-sm tracking-[0.25em]">
-
         <Link
           href="/account/orders"
           className="
@@ -318,7 +330,6 @@ export default function AccountPage() {
           <span>LOGOUT</span>
           <span>→</span>
         </button>
-
       </div>
 
       {/* Signature */}
@@ -331,7 +342,6 @@ export default function AccountPage() {
           Quiet Luxury. Limited Pieces.
         </p>
       </div>
-
     </main>
   );
 }
