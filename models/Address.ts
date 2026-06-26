@@ -6,7 +6,7 @@ import mongoose, {
 
 const AddressSchema = new Schema(
   {
-    customerEmail: {
+    email: {
       type: String,
       required: true,
       index: true,
