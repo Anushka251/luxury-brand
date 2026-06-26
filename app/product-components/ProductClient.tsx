@@ -111,9 +111,7 @@ export default function ProductClient({
               {sizes.map((size) => (
                 <button
                   key={size}
-                  onClick={() =>
-                    setSelectedSize(size)
-                  }
+                  onClick={() => setSelectedSize(size)}
                   className={`
                     w-14
                     h-14
@@ -166,16 +164,12 @@ export default function ProductClient({
             ADD TO BAG
           </button>
 
-          <div className="mt-12 text-xs text-gray-400 tracking-[0.2em]">
-            QUIET LUXURY • LIMITED DROP
-          </div>
-
         </div>
       </div>
 
       {/* DESIGN SECTION */}
 
-      <div className="mt-20 border-t pt-16 pb-24">
+      <div className="mt-28 border-t pt-20 pb-28">
 
         <p className="text-xs tracking-[0.35em] text-gray-400 text-center mb-6">
           DESIGN
@@ -197,7 +191,7 @@ export default function ProductClient({
           Crafted with intention.
         </h2>
 
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-xl mx-auto">
 
           <p
             className="
@@ -210,6 +204,12 @@ export default function ProductClient({
           >
             {product.detailDescription}
           </p>
+
+          <div className="mt-20 text-center">
+            <p className="text-[11px] tracking-[0.45em] uppercase text-gray-400">
+              QUIET LUXURY • CONTEMPORARY FASHION • LIMITED DROP
+            </p>
+          </div>
 
         </div>
 
