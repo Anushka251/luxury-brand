@@ -31,7 +31,7 @@ export default function SignupPage() {
 
     alert("Account created successfully.");
 
-    router.push("/login");
+    router.push("/auth");
   };
 
   return (
@@ -151,7 +151,7 @@ export default function SignupPage() {
         </p>
 
         <Link
-          href="/login"
+          href="/auth"
           className="
             inline-block
             mt-4
