@@ -120,7 +120,7 @@ export default function Home(): React.JSX.Element {
               '"Cormorant Garamond", serif',
           }}
         >
-          Quiet Luxury • Contemporary Fashion • Limited Drop
+          MODERN COUTURE • SILENT LUXURY • CRAFTED WITH INTENTION
         </p>
       </div>
 
