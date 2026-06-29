@@ -343,7 +343,7 @@ export default function AccountPage() {
         </p>
 
         <p className="mt-4 text-sm text-gray-500">
-          Quiet Luxury. Limited Pieces.
+          Silent luxury. Made To Order.
         </p>
       </div>
     </main>
