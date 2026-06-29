@@ -88,7 +88,7 @@ export default function Shop() {
               </p>
 
               <p className="mt-4 text-xs tracking-[0.35em] text-gray-500">
-                LIMITED TO {p.totalPieces} PIECES
+                Made to Order • Individually Crafted
               </p>
 
               <p className="mt-8 text-sm tracking-[0.35em] text-gray-400">
