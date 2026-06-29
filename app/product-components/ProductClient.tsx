@@ -173,7 +173,7 @@ export default function ProductClient({
             )}
           </div>
 
-          {/* ADD TO BAG */}
+          {/* BOOK YOUR PIECE */}
 
           <button
             onClick={addToBag}
