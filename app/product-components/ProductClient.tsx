@@ -173,7 +173,7 @@ export default function ProductClient({
             )}
           </div>
 
-          {/* BOOK YOUR PIECE */}
+          {/* RESERVE YOUR SLOT */}
 
           <button
             onClick={addToBag}
@@ -193,7 +193,7 @@ export default function ProductClient({
               }
             `}
           >
-            BOOK YOUR PIECE
+            RESERVE YOUR SLOT
           </button>
         </div>
       </div>
