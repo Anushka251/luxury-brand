@@ -104,11 +104,11 @@ export default function AboutPage() {
               '"Cormorant Garamond", serif',
           }}
         >
-          Quiet Luxury.
+          Modern Couture.
           <br />
-          Contemporary Fashion.
+          Silent Luxury.
           <br />
-          Limited Drop.
+          Crafted With Intention.
         </p>
 
       </div>
