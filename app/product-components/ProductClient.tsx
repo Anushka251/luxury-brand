@@ -117,24 +117,44 @@ export default function ProductClient({
 
           <div className="mt-12">
             <div className="flex items-center justify-between mb-6">
-              <p className="text-xs tracking-[0.3em] text-gray-400">
-                SELECT SIZE
-              </p>
 
-              <Link
-                href="/size-chart"
-                className="
-                  text-[11px]
-                  tracking-[0.25em]
-                  uppercase
-                  text-gray-400
-                  hover:text-black
-                  transition
-                "
-              >
-                Size Chart
-              </Link>
-            </div>
+  <p className="text-xs tracking-[0.3em] text-gray-400">
+    SELECT SIZE
+  </p>
+
+  <div className="flex items-center gap-5">
+
+    <Link
+      href="/size-chart"
+      className="
+        text-[11px]
+        tracking-[0.25em]
+        uppercase
+        text-gray-400
+        hover:text-black
+        transition
+      "
+    >
+      Size Chart
+    </Link>
+
+    <Link
+      href="/custom-fit"
+      className="
+        text-[11px]
+        tracking-[0.25em]
+        uppercase
+        text-gray-400
+        hover:text-black
+        transition
+      "
+    >
+      Custom Fit
+    </Link>
+
+  </div>
+
+</div>
 
             <div className="flex gap-3 flex-wrap">
               {sizes.map((size) => (
@@ -236,7 +256,7 @@ export default function ProductClient({
 
           <div className="mt-20 text-center">
             <p className="text-[11px] tracking-[0.45em] uppercase text-gray-400">
-              QUIET LUXURY • CONTEMPORARY FASHION • LIMITED DROP
+              ⁠MODERN COUTURE • SILENT LUXURY • CRAFTED WITH INTENTION⁠
             </p>
           </div>
         </div>
