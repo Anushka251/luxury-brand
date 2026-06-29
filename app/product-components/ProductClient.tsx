@@ -98,7 +98,7 @@ export default function ProductClient({
           </p>
 
           <p className="mt-3 text-xs tracking-[0.3em] text-gray-500">
-            LIMITED TO {product.totalPieces} PIECES
+            Made to Order • Individually Crafted
           </p>
 
           {/* DESCRIPTION */}
@@ -121,19 +121,35 @@ export default function ProductClient({
                 SELECT SIZE
               </p>
 
-              <Link
-                href="/size-chart"
-                className="
-                  text-[11px]
-                  tracking-[0.25em]
-                  uppercase
-                  text-gray-400
-                  hover:text-black
-                  transition
-                "
-              >
-                Size Chart
-              </Link>
+              <div className="flex items-center gap-5">
+                <Link
+                  href="/size-chart"
+                  className="
+                    text-[11px]
+                    tracking-[0.25em]
+                    uppercase
+                    text-gray-400
+                    hover:text-black
+                    transition
+                  "
+                >
+                  Size Chart
+                </Link>
+
+                <Link
+                  href="/custom-fit"
+                  className="
+                    text-[11px]
+                    tracking-[0.25em]
+                    uppercase
+                    text-gray-400
+                    hover:text-black
+                    transition
+                  "
+                >
+                  Custom Fit
+                </Link>
+              </div>
             </div>
 
             <div className="flex gap-3 flex-wrap">
@@ -173,7 +189,7 @@ export default function ProductClient({
             )}
           </div>
 
-          {/* ADD TO BAG */}
+          {/* RESERVE YOUR SLOT */}
 
           <button
             onClick={addToBag}
@@ -193,7 +209,7 @@ export default function ProductClient({
               }
             `}
           >
-            ADD TO BAG
+            RESERVE YOUR SLOT
           </button>
         </div>
       </div>
@@ -236,7 +252,7 @@ export default function ProductClient({
 
           <div className="mt-20 text-center">
             <p className="text-[11px] tracking-[0.45em] uppercase text-gray-400">
-              MODERN COUTURE • SILENT LUXURY • CRAFTED WITH INTENTION⁠
+              MODERN COUTURE • SILENT LUXURY • CRAFTED WITH INTENTION
             </p>
           </div>
         </div>
