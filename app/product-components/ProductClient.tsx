@@ -98,7 +98,7 @@ export default function ProductClient({
           </p>
 
           <p className="mt-3 text-xs tracking-[0.3em] text-gray-500">
-            LIMITED TO {product.totalPieces} PIECES
+            Made to Order • Individually Crafted
           </p>
 
           {/* DESCRIPTION */}
@@ -193,7 +193,7 @@ export default function ProductClient({
               }
             `}
           >
-            ADD TO BAG
+            BOOK YOUR PIECE
           </button>
         </div>
       </div>
