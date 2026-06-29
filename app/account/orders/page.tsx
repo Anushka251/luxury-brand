@@ -136,7 +136,7 @@ export default function OrdersPage() {
                       </p>
 
                       <p className="text-sm text-gray-400 mt-8 tracking-[0.2em]">
-                        LIMITED PIECE
+                        MADE TO ORDER
                       </p>
 
                     </div>
