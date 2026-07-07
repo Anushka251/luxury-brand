@@ -62,6 +62,7 @@ export default function ProductClient({
 
         <div className="lg:w-[62%]">
           <ProductGallery
+            id={product.id}
             images={product.images}
             name={product.name}
           />
