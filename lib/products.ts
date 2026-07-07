@@ -42,7 +42,7 @@ Every detail reflects precision craftsmanship—from the clean construction to t
   },
 
   {
-    id: "desert-blush",
+    id: "ivory-blush",
     name: "Ivory Blush",
     type: "Dusty Gold Floral Embroidered Gown",
     price: 50000,
@@ -58,14 +58,14 @@ Every gown is meticulously constructed with exceptional attention to detail, cel
     coverImage: "/products/desert-blush/cover.jpg",
 
     images: [
-      "/products/desert-blush/1.JPG",
-      "/products/desert-blush/2.jpg",
-      "/products/desert-blush/3.jpg",
-      "/products/desert-blush/4.jpg",
-      "/products/desert-blush/5.JPG",
-      "/products/desert-blush/6.jpg",
-      "/products/desert-blush/7.jpg",
-      "/products/desert-blush/8.jpg",
+      "/products/ivory-blush/1.jpg",
+      "/products/ivory-blush/2.jpg",
+      "/products/ivory-blush/3.jpg",
+      "/products/ivory-blush/4.jpg",
+      "/products/ivory-blush/5.JPG",
+      "/products/ivory-blush/6.jpg",
+      "/products/ivory-blush/7.jpg",
+      "/products/ivory-blush/8.jpg",
     ],
 
     totalPieces: 5,
