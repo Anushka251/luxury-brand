@@ -193,14 +193,14 @@ export default function ProductGallery({
               object-center
               transition-all
               duration-300
+              max-w-[260px]
+              md:max-w-sm
               ${
-                name === "Ivory Blush"
-                  ? largeImage
-                    ? "w-[155%] h-[155%]"
-                    : "w-[132%] h-[132%]"
-                  : largeImage
-                    ? "w-[104%] h-[104%]"
-                    : "w-full h-full"
+                largeImage
+                  ? name === "Ivory Blush"
+                    ? "scale-[1.22]"
+                    : "scale-[1.04]"
+                  : "scale-100"
               }
               ${
                 isTransitioning
