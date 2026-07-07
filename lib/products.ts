@@ -43,7 +43,7 @@ Every detail reflects precision craftsmanship—from the clean construction to t
 
   {
     id: "desert-blush",
-    name: "Desert Blush",
+    name: "Ivory Blush",
     type: "Dusty Gold Floral Embroidered Gown",
     price: 50000,
 
