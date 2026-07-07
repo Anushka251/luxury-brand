@@ -59,13 +59,13 @@ Every gown is meticulously constructed with exceptional attention to detail, cel
 
     images: [
       "/products/desert-blush/1.JPG",
-      "/products/desert-blush/2.JPG",
-      "/products/desert-blush/3.JPG",
-      "/products/desert-blush/4.JPG",
+      "/products/desert-blush/2.jpg",
+      "/products/desert-blush/3.jpg",
+      "/products/desert-blush/4.jpg",
       "/products/desert-blush/5.JPG",
-      "/products/desert-blush/6.JPG",
-      "/products/desert-blush/7.JPG",
-      "/products/desert-blush/8.JPG",
+      "/products/desert-blush/6.jpg",
+      "/products/desert-blush/7.jpg",
+      "/products/desert-blush/8.jpg",
     ],
 
     totalPieces: 5,
