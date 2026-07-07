@@ -60,7 +60,7 @@ export default function ProductClient({
       <div className="flex flex-col lg:flex-row lg:items-start lg:gap-12">
         {/* GALLERY */}
 
-        <div className="lg:w-[62%]">
+        <div className="lg:w-[72%]">
           <ProductGallery
             id={product.id}
             images={product.images}
@@ -70,7 +70,7 @@ export default function ProductClient({
 
         {/* DETAILS */}
 
-        <div className="mt-8 lg:mt-4 lg:w-[38%] lg:sticky lg:top-28">
+        <div className="mt-8 lg:mt-4 lg:w-[28%] lg:sticky lg:top-28">
           <p className="text-xs tracking-[0.35em] text-gray-400 mb-4">
             AVENOR COLLECTION
           </p>
@@ -158,9 +158,7 @@ export default function ProductClient({
                 <button
                   key={size}
                   onClick={() =>
-                    setSelectedSize(
-                      size
-                    )
+                    setSelectedSize(size)
                   }
                   className={`
                     w-14
@@ -171,8 +169,7 @@ export default function ProductClient({
                     text-sm
                     tracking-wider
                     ${
-                      selectedSize ===
-                      size
+                      selectedSize === size
                         ? "bg-black text-white border-black"
                         : "border-gray-300 hover:border-black hover:bg-gray-50"
                     }
