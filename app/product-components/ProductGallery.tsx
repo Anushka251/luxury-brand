@@ -8,11 +8,13 @@ import {
 import Link from "next/link";
 
 type Props = {
+  id: string;
   images: string[];
   name: string;
 };
 
 export default function ProductGallery({
+  id,
   images,
   name,
 }: Props) {
@@ -166,7 +168,7 @@ export default function ProductGallery({
 
         {/* IMAGE */}
         <Link
-          href={`/gallery/${index}`}
+          href={`/product/${id}/gallery/${index}`}
           className="
             relative
             w-full
