@@ -28,9 +28,11 @@ export default function ProductGallery({
 
   const minSwipeDistance = 50;
 
-  // Images 3,4,6,8
+  // Larger images depending on the product
   const largeImage =
-    [2, 3, 5, 7].includes(index);
+    name === "Ivory Blush"
+      ? [0, 4, 6, 7].includes(index) // Images 1, 5, 7, 8
+      : [2, 3, 5, 7].includes(index); // Crimson Rose: Images 3, 4, 6, 8
 
   useEffect(() => {
     images.forEach((src) => {
