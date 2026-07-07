@@ -62,7 +62,7 @@ export default function Home(): React.JSX.Element {
                 select-none
               "
               style={{
-                fontFamily: '"Cormorant Garamond", serif’,
+                fontFamily: '"Cormorant Garamond", serif",
               }}
             >
               AVENOR
@@ -112,7 +112,7 @@ export default function Home(): React.JSX.Element {
             max-w-2xl
           "
           style={{
-            fontFamily: '"Cormorant Garamond", serif’,
+            fontFamily: '"Cormorant Garamond", serif",
           }}
         >
           MODERN COUTURE • SILENT LUXURY • CRAFTED WITH INTENTION
@@ -159,7 +159,7 @@ export default function Home(): React.JSX.Element {
                     leading-none
                   "
                   style={{
-                    fontFamily: '"Cormorant Garamond", serif’,
+                    fontFamily: '"Cormorant Garamond", serif",
                   }}
                 >
                   Crimson Rose
