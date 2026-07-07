@@ -30,11 +30,12 @@ export default function ProductGallery({
 
   const minSwipeDistance = 50;
 
-  // Larger images depending on the product
+  // Crimson Rose: Images 3,4,6,8
+  // Ivory Blush: Images 1,5,7,8
   const largeImage =
     name === "Ivory Blush"
-      ? [0, 4, 6, 7].includes(index) // Images 1, 5, 7, 8
-      : [2, 3, 5, 7].includes(index); // Crimson Rose: Images 3, 4, 6, 8
+      ? [0, 4, 6, 7].includes(index)
+      : [2, 3, 5, 7].includes(index);
 
   useEffect(() => {
     images.forEach((src) => {
@@ -194,7 +195,9 @@ export default function ProductGallery({
               duration-300
               ${
                 largeImage
-                  ? "w-[104%] h-[104%]"
+                  ? name === "Ivory Blush"
+                    ? "w-[122%] h-[122%]"
+                    : "w-[104%] h-[104%]"
                   : "w-full h-full"
               }
               ${
