@@ -22,8 +22,7 @@ export default function Shop() {
             mb-8
           "
           style={{
-            fontFamily:
-              '"Cormorant Garamond", serif',
+            fontFamily: '"Cormorant Garamond", serif',
           }}
         >
           COLLECTION I
@@ -35,9 +34,18 @@ export default function Shop() {
         </p>
       </div>
 
-      {/* PRODUCT */}
+      {/* PRODUCTS */}
 
-      <section className="flex justify-center">
+      <section
+        className="
+          grid
+          grid-cols-1
+          lg:grid-cols-2
+          gap-y-24
+          gap-x-20
+          justify-items-center
+        "
+      >
         {products.map((p) => (
           <Link
             key={p.id}
@@ -47,7 +55,7 @@ export default function Shop() {
           >
             {/* IMAGE */}
 
-            <div className="relative aspect-[3/4] overflow-hidden">
+            <div className="relative aspect-[3/4] overflow-hidden bg-[#f8f8f8]">
               <Image
                 src={p.coverImage}
                 alt={p.name}
@@ -66,8 +74,13 @@ export default function Shop() {
 
             <div className="pt-10 text-center">
 
+              <p className="text-[11px] tracking-[0.35em] uppercase text-gray-400">
+                {p.type}
+              </p>
+
               <h2
                 className="
+                  mt-4
                   text-5xl
                   md:text-6xl
                   font-light
@@ -76,14 +89,17 @@ export default function Shop() {
                   leading-none
                 "
                 style={{
-                  fontFamily:
-                    '"Cormorant Garamond", serif',
+                  fontFamily: '"Cormorant Garamond", serif',
                 }}
               >
                 {p.name}
               </h2>
 
-              <p className="mt-5 text-2xl font-light">
+              <p className="mt-5 text-base text-gray-600 leading-8 max-w-sm mx-auto">
+                {p.description}
+              </p>
+
+              <p className="mt-6 text-2xl font-light">
                 ₹{p.price.toLocaleString("en-IN")}
               </p>
 
@@ -91,7 +107,17 @@ export default function Shop() {
                 Made to Order • Individually Crafted
               </p>
 
-              <p className="mt-8 text-sm tracking-[0.35em] text-gray-400">
+              <p
+                className="
+                  mt-8
+                  text-sm
+                  tracking-[0.35em]
+                  text-gray-400
+                  transition-colors
+                  duration-300
+                  group-hover:text-black
+                "
+              >
                 DISCOVER THE COLLECTION
               </p>
 
