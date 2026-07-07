@@ -108,10 +108,6 @@ export default function Shop() {
                 {p.description}
               </p>
 
-              <p className="mt-6 text-xs tracking-[0.35em] text-gray-500">
-                Made to Order • Individually Crafted
-              </p>
-
               <p
                 className="
                   mt-8
@@ -130,6 +126,14 @@ export default function Shop() {
           </Link>
         ))}
       </section>
+
+      {/* FOOTER */}
+
+      <div className="mt-32 border-t pt-14 text-center">
+        <p className="text-[11px] tracking-[0.45em] uppercase text-gray-400">
+          MADE TO ORDER • INDIVIDUALLY CRAFTED • LIMITED QUANTITIES
+        </p>
+      </div>
 
     </main>
   );
