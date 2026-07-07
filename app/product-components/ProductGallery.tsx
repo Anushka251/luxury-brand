@@ -173,8 +173,8 @@ export default function ProductGallery({
           className="
             relative
             w-full
-            max-w-[260px]
-            md:max-w-sm
+            max-w-[340px]
+            md:max-w-[720px]
             aspect-[3/4]
             overflow-hidden
             rounded-lg
@@ -194,11 +194,13 @@ export default function ProductGallery({
               transition-all
               duration-300
               ${
-                largeImage
-                  ? name === "Ivory Blush"
-                    ? "w-[122%] h-[122%]"
-                    : "w-[104%] h-[104%]"
-                  : "w-full h-full"
+                name === "Ivory Blush"
+                  ? largeImage
+                    ? "w-[155%] h-[155%]"
+                    : "w-[132%] h-[132%]"
+                  : largeImage
+                    ? "w-[104%] h-[104%]"
+                    : "w-full h-full"
               }
               ${
                 isTransitioning
