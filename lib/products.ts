@@ -55,7 +55,7 @@ Desert Blush is an expression of refined femininity, crafted in a soft dusty gol
 Every gown is meticulously constructed with exceptional attention to detail, celebrating the artistry of fine craftsmanship. Produced in limited quantities, Desert Blush reflects AVENOR's commitment to exclusivity, quiet luxury, and contemporary elegance.
     `,
 
-    coverImage: "/products/desert-blush/cover.jpg",
+    coverImage: "/products/ivory-blush/cover.jpg",
 
     images: [
       "/products/ivory-blush/1.jpg",
