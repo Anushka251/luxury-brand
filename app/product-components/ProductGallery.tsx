@@ -173,8 +173,8 @@ export default function ProductGallery({
           className="
             relative
             w-full
-            max-w-[340px]
-            md:max-w-[720px]
+            max-w-[260px]
+            md:max-w-sm
             aspect-[3/4]
             overflow-hidden
             rounded-lg
@@ -193,14 +193,12 @@ export default function ProductGallery({
               object-center
               transition-all
               duration-300
-              max-w-[260px]
-              md:max-w-sm
               ${
                 largeImage
                   ? name === "Ivory Blush"
-                    ? "scale-[1.22]"
-                    : "scale-[1.04]"
-                  : "scale-100"
+                    ? "w-[122%] h-[122%]"
+                    : "w-[104%] h-[104%]"
+                  : "w-full h-full"
               }
               ${
                 isTransitioning
