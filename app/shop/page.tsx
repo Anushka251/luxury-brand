@@ -95,15 +95,20 @@ export default function Shop() {
                 {p.name}
               </h2>
 
-              <p className="mt-5 text-base text-gray-600 leading-8 max-w-sm mx-auto">
+              <p
+                className="
+                  mt-5
+                  text-sm
+                  text-gray-500
+                  leading-7
+                  max-w-xs
+                  mx-auto
+                "
+              >
                 {p.description}
               </p>
 
-              <p className="mt-6 text-2xl font-light">
-                ₹{p.price.toLocaleString("en-IN")}
-              </p>
-
-              <p className="mt-4 text-xs tracking-[0.35em] text-gray-500">
+              <p className="mt-6 text-xs tracking-[0.35em] text-gray-500">
                 Made to Order • Individually Crafted
               </p>
 
