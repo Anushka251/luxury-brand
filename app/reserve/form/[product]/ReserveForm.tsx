@@ -102,7 +102,7 @@ export default function ReserveForm({
             className="mt-4 text-5xl font-light text-[#AF9685]"
             style={{
               fontFamily:
-                "Cormorant Garamond", serif",
+                "Cormorant Garamond, serif",
             }}
           >
             Studio Reservation Ledger
