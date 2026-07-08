@@ -8,7 +8,6 @@ export default function Home(): React.JSX.Element {
   return (
     <main className="w-full bg-ivory">
       {/* HERO */}
-
       <section className="flex justify-center px-4 pt-2">
         <div className="relative w-full max-w-6xl">
           <motion.div
@@ -28,7 +27,6 @@ export default function Home(): React.JSX.Element {
           </motion.div>
 
           {/* LOGO */}
-
           <div
             onClick={() => {
               document
@@ -62,7 +60,7 @@ export default function Home(): React.JSX.Element {
                 select-none
               "
               style={{
-                fontFamily: '"Cormorant Garamond", serif",
+                fontFamily: '"Cormorant Garamond", serif',
               }}
             >
               AVENOR
@@ -72,7 +70,6 @@ export default function Home(): React.JSX.Element {
       </section>
 
       {/* SHOP */}
-
       <div
         id="shop"
         className="flex justify-center pt-16 pb-6"
@@ -98,7 +95,6 @@ export default function Home(): React.JSX.Element {
       </div>
 
       {/* STATEMENT */}
-
       <div className="flex justify-center pb-20">
         <p
           className="
@@ -112,7 +108,7 @@ export default function Home(): React.JSX.Element {
             max-w-2xl
           "
           style={{
-            fontFamily: '"Cormorant Garamond", serif",
+            fontFamily: '"Cormorant Garamond", serif',
           }}
         >
           MODERN COUTURE • SILENT LUXURY • CRAFTED WITH INTENTION
@@ -120,11 +116,9 @@ export default function Home(): React.JSX.Element {
       </div>
 
       {/* COLLECTION I */}
-
       <section className="px-6 pb-28">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 max-w-6xl mx-auto">
           {/* CRIMSON ROSE */}
-
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -159,7 +153,7 @@ export default function Home(): React.JSX.Element {
                     leading-none
                   "
                   style={{
-                    fontFamily: '"Cormorant Garamond", serif",
+                    fontFamily: '"Cormorant Garamond", serif',
                   }}
                 >
                   Crimson Rose
@@ -173,7 +167,6 @@ export default function Home(): React.JSX.Element {
           </motion.div>
 
           {/* IVORY BLUSH */}
-
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -208,7 +201,7 @@ export default function Home(): React.JSX.Element {
                     leading-none
                   "
                   style={{
-                    fontFamily: '"Cormorant Garamond", serif",
+                    fontFamily: '"Cormorant Garamond", serif',
                   }}
                 >
                   Ivory Blush
