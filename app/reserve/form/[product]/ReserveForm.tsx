@@ -68,8 +68,8 @@ export default function ReserveForm({
         },
         body: JSON.stringify({
           product,
-          fullName: session!user?.name,
-          email: session!user?.email,
+          fullName: session!.user?.name,
+          email: session!.user?.email,
           instagram,
           phone,
           fitPreference,
