@@ -50,7 +50,7 @@ export default function IvoryBlushReservationPage() {
 
           <div className="mt-12 flex justify-center">
             <Link
-              href="/reserve/form?product=ivory-blush"
+              href="/reserve/form/ivory-blush"
               className="
                 border
                 border-[#AF9685]
