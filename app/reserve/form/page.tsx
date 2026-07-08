@@ -16,6 +16,42 @@ export default function ReserveFormPage() {
 
   const [fitPreference, setFitPreference] = useState("custom");
 
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [phone, setPhone] = useState("");
+  const [standardSize, setStandardSize] = useState("");
+  const [occasion, setOccasion] = useState("");
+  const [notes, setNotes] = useState("");
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const response = await fetch("/api/reserve", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        product,
+        fullName,
+        email,
+        instagram,
+        phone,
+        fitPreference,
+        standardSize,
+        occasion,
+        notes,
+      }),
+    });
+
+    if (response.ok) {
+      window.location.href = "/reserve/success";
+    } else {
+      alert("Something went wrong. Please try again.");
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[#FAF8F5] px-6 py-16">
       <div className="mx-auto max-w-2xl">
@@ -40,7 +76,7 @@ export default function ReserveFormPage() {
           </p>
         </div>
 
-        <form className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
           <div>
             <label className="block mb-2 text-xs uppercase tracking-[0.3em] text-gray-500">
               Full Name
@@ -48,6 +84,8 @@ export default function ReserveFormPage() {
 
             <input
               type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
               className="w-full border border-[#D9C9BC] bg-white px-4 py-4 outline-none focus:border-[#AF9685]"
             />
           </div>
@@ -59,6 +97,8 @@ export default function ReserveFormPage() {
 
             <input
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full border border-[#D9C9BC] bg-white px-4 py-4 outline-none focus:border-[#AF9685]"
             />
           </div>
@@ -71,6 +111,8 @@ export default function ReserveFormPage() {
             <input
               type="text"
               placeholder="@username"
+              value={instagram}
+              onChange={(e) => setInstagram(e.target.value)}
               className="w-full border border-[#D9C9BC] bg-white px-4 py-4 outline-none focus:border-[#AF9685]"
             />
           </div>
@@ -82,6 +124,8 @@ export default function ReserveFormPage() {
 
             <input
               type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               className="w-full border border-[#D9C9BC] bg-white px-4 py-4 outline-none focus:border-[#AF9685]"
             />
           </div>
@@ -120,12 +164,17 @@ export default function ReserveFormPage() {
                 Standard Size
               </label>
 
-              <select className="w-full border border-[#D9C9BC] bg-white px-4 py-4 outline-none focus:border-[#AF9685]">
-                <option>XS</option>
-                <option>S</option>
-                <option>M</option>
-                <option>L</option>
-                <option>XL</option>
+              <select
+                value={standardSize}
+                onChange={(e) => setStandardSize(e.target.value)}
+                className="w-full border border-[#D9C9BC] bg-white px-4 py-4 outline-none focus:border-[#AF9685]"
+              >
+                <option value="">Select Size</option>
+                <option value="XS">XS</option>
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
               </select>
             </div>
           )}
@@ -138,6 +187,8 @@ export default function ReserveFormPage() {
             <input
               type="text"
               placeholder="Wedding, Gala, Reception..."
+              value={occasion}
+              onChange={(e) => setOccasion(e.target.value)}
               className="w-full border border-[#D9C9BC] bg-white px-4 py-4 outline-none focus:border-[#AF9685]"
             />
           </div>
@@ -149,6 +200,8 @@ export default function ReserveFormPage() {
 
             <textarea
               rows={5}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               className="w-full border border-[#D9C9BC] bg-white px-4 py-4 outline-none focus:border-[#AF9685]"
             />
           </div>
