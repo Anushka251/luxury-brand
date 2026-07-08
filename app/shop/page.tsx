@@ -5,21 +5,20 @@ import Image from "next/image";
 export default function Shop() {
   return (
     <main className="max-w-7xl mx-auto px-6 md:px-12 pt-20 pb-32">
-
       {/* HEADER */}
 
-      <div className="text-center mb-20">
-        <p className="text-xs tracking-[0.35em] text-gray-400 mb-5">
+      <div className="mb-20 text-center">
+        <p className="mb-5 text-xs tracking-[0.35em] text-gray-400">
           AVENOR COLLECTION
         </p>
 
         <h1
           className="
+            mb-8
             text-5xl
             md:text-7xl
             font-light
             tracking-[0.08em]
-            mb-8
           "
           style={{
             fontFamily: '"Cormorant Garamond", serif',
@@ -28,7 +27,7 @@ export default function Shop() {
           COLLECTION I
         </h1>
 
-        <p className="max-w-xl mx-auto text-gray-500 leading-8">
+        <p className="max-w-xl mx-auto leading-8 text-gray-500">
           A study in silhouette, craftsmanship, and quiet luxury.
           Produced in limited quantities.
         </p>
@@ -49,7 +48,11 @@ export default function Shop() {
         {products.map((p) => (
           <Link
             key={p.id}
-            href={`/product/${p.id}`}
+            href={
+              p.id === "crimson-rose"
+                ? "/reserve/crimson-rose"
+                : "/reserve/ivory-blush"
+            }
             scroll={true}
             className="group w-full max-w-md"
           >
@@ -73,8 +76,7 @@ export default function Shop() {
             {/* DETAILS */}
 
             <div className="pt-10 text-center">
-
-              <p className="text-[11px] tracking-[0.35em] uppercase text-gray-400">
+              <p className="text-[11px] uppercase tracking-[0.35em] text-gray-400">
                 {p.type}
               </p>
 
@@ -85,8 +87,8 @@ export default function Shop() {
                   md:text-6xl
                   font-light
                   tracking-[0.05em]
-                  text-[#AF9685]
                   leading-none
+                  text-[#AF9685]
                 "
                 style={{
                   fontFamily: '"Cormorant Garamond", serif',
@@ -98,11 +100,11 @@ export default function Shop() {
               <p
                 className="
                   mt-5
-                  text-sm
-                  text-gray-500
-                  leading-7
-                  max-w-xs
                   mx-auto
+                  max-w-xs
+                  text-sm
+                  leading-7
+                  text-gray-500
                 "
               >
                 {p.description}
@@ -121,7 +123,6 @@ export default function Shop() {
               >
                 DISCOVER THE COLLECTION
               </p>
-
             </div>
           </Link>
         ))}
@@ -130,11 +131,10 @@ export default function Shop() {
       {/* FOOTER */}
 
       <div className="mt-32 border-t pt-14 text-center">
-        <p className="text-[11px] tracking-[0.45em] uppercase text-gray-400">
+        <p className="text-[11px] uppercase tracking-[0.45em] text-gray-400">
           MADE TO ORDER • INDIVIDUALLY CRAFTED • LIMITED QUANTITIES
         </p>
       </div>
-
     </main>
   );
 }
