@@ -50,7 +50,7 @@ export default function CrimsonRoseReservationPage() {
 
           <div className="mt-12 flex justify-center">
             <Link
-              href="/reserve/form?product=crimson-rose"
+              href="/reserve/form/crimson-rose"
               className="
                 border
                 border-[#AF9685]
