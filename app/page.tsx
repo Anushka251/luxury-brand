@@ -126,7 +126,7 @@ export default function Home(): React.JSX.Element {
             transition={{ duration: 1.4 }}
           >
             <Link
-              href="/product/crimson-rose"
+              href="/reserve/crimson-rose"
               className="block hover:opacity-95 transition"
             >
               <Image
@@ -174,7 +174,7 @@ export default function Home(): React.JSX.Element {
             transition={{ duration: 1.4, delay: 0.15 }}
           >
             <Link
-              href="/product/ivory-blush"
+              href="/reserve/ivory-blush"
               className="block hover:opacity-95 transition"
             >
               <Image
