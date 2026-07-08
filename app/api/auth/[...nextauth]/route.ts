@@ -33,6 +33,7 @@ const handler = NextAuth({
 
         return {
           id: user._id.toString(),
+          name: user.name,
           email: user.email,
         };
       },
@@ -55,11 +56,36 @@ const handler = NextAuth({
     strategy: "jwt",
   },
 
-  // ✅ KEEP AUTH STABLE (NO FORCED REDIRECTS)
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+      }
+
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.name = token.name as string;
+        session.user.email = token.email as string;
+      }
+
+      return session;
+    },
+
     async redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      if (new URL(url).origin === baseUrl) return url;
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`;
+      }
+
+      if (new URL(url).origin === baseUrl) {
+        return url;
+      }
+
       return baseUrl;
     },
   },
