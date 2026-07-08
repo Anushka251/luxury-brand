@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function SignupPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -17,6 +18,7 @@ export default function SignupPage() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        name,
         email,
         password,
       }),
@@ -36,36 +38,61 @@ export default function SignupPage() {
 
   return (
     <main className="max-w-xl mx-auto px-8 py-24">
-
       {/* Header */}
 
-      <p className="text-xs tracking-[0.35em] text-gray-400 mb-5">
+      <p className="mb-5 text-xs tracking-[0.35em] text-gray-400">
         AVENOR CLIENT
       </p>
 
       <h1
         className="
+          mb-5
           text-5xl
-          md:text-6xl
           font-light
           tracking-[0.08em]
-          mb-5
+          md:text-6xl
         "
       >
         CREATE ACCOUNT
       </h1>
 
-      <p className="text-gray-500 leading-8 mb-16">
+      <p className="mb-16 leading-8 text-gray-500">
         Create your Avenor account to access your orders,
         saved addresses, future collections and exclusive
         client releases.
       </p>
 
+      {/* Full Name */}
+
+      <div className="mb-12">
+        <label className="mb-4 block text-xs tracking-[0.3em] text-gray-400">
+          FULL NAME
+        </label>
+
+        <input
+          type="text"
+          placeholder="Your full name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="
+            w-full
+            border-0
+            border-b
+            border-gray-300
+            bg-transparent
+            py-4
+            text-lg
+            outline-none
+            transition
+            focus:border-black
+          "
+        />
+      </div>
+
       {/* Email */}
 
       <div className="mb-12">
-
-        <label className="block text-xs tracking-[0.3em] text-gray-400 mb-4">
+        <label className="mb-4 block text-xs tracking-[0.3em] text-gray-400">
           EMAIL
         </label>
 
@@ -83,20 +110,18 @@ export default function SignupPage() {
             border-gray-300
             bg-transparent
             py-4
-            outline-none
             text-lg
-            focus:border-black
+            outline-none
             transition
+            focus:border-black
           "
         />
-
       </div>
 
       {/* Password */}
 
       <div className="mb-16">
-
-        <label className="block text-xs tracking-[0.3em] text-gray-400 mb-4">
+        <label className="mb-4 block text-xs tracking-[0.3em] text-gray-400">
           PASSWORD
         </label>
 
@@ -114,13 +139,12 @@ export default function SignupPage() {
             border-gray-300
             bg-transparent
             py-4
-            outline-none
             text-lg
-            focus:border-black
+            outline-none
             transition
+            focus:border-black
           "
         />
-
       </div>
 
       {/* Button */}
@@ -133,10 +157,10 @@ export default function SignupPage() {
           border-black
           py-5
           tracking-[0.3em]
-          hover:bg-black
-          hover:text-white
           transition-all
           duration-300
+          hover:bg-black
+          hover:text-white
         "
       >
         CREATE ACCOUNT
@@ -145,7 +169,6 @@ export default function SignupPage() {
       {/* Login */}
 
       <div className="mt-10 text-center">
-
         <p className="text-sm text-gray-500">
           Already have an account?
         </p>
@@ -153,19 +176,17 @@ export default function SignupPage() {
         <Link
           href="/auth"
           className="
-            inline-block
             mt-4
-            tracking-[0.25em]
+            inline-block
             text-sm
-            hover:opacity-60
+            tracking-[0.25em]
             transition
+            hover:opacity-60
           "
         >
           LOGIN
         </Link>
-
       </div>
-
     </main>
   );
 }
