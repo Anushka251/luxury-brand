@@ -3,22 +3,30 @@ import User from "@/models/User";
 import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
-  const { email, password } = await req.json();
+  const { name, email, password } =
+    await req.json();
 
   await connectDB();
 
-  const existing = await User.findOne({ email });
+  const existing =
+    await User.findOne({ email });
 
   if (existing) {
-    return Response.json({ error: "User exists" });
+    return Response.json({
+      error: "User exists",
+    });
   }
 
-  const hashed = await bcrypt.hash(password, 10);
+  const hashed =
+    await bcrypt.hash(password, 10);
 
   await User.create({
+    name,
     email,
     password: hashed,
   });
 
-  return Response.json({ success: true });
+  return Response.json({
+    success: true,
+  });
 }
