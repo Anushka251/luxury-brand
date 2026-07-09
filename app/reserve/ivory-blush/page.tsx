@@ -38,14 +38,15 @@ export default function IvoryBlushReservationPage() {
           </h1>
 
           <p className="mt-8 text-[15px] leading-8 text-[#6B625B]">
-            Crafted in limited numbers and made exclusively to order,
-            Ivory Blush is individually finished in our atelier for
-            collectors who appreciate exceptional craftsmanship and
-            timeless design. Each creation is priced at{" "}
-            <strong>₹50,000</strong>. Studio reservations are available
-            prior to the public release and serve as an expression of
-            interest only. Allocation will remain subject to availability
-            once the collection opens.
+            <strong>Ivory Blush</strong> is part of an upcoming collection
+            and is currently in production. Crafted in limited numbers and
+            made exclusively to order, each gown is individually finished
+            in our atelier for collectors who appreciate exceptional
+            craftsmanship and timeless design. Priced at{" "}
+            <strong>₹50,000</strong>, you may reserve your studio
+            consultation and production slot before the official launch.
+            Reservations help us prioritize our first production batch and
+            do not guarantee allocation.
           </p>
 
           <div className="mt-12 flex justify-center">
@@ -66,15 +67,16 @@ export default function IvoryBlushReservationPage() {
                 hover:text-white
               "
             >
-              Book Studio Slot
+              Reserve Your Slot
             </Link>
           </div>
 
           <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
-            Studio reservations close 48 hours before the collection is
-            released publicly. After reservations close, this piece will
-            become available to all clients on a first-come,
-            first-served basis and may sell out.
+            This collection is launching soon. Reserve your production
+            slot before the official release. Once the collection
+            launches, reservations will close and availability will be
+            offered to all clients while limited production capacity
+            remains.
           </p>
         </div>
       </section>
