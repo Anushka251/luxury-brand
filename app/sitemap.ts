@@ -1,23 +1,21 @@
-import type { MetadataRoute } from "next";
+import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://avenorcollection.com";
-
   return [
     {
-      url: baseUrl,
+      url: "https://avenorcollection.com",
       lastModified: new Date(),
     },
     {
-      url: `${baseUrl}/shop`,
+      url: "https://avenorcollection.com/shop",
       lastModified: new Date(),
     },
     {
-      url: `${baseUrl}/reserve/crimson-rose`,
+      url: "https://avenorcollection.com/reserve/crimson-rose",
       lastModified: new Date(),
     },
     {
-      url: `${baseUrl}/reserve/ivory-blush`,
+      url: "https://avenorcollection.com/reserve/ivory-blush",
       lastModified: new Date(),
     },
   ];
