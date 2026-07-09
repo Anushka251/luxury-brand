@@ -208,7 +208,7 @@ export default function Home(): React.JSX.Element {
                 </h2>
 
                 <p className="mt-5 text-xs tracking-[0.35em] text-gray-500">
-                  DISCOVER THE COLLECTION
+                  UPCOMING COLLECTION
                 </p>
               </div>
             </Link>
