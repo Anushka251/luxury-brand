@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import ProductGallery from "@/app/product/[slug]/ProductGallery";
+import ProductGallery from "@/app/product-components/ProductGallery";
 
 export default function CrimsonRoseReservationPage() {
   return (
