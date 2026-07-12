@@ -17,12 +17,14 @@ export default function CrimsonRoseReservationPage() {
             id="crimson-rose"
             name="Crimson Rose"
             images={[
-              "/products/crimson-rose/cover.jpg",
               "/products/crimson-rose/1.jpg",
               "/products/crimson-rose/2.jpg",
               "/products/crimson-rose/3.jpg",
               "/products/crimson-rose/4.jpg",
               "/products/crimson-rose/5.jpg",
+              "/products/crimson-rose/6.jpg",
+              "/products/crimson-rose/7.jpg",
+              "/products/crimson-rose/8.jpg",
             ]}
           />
         </motion.div>
