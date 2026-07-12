@@ -39,7 +39,7 @@ export default function IvoryBlushReservationPage() {
 
           <p className="mt-8 text-[15px] leading-8 text-[#6B625B]">
             <strong>Ivory Blush</strong> is part of an upcoming collection
-            and is currently in production. Crafted in limited numbers and
+            and will be released in limited numbers. Crafted in limited numbers and
             made exclusively to order, each gown is individually finished
             in our atelier for collectors who appreciate exceptional
             craftsmanship and timeless design. Priced at{" "}
