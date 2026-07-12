@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import ProductGallery from "@/app/product/[slug]/ProductGallery";
 
 export default function CrimsonRoseReservationPage() {
   return (
@@ -13,13 +13,17 @@ export default function CrimsonRoseReservationPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2 }}
         >
-          <Image
-            src="/products/crimson-rose/cover.jpg"
-            alt="Crimson Rose"
-            width={900}
-            height={1200}
-            priority
-            className="w-full h-auto object-cover"
+          <ProductGallery
+            id="crimson-rose"
+            name="Crimson Rose"
+            images={[
+              "/products/crimson-rose/cover.jpg",
+              "/products/crimson-rose/1.jpg",
+              "/products/crimson-rose/2.jpg",
+              "/products/crimson-rose/3.jpg",
+              "/products/crimson-rose/4.jpg",
+              "/products/crimson-rose/5.jpg",
+            ]}
           />
         </motion.div>
 
