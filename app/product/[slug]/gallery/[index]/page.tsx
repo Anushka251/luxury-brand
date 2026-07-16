@@ -26,6 +26,7 @@ export default async function GalleryPage({
     <GalleryClient
       product={product}
       initialIndex={Number(index)}
+      returnTo="product"
     />
   );
 }
