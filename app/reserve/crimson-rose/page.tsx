@@ -16,6 +16,7 @@ export default function CrimsonRoseReservationPage() {
           <ProductGallery
             id="crimson-rose"
             name="Crimson Rose"
+            galleryBase="reserve"
             images={[
               "/products/crimson-rose/1.jpg",
               "/products/crimson-rose/2.jpg",
