@@ -11,12 +11,14 @@ type Props = {
   id: string;
   images: string[];
   name: string;
+  galleryBase?: string;
 };
 
 export default function ProductGallery({
   id,
   images,
   name,
+  galleryBase = "product",
 }: Props) {
   const [index, setIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] =
@@ -169,7 +171,7 @@ export default function ProductGallery({
 
         {/* IMAGE */}
         <Link
-          href={`/product/${id}/gallery/${index}`}
+          href={`/${galleryBase}/${id}/gallery/${index}`}
           className="
             relative
             w-full
