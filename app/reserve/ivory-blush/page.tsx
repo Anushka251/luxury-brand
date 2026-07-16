@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import ProductGallery from "@/app/product-components/ProductGallery";
 
 export default function IvoryBlushReservationPage() {
   return (
@@ -13,13 +13,19 @@ export default function IvoryBlushReservationPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2 }}
         >
-          <Image
-            src="/products/ivory-blush/cover.jpg"
-            alt="Ivory Blush"
-            width={900}
-            height={1200}
-            priority
-            className="w-full h-auto object-cover"
+          <ProductGallery
+            id="ivory-blush"
+            name="Ivory Blush"
+            images={[
+              "/products/ivory-blush/1.jpg",
+              "/products/ivory-blush/2.jpg",
+              "/products/ivory-blush/3.jpg",
+              "/products/ivory-blush/4.jpg",
+              "/products/ivory-blush/5.jpg",
+              "/products/ivory-blush/6.jpg",
+              "/products/ivory-blush/7.jpg",
+              "/products/ivory-blush/8.jpg",
+            ]}
           />
         </motion.div>
 
