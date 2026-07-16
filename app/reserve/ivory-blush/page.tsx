@@ -81,4 +81,3 @@ export default function IvoryBlushReservationPage() {
     </main>
   );
 }
-Change it to such that the collection is upcoming 
