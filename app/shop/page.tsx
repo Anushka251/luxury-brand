@@ -121,9 +121,7 @@ export default function Shop() {
                   group-hover:text-black
                 "
               >
-                {p.id === "ivory-blush"
-                  ? "UPCOMING COLLECTION"
-                  : "DISCOVER THE COLLECTION"}
+                DISCOVER THE COLLECTION
               </p>
             </div>
           </Link>
