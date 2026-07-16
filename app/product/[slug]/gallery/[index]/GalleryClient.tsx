@@ -7,11 +7,13 @@ import { Product } from "@/lib/products";
 interface Props {
   product: Product;
   initialIndex: number;
+  returnTo?: "product" | "reserve";
 }
 
 export default function GalleryClient({
   product,
   initialIndex,
+  returnTo = "product",
 }: Props) {
   const [index, setIndex] = useState(initialIndex);
 
@@ -87,7 +89,11 @@ export default function GalleryClient({
 
       {/* Close */}
       <Link
-        href={`/product/${product.id}`}
+        href={
+          returnTo === "reserve"
+            ? `/reserve/${product.id}`
+            : `/product/${product.id}`
+        }
         className="
           absolute
           top-8
