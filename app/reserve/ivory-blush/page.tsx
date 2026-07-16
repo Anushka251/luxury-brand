@@ -16,6 +16,7 @@ export default function IvoryBlushReservationPage() {
           <ProductGallery
             id="ivory-blush"
             name="Ivory Blush"
+            galleryBase="reserve"
             images={[
               "/products/ivory-blush/1.jpg",
               "/products/ivory-blush/2.jpg",
