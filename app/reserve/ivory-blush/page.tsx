@@ -21,7 +21,7 @@ export default function IvoryBlushReservationPage() {
               "/products/ivory-blush/2.jpg",
               "/products/ivory-blush/3.jpg",
               "/products/ivory-blush/4.jpg",
-              "/products/ivory-blush/5.jpg",
+              "/products/ivory-blush/5.JPG",
               "/products/ivory-blush/6.jpg",
               "/products/ivory-blush/7.jpg",
               "/products/ivory-blush/8.jpg",
