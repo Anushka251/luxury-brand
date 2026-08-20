@@ -70,4 +70,30 @@ Every gown is meticulously constructed with exceptional attention to detail, cel
 
     totalPieces: 5,
   },
+
+  {
+    id: "blue-crystal",
+    name: "Blue Crystal",
+    type: "Embroidered Mini Dress",
+    price: 30000,
+
+    description: "An intricately embroidered mini dress designed with a luminous crystal-like finish.",
+
+    detailDescription: `
+Blue Crystal is a refined expression of contemporary glamour, crafted as an intricately embroidered mini dress with a luminous, jewel-like character. The delicate detailing catches the light with subtle brilliance, creating a silhouette that feels both striking and effortlessly elegant.
+
+Every detail is thoughtfully finished to celebrate the artistry of fine craftsmanship. Produced in limited quantities, Blue Crystal embodies AVENOR's philosophy of quiet luxury, individuality, and contemporary sophistication.
+    `,
+
+    coverImage: "/products/blue-crystal/cover.jpg",
+
+    images: [
+      "/products/blue-crystal/1.jpg",
+      "/products/blue-crystal/2.JPG",
+      "/products/blue-crystal/3.jpg",
+      "/products/blue-crystal/cover.jpg",
+    ],
+
+    totalPieces: 1,
+  },
 ];
