@@ -75,7 +75,7 @@ Every gown is meticulously constructed with exceptional attention to detail, cel
     id: "blue-crystal",
     name: "Blue Crystal",
     type: "Embroidered Mini Dress",
-    price: 30000,
+    price: 33000,
 
     description: "An intricately embroidered mini dress designed with a luminous crystal-like finish.",
 
