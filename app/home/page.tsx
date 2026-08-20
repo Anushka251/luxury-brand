@@ -117,7 +117,8 @@ export default function Home(): React.JSX.Element {
 
       {/* COLLECTION I */}
       <section className="px-6 pb-28">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14 max-w-7xl mx-auto">
+
           {/* CRIMSON ROSE */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -146,7 +147,8 @@ export default function Home(): React.JSX.Element {
                   className="
                     mt-3
                     text-4xl
-                    md:text-5xl
+                    md:text-4xl
+                    lg:text-5xl
                     font-light
                     tracking-[0.06em]
                     text-[#AF9685]
@@ -194,7 +196,8 @@ export default function Home(): React.JSX.Element {
                   className="
                     mt-3
                     text-4xl
-                    md:text-5xl
+                    md:text-4xl
+                    lg:text-5xl
                     font-light
                     tracking-[0.06em]
                     text-[#AF9685]
@@ -213,6 +216,56 @@ export default function Home(): React.JSX.Element {
               </div>
             </Link>
           </motion.div>
+
+          {/* BLUE CRYSTAL */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.3 }}
+            transition={{ duration: 1.4, delay: 0.3 }}
+          >
+            <Link
+              href="/reserve/blue-crystal"
+              className="block hover:opacity-95 transition"
+            >
+              <Image
+                src="/products/blue-crystal/cover.jpg"
+                alt="Blue Crystal"
+                width={700}
+                height={950}
+                className="w-full h-auto object-cover"
+              />
+
+              <div className="pt-8 text-center">
+                <p className="text-[11px] tracking-[0.35em] uppercase text-gray-400">
+                  Embroidered Mini Dress
+                </p>
+
+                <h2
+                  className="
+                    mt-3
+                    text-4xl
+                    md:text-4xl
+                    lg:text-5xl
+                    font-light
+                    tracking-[0.06em]
+                    text-[#AF9685]
+                    leading-none
+                  "
+                  style={{
+                    fontFamily: '"Cormorant Garamond", serif',
+                  }}
+                >
+                  Blue Crystal
+                </h2>
+
+                <p className="mt-5 text-xs tracking-[0.35em] text-gray-500">
+                  DISCOVER THE COLLECTION
+                </p>
+              </div>
+            </Link>
+          </motion.div>
+
         </div>
       </section>
     </main>
