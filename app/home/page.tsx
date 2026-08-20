@@ -229,7 +229,7 @@ export default function Home(): React.JSX.Element {
               className="block hover:opacity-95 transition"
             >
               <Image
-                src="/products/blue-crystal/cover.jpg"
+                src="/products/blue-crystal/cover.JPG"
                 alt="Blue Crystal"
                 width={700}
                 height={950}
