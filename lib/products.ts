@@ -91,7 +91,6 @@ Every detail is thoughtfully finished to celebrate the artistry of fine craftsma
       "/products/blue-crystal/1.jpg",
       "/products/blue-crystal/2.JPG",
       "/products/blue-crystal/3.JPG",
-      "/products/blue-crystal/cover.jpg",
     ],
 
     totalPieces: 1,
