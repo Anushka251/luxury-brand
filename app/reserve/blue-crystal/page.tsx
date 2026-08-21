@@ -20,7 +20,7 @@ export default function BlueCrystalReservationPage() {
             images={[
               "/products/blue-crystal/1.JPG",
               "/products/blue-crystal/2.JPG",
-              "/products/blue-crystal/3.JPG",
+              "/products/blue-crystal/3.jpg",
             ]}
           />
         </motion.div>
