@@ -29,11 +29,9 @@ export default function Home(): React.JSX.Element {
           {/* LOGO */}
           <div
             onClick={() => {
-              document
-                .getElementById("shop")
-                ?.scrollIntoView({
-                  behavior: "smooth",
-                });
+              document.getElementById("shop")?.scrollIntoView({
+                behavior: "smooth",
+              });
             }}
             className="
               absolute
@@ -70,10 +68,7 @@ export default function Home(): React.JSX.Element {
       </section>
 
       {/* SHOP */}
-      <div
-        id="shop"
-        className="flex justify-center pt-16 pb-6"
-      >
+      <div id="shop" className="flex justify-center pt-16 pb-6">
         <Link
           href="/shop"
           className="
@@ -117,8 +112,19 @@ export default function Home(): React.JSX.Element {
 
       {/* COLLECTION I */}
       <section className="px-6 pb-28">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14 max-w-7xl mx-auto">
-
+        <div
+          className="
+            grid
+            grid-cols-1
+            md:grid-cols-2
+            gap-x-10
+            lg:gap-x-14
+            gap-y-20
+            max-w-6xl
+            mx-auto
+            items-start
+          "
+        >
           {/* CRIMSON ROSE */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -222,7 +228,8 @@ export default function Home(): React.JSX.Element {
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 1.4, delay: 0.3 }}
+            transition={{ duration: 1.4 }}
+            className="md:col-start-1"
           >
             <Link
               href="/reserve/blue-crystal"
@@ -265,7 +272,6 @@ export default function Home(): React.JSX.Element {
               </div>
             </Link>
           </motion.div>
-
         </div>
       </section>
     </main>
