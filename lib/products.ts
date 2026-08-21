@@ -90,7 +90,7 @@ Every detail is thoughtfully finished to celebrate the artistry of fine craftsma
     images: [
       "/products/blue-crystal/1.JPG",
       "/products/blue-crystal/2.JPG",
-      "/products/blue-crystal/3.jpg",
+      "/products/blue-crystal/3.JPG",
     ],
 
     totalPieces: 1,
