@@ -117,7 +117,7 @@ export default function Home(): React.JSX.Element {
 
       {/* COLLECTION I */}
       <section className="px-6 pb-28">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-14 max-w-6xl mx-auto">
 
           {/* CRIMSON ROSE */}
           <motion.div
