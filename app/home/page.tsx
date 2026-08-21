@@ -119,159 +119,166 @@ export default function Home(): React.JSX.Element {
             md:grid-cols-2
             gap-x-10
             lg:gap-x-14
-            gap-y-20
             max-w-6xl
             mx-auto
             items-start
           "
         >
-          {/* CRIMSON ROSE */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 1.4 }}
-          >
-            <Link
-              href="/reserve/crimson-rose"
-              className="block hover:opacity-95 transition"
+          {/* LEFT COLUMN */}
+          <div className="flex flex-col gap-20">
+
+            {/* CRIMSON ROSE */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 1.4 }}
             >
-              <Image
-                src="/products/crimson-rose/cover.jpg"
-                alt="Crimson Rose"
-                width={700}
-                height={950}
-                className="w-full h-auto object-cover"
-              />
+              <Link
+                href="/reserve/crimson-rose"
+                className="block hover:opacity-95 transition"
+              >
+                <Image
+                  src="/products/crimson-rose/cover.jpg"
+                  alt="Crimson Rose"
+                  width={700}
+                  height={950}
+                  className="w-full h-auto object-cover"
+                />
 
-              <div className="pt-8 text-center">
-                <p className="text-[11px] tracking-[0.35em] uppercase text-gray-400">
-                  Lace-up Co-ord Set
-                </p>
+                <div className="pt-8 text-center">
+                  <p className="text-[11px] tracking-[0.35em] uppercase text-gray-400">
+                    Lace-up Co-ord Set
+                  </p>
 
-                <h2
-                  className="
-                    mt-3
-                    text-4xl
-                    md:text-4xl
-                    lg:text-5xl
-                    font-light
-                    tracking-[0.06em]
-                    text-[#AF9685]
-                    leading-none
-                  "
-                  style={{
-                    fontFamily: '"Cormorant Garamond", serif',
-                  }}
-                >
-                  Crimson Rose
-                </h2>
+                  <h2
+                    className="
+                      mt-3
+                      text-4xl
+                      md:text-4xl
+                      lg:text-5xl
+                      font-light
+                      tracking-[0.06em]
+                      text-[#AF9685]
+                      leading-none
+                    "
+                    style={{
+                      fontFamily: '"Cormorant Garamond", serif',
+                    }}
+                  >
+                    Crimson Rose
+                  </h2>
 
-                <p className="mt-5 text-xs tracking-[0.35em] text-gray-500">
-                  DISCOVER THE COLLECTION
-                </p>
-              </div>
-            </Link>
-          </motion.div>
+                  <p className="mt-5 text-xs tracking-[0.35em] text-gray-500">
+                    DISCOVER THE COLLECTION
+                  </p>
+                </div>
+              </Link>
+            </motion.div>
 
-          {/* IVORY BLUSH */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 1.4, delay: 0.15 }}
-          >
-            <Link
-              href="/reserve/ivory-blush"
-              className="block hover:opacity-95 transition"
+            {/* BLUE CRYSTAL */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 1.4 }}
             >
-              <Image
-                src="/products/ivory-blush/cover.jpg"
-                alt="Ivory Blush"
-                width={700}
-                height={950}
-                className="w-full h-auto object-cover"
-              />
+              <Link
+                href="/reserve/blue-crystal"
+                className="block hover:opacity-95 transition"
+              >
+                <Image
+                  src="/products/blue-crystal/cover.JPG"
+                  alt="Blue Crystal"
+                  width={700}
+                  height={950}
+                  className="w-full h-auto object-cover"
+                />
 
-              <div className="pt-8 text-center">
-                <p className="text-[11px] tracking-[0.35em] uppercase text-gray-400">
-                  Dusty Gold Floral Embroidered Gown
-                </p>
+                <div className="pt-8 text-center">
+                  <p className="text-[11px] tracking-[0.35em] uppercase text-gray-400">
+                    Embroidered Mini Dress
+                  </p>
 
-                <h2
-                  className="
-                    mt-3
-                    text-4xl
-                    md:text-4xl
-                    lg:text-5xl
-                    font-light
-                    tracking-[0.06em]
-                    text-[#AF9685]
-                    leading-none
-                  "
-                  style={{
-                    fontFamily: '"Cormorant Garamond", serif',
-                  }}
-                >
-                  Ivory Blush
-                </h2>
+                  <h2
+                    className="
+                      mt-3
+                      text-4xl
+                      md:text-4xl
+                      lg:text-5xl
+                      font-light
+                      tracking-[0.06em]
+                      text-[#AF9685]
+                      leading-none
+                    "
+                    style={{
+                      fontFamily: '"Cormorant Garamond", serif',
+                    }}
+                  >
+                    Blue Crystal
+                  </h2>
 
-                <p className="mt-5 text-xs tracking-[0.35em] text-gray-500">
-                  DISCOVER THE COLLECTION
-                </p>
-              </div>
-            </Link>
-          </motion.div>
+                  <p className="mt-5 text-xs tracking-[0.35em] text-gray-500">
+                    DISCOVER THE COLLECTION
+                  </p>
+                </div>
+              </Link>
+            </motion.div>
 
-          {/* BLUE CRYSTAL */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 1.4 }}
-            className="md:col-start-1"
-          >
-            <Link
-              href="/reserve/blue-crystal"
-              className="block hover:opacity-95 transition"
+          </div>
+
+          {/* RIGHT COLUMN */}
+          <div>
+            {/* IVORY BLUSH */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 1.4, delay: 0.15 }}
             >
-              <Image
-                src="/products/blue-crystal/cover.JPG"
-                alt="Blue Crystal"
-                width={700}
-                height={950}
-                className="w-full h-auto object-cover"
-              />
+              <Link
+                href="/reserve/ivory-blush"
+                className="block hover:opacity-95 transition"
+              >
+                <Image
+                  src="/products/ivory-blush/cover.jpg"
+                  alt="Ivory Blush"
+                  width={700}
+                  height={950}
+                  className="w-full h-auto object-cover"
+                />
 
-              <div className="pt-8 text-center">
-                <p className="text-[11px] tracking-[0.35em] uppercase text-gray-400">
-                  Embroidered Mini Dress
-                </p>
+                <div className="pt-8 text-center">
+                  <p className="text-[11px] tracking-[0.35em] uppercase text-gray-400">
+                    Dusty Gold Floral Embroidered Gown
+                  </p>
 
-                <h2
-                  className="
-                    mt-3
-                    text-4xl
-                    md:text-4xl
-                    lg:text-5xl
-                    font-light
-                    tracking-[0.06em]
-                    text-[#AF9685]
-                    leading-none
-                  "
-                  style={{
-                    fontFamily: '"Cormorant Garamond", serif',
-                  }}
-                >
-                  Blue Crystal
-                </h2>
+                  <h2
+                    className="
+                      mt-3
+                      text-4xl
+                      md:text-4xl
+                      lg:text-5xl
+                      font-light
+                      tracking-[0.06em]
+                      text-[#AF9685]
+                      leading-none
+                    "
+                    style={{
+                      fontFamily: '"Cormorant Garamond", serif',
+                    }}
+                  >
+                    Ivory Blush
+                  </h2>
 
-                <p className="mt-5 text-xs tracking-[0.35em] text-gray-500">
-                  DISCOVER THE COLLECTION
-                </p>
-              </div>
-            </Link>
-          </motion.div>
+                  <p className="mt-5 text-xs tracking-[0.35em] text-gray-500">
+                    DISCOVER THE COLLECTION
+                  </p>
+                </div>
+              </Link>
+            </motion.div>
+          </div>
+
         </div>
       </section>
     </main>
