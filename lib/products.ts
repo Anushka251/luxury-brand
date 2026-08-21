@@ -85,7 +85,7 @@ Blue Crystal is a refined expression of contemporary glamour, crafted as an intr
 Every detail is thoughtfully finished to celebrate the artistry of fine craftsmanship. Produced in limited quantities, Blue Crystal embodies AVENOR's philosophy of quiet luxury, individuality, and contemporary sophistication.
     `,
 
-    coverImage: "/products/blue-crystal/cover.jpg",
+    coverImage: "/products/blue-crystal/cover.JPG",
 
     images: [
       "/products/blue-crystal/1.JPG",
