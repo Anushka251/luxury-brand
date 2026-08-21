@@ -51,7 +51,11 @@ export default function Shop() {
             href={
               p.id === "crimson-rose"
                 ? "/reserve/crimson-rose"
-                : "/reserve/ivory-blush"
+                : p.id === "ivory-blush"
+                ? "/reserve/ivory-blush"
+                : p.id === "blue-crystal"
+                ? "/reserve/blue-crystal"
+                : `/product/${p.id}`
             }
             scroll={true}
             className="group w-full max-w-md"
