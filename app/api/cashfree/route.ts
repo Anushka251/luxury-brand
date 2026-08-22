@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { connectDB } from "@/lib/mongodb";
+import Reservation from "@/models/Reservation";
 
 export async function POST(req: Request) {
   try {
@@ -15,6 +17,10 @@ export async function POST(req: Request) {
       occasion,
       notes,
     } = body;
+
+    /*
+     * Validate required information
+     */
 
     if (!product) {
       return NextResponse.json(
@@ -36,6 +42,19 @@ export async function POST(req: Request) {
     }
 
     if (
+      fitPreference !== "custom" &&
+      fitPreference !== "standard"
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Invalid fit preference.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (
       fitPreference === "standard" &&
       !standardSize
     ) {
@@ -49,16 +68,26 @@ export async function POST(req: Request) {
     }
 
     /*
-     * NEVER take the reservation fee
-     * from the browser.
+     * IMPORTANT:
      *
-     * The server fixes it at ₹2,000.
+     * Never trust the amount sent by the browser.
+     *
+     * The AVENOR reservation fee is fixed
+     * on the server at ₹2,000.
      */
 
     const amount = 2000;
 
+    /*
+     * Create a unique Cashfree order ID.
+     */
+
     const orderId =
       `AVENOR_RES_${Date.now()}`;
+
+    /*
+     * Create Cashfree order.
+     */
 
     const response = await fetch(
       "https://api.cashfree.com/pg/orders",
@@ -97,6 +126,9 @@ export async function POST(req: Request) {
           order_meta: {
             return_url:
               `https://avenorcollection.com/reserve/payment-success?order_id={order_id}`,
+
+            notify_url:
+              "https://avenorcollection.com/api/cashfree/webhook",
           },
 
           customer_details: {
@@ -129,6 +161,12 @@ export async function POST(req: Request) {
       data
     );
 
+    /*
+     * If Cashfree failed to create
+     * the order, do NOT create a
+     * MongoDB reservation.
+     */
+
     if (!response.ok) {
       return NextResponse.json(
         {
@@ -147,10 +185,82 @@ export async function POST(req: Request) {
     }
 
     /*
-     * We return the payment session
-     * to the browser.
+     * Make sure Cashfree actually
+     * returned a payment session.
+     */
+
+    if (!data.payment_session_id) {
+      return NextResponse.json(
+        {
+          error:
+            "Cashfree payment session was not created.",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    /*
+     * Connect to MongoDB.
+     */
+
+    await connectDB();
+
+    /*
+     * Create a PENDING reservation.
      *
-     * MongoDB reservation is NOT created yet.
+     * The reservation is NOT considered
+     * paid yet.
+     *
+     * The webhook will later change:
+     *
+     * paymentStatus: "pending"
+     *
+     * to:
+     *
+     * paymentStatus: "success"
+     */
+
+    await Reservation.create({
+      product,
+
+      fullName,
+
+      email,
+
+      instagram:
+        instagram || "",
+
+      phone,
+
+      fitPreference,
+
+      standardSize:
+        standardSize || "",
+
+      occasion:
+        occasion || "",
+
+      notes:
+        notes || "",
+
+      cashfreeOrderId:
+        data.order_id,
+
+      reservationFee:
+        amount,
+
+      paymentStatus:
+        "pending",
+
+      status:
+        "pending",
+    });
+
+    /*
+     * Send the Cashfree session
+     * back to the browser.
      */
 
     return NextResponse.json({
@@ -165,7 +275,7 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error(
-      "Cashfree order error:",
+      "Cashfree reservation order error:",
       error
     );
 
