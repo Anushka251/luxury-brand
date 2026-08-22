@@ -26,7 +26,7 @@ const ReservationSchema = new Schema(
 
     instagram: {
       type: String,
-      required: true,
+      default: "",
       trim: true,
     },
 
@@ -60,10 +60,7 @@ const ReservationSchema = new Schema(
       trim: true,
     },
 
-    /*
-     * Cashfree information
-     */
-
+    // Cashfree order ID
     cashfreeOrderId: {
       type: String,
       required: true,
@@ -71,12 +68,14 @@ const ReservationSchema = new Schema(
       index: true,
     },
 
+    // Studio reservation fee
     reservationFee: {
       type: Number,
       required: true,
       default: 2000,
     },
 
+    // Cashfree payment status
     paymentStatus: {
       type: String,
       enum: [
@@ -87,6 +86,7 @@ const ReservationSchema = new Schema(
       default: "pending",
     },
 
+    // Internal reservation status
     status: {
       type: String,
       enum: [
