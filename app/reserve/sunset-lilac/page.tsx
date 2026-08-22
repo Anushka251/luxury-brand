@@ -44,7 +44,7 @@ export default function SunsetLilacReservationPage() {
             Sunset Lilac is individually finished in our atelier for
             collectors who appreciate exceptional craftsmanship and
             timeless design. Each creation is priced at{" "}
-            <strong>₹33,000</strong>. Studio reservations are available
+            <strong>₹25,000</strong>. Studio reservations are available
             prior to the public release and serve as an expression of
             interest only. Allocation will remain subject to availability
             once the collection opens.
