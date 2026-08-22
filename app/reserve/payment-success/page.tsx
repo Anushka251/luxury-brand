@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  Suspense,
+  useEffect,
+  useState,
+} from "react";
 import { useSearchParams } from "next/navigation";
 
 type PaymentState =
@@ -9,7 +13,7 @@ type PaymentState =
   | "pending"
   | "failed";
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const searchParams =
     useSearchParams();
 
@@ -27,9 +31,11 @@ export default function PaymentSuccessPage() {
   useEffect(() => {
     if (!orderId) {
       setStatus("failed");
+
       setMessage(
         "No reservation order was found."
       );
+
       return;
     }
 
@@ -61,9 +67,6 @@ export default function PaymentSuccessPage() {
           );
         }
 
-        /*
-         * Payment successfully verified.
-         */
         if (
           data.paymentStatus ===
           "success"
@@ -74,10 +77,6 @@ export default function PaymentSuccessPage() {
             "Your studio reservation has been confirmed."
           );
 
-          /*
-           * The temporary form data
-           * is no longer needed.
-           */
           sessionStorage.removeItem(
             "avenor_reservation"
           );
@@ -85,9 +84,6 @@ export default function PaymentSuccessPage() {
           return;
         }
 
-        /*
-         * Payment may still be processing.
-         */
         if (
           data.paymentStatus ===
           "pending"
@@ -101,9 +97,6 @@ export default function PaymentSuccessPage() {
           return;
         }
 
-        /*
-         * Payment failed.
-         */
         setStatus("failed");
 
         setMessage(
@@ -188,7 +181,7 @@ export default function PaymentSuccessPage() {
           {message}
         </p>
 
-        {/* SUCCESS INFORMATION */}
+        {/* SUCCESS */}
 
         {status === "success" && (
           <div className="mx-auto mt-10 max-w-xl border border-[#D9C9BC] bg-[#F7F5F2] p-8 text-left">
@@ -235,7 +228,7 @@ export default function PaymentSuccessPage() {
           </div>
         )}
 
-        {/* PENDING INFORMATION */}
+        {/* PENDING */}
 
         {status === "pending" && (
           <div className="mx-auto mt-10 max-w-xl border border-[#D9C9BC] bg-[#F7F5F2] p-8">
@@ -256,7 +249,7 @@ export default function PaymentSuccessPage() {
           </div>
         )}
 
-        {/* FAILED INFORMATION */}
+        {/* FAILED */}
 
         {status === "failed" && (
           <div className="mx-auto mt-10 max-w-xl border border-[#D9C9BC] bg-[#F7F5F2] p-8">
@@ -296,5 +289,39 @@ export default function PaymentSuccessPage() {
 
       </div>
     </main>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#FAF8F5] px-6 py-20">
+          <div className="mx-auto max-w-2xl text-center">
+
+            <p className="text-xs uppercase tracking-[0.35em] text-gray-400">
+              AVENOR
+            </p>
+
+            <h1
+              className="mt-6 text-5xl font-light text-[#AF9685]"
+              style={{
+                fontFamily:
+                  "Cormorant Garamond, serif",
+              }}
+            >
+              Verifying Payment
+            </h1>
+
+            <div className="mt-10 flex justify-center">
+              <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#D9C9BC] border-t-[#AF9685]" />
+            </div>
+
+          </div>
+        </main>
+      }
+    >
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }
