@@ -6,6 +6,8 @@ import {
   useState,
 } from "react";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
+import { products } from "@/lib/products";
 
 type PaymentState =
   | "checking"
@@ -20,7 +22,8 @@ type SavedReservation = {
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
 
-  const orderId = searchParams.get("order_id");
+  const orderId =
+    searchParams.get("order_id");
 
   const [status, setStatus] =
     useState<PaymentState>("checking");
@@ -28,6 +31,19 @@ function PaymentSuccessContent() {
   const [message, setMessage] = useState(
     "Verifying your reservation payment..."
   );
+
+  const [reservedProductId, setReservedProductId] =
+    useState<string>("");
+
+  /*
+   * Find the actual product from
+   * lib/products.ts
+   */
+  const reservedProduct =
+    products.find(
+      (product) =>
+        product.id === reservedProductId
+    );
 
   useEffect(() => {
     if (!orderId) {
@@ -83,10 +99,19 @@ function PaymentSuccessContent() {
           );
 
           /*
-           * The temporary reservation
-           * data is no longer needed.
+           * Get the exact piece that
+           * was reserved.
            */
+          if (data.product) {
+            setReservedProductId(
+              data.product
+            );
+          }
 
+          /*
+           * Remove temporary data only
+           * after successful payment.
+           */
           sessionStorage.removeItem(
             "avenor_reservation"
           );
@@ -108,6 +133,16 @@ function PaymentSuccessContent() {
             "Your payment is being processed. Your reservation will be confirmed once Cashfree confirms the payment."
           );
 
+          /*
+           * If available, remember the
+           * piece while payment is pending.
+           */
+          if (data.product) {
+            setReservedProductId(
+              data.product
+            );
+          }
+
           return;
         }
 
@@ -120,6 +155,12 @@ function PaymentSuccessContent() {
         setMessage(
           "Your reservation payment could not be confirmed."
         );
+
+        /*
+         * Keep the reservation in
+         * sessionStorage so the user
+         * can try payment again.
+         */
       } catch (error) {
         console.error(
           "Payment verification error:",
@@ -168,12 +209,6 @@ function PaymentSuccessContent() {
       }
     }
 
-    /*
-     * If the temporary reservation
-     * data is unavailable, return
-     * to the collection.
-     */
-
     window.location.href =
       "/shop";
   }
@@ -203,7 +238,7 @@ function PaymentSuccessContent() {
           className="mt-6 text-5xl font-light text-[#AF9685]"
           style={{
             fontFamily:
-              "Cormorant Garamond, serif",
+              '"Cormorant Garamond", serif',
           }}
         >
           {status === "success"
@@ -219,13 +254,9 @@ function PaymentSuccessContent() {
 
         <div className="mt-10 flex justify-center">
 
-          {/* CHECKING */}
-
           {status === "checking" && (
             <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#D9C9BC] border-t-[#AF9685]" />
           )}
-
-          {/* SUCCESS */}
 
           {status === "success" && (
             <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#AF9685] text-2xl text-[#AF9685]">
@@ -233,15 +264,11 @@ function PaymentSuccessContent() {
             </div>
           )}
 
-          {/* PENDING */}
-
           {status === "pending" && (
             <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#D9C9BC] text-2xl text-[#AF9685]">
               …
             </div>
           )}
-
-          {/* FAILED */}
 
           {status === "failed" && (
             <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#D9C9BC] text-2xl text-gray-500">
@@ -256,6 +283,57 @@ function PaymentSuccessContent() {
         <p className="mx-auto mt-8 max-w-xl text-sm leading-8 text-gray-500">
           {message}
         </p>
+
+        {/* ================================================= */}
+        {/* RESERVED PIECE */}
+        {/* ================================================= */}
+
+        {(status === "success" ||
+          status === "pending") &&
+          reservedProduct && (
+            <div className="mx-auto mt-12 max-w-md">
+
+              <p className="text-xs uppercase tracking-[0.35em] text-[#AF9685]">
+                Reserved Piece
+              </p>
+
+              {/* COVER IMAGE */}
+
+              <div className="relative mt-6 aspect-[3/4] w-full overflow-hidden border border-[#D9C9BC] bg-[#F7F5F2]">
+                <Image
+                  src={
+                    reservedProduct.coverImage
+                  }
+                  alt={
+                    reservedProduct.name
+                  }
+                  fill
+                  sizes="(max-width: 768px) 90vw, 420px"
+                  className="object-cover"
+                  priority
+                />
+              </div>
+
+              {/* PRODUCT NAME */}
+
+              <h2
+                className="mt-7 text-4xl font-light text-[#AF9685]"
+                style={{
+                  fontFamily:
+                    '"Cormorant Garamond", serif',
+                }}
+              >
+                {reservedProduct.name}
+              </h2>
+
+              {/* PRODUCT TYPE */}
+
+              <p className="mt-3 text-xs uppercase tracking-[0.3em] text-gray-400">
+                {reservedProduct.type}
+              </p>
+
+            </div>
+          )}
 
         {/* ================================================= */}
         {/* SUCCESS */}
@@ -273,6 +351,17 @@ function PaymentSuccessContent() {
               reservation fee has been
               successfully received.
             </p>
+
+            {reservedProduct && (
+              <p className="mt-3 text-sm leading-7 text-gray-600">
+                Your reservation has been
+                recorded for{" "}
+                <strong>
+                  {reservedProduct.name}
+                </strong>
+                .
+              </p>
+            )}
 
             <p className="mt-3 text-sm leading-7 text-gray-600">
               Your reserved consultation
@@ -344,8 +433,6 @@ function PaymentSuccessContent() {
 
         {status === "failed" && (
           <div className="mx-auto mt-10 max-w-xl">
-
-            {/* FAILED INFORMATION */}
 
             <div className="border border-[#D9C9BC] bg-[#F7F5F2] p-8 text-left">
 
@@ -428,7 +515,7 @@ function PaymentSuccessContent() {
 
             </div>
 
-            {/* MONEY-DEDUCTED WARNING */}
+            {/* MONEY DEDUCTED WARNING */}
 
             <p className="mt-8 text-xs leading-6 tracking-[0.08em] text-gray-400">
               If your bank account was
@@ -472,7 +559,7 @@ export default function PaymentSuccessPage() {
               className="mt-6 text-5xl font-light text-[#AF9685]"
               style={{
                 fontFamily:
-                  "Cormorant Garamond, serif",
+                  '"Cormorant Garamond", serif',
               }}
             >
               Verifying Payment
