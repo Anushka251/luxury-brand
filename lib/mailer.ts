@@ -133,7 +133,7 @@ export async function sendOrderConfirmationEmail({
                 >
                   ₹${(
                     item.price * item.quantity
-                  ).toLocaleString()}
+                  ).toLocaleString("en-IN")}
                 </td>
 
               </tr>
@@ -148,7 +148,8 @@ export async function sendOrderConfirmationEmail({
     from: `"Avenor Collection" <${process.env.ZOHO_EMAIL}>`,
     to: customerEmail,
 
-    subject: `Avenor Order Confirmation • ${orderNumber}`,
+    subject:
+      `Avenor Order Confirmation • ${orderNumber}`,
 
     html: `
       <div style="
@@ -156,6 +157,7 @@ export async function sendOrderConfirmationEmail({
         padding:0;
         background:#f7f7f5;
       ">
+
         <table
           width="100%"
           cellpadding="0"
@@ -166,6 +168,7 @@ export async function sendOrderConfirmationEmail({
             font-family:Helvetica,Arial,sans-serif;
           "
         >
+
           <tr>
             <td align="center">
 
@@ -182,6 +185,7 @@ export async function sendOrderConfirmationEmail({
 
                 <tr>
                   <td align="center">
+
                     <p style="
                       margin:0;
                       font-size:32px;
@@ -191,6 +195,7 @@ export async function sendOrderConfirmationEmail({
                     ">
                       AVENOR
                     </p>
+
                   </td>
                 </tr>
 
@@ -258,9 +263,11 @@ export async function sendOrderConfirmationEmail({
 
                 <tr>
                   <td style="padding-top:40px;">
+
                     <table width="100%">
                       ${itemsHtml}
                     </table>
+
                   </td>
                 </tr>
 
@@ -271,6 +278,7 @@ export async function sendOrderConfirmationEmail({
                   ">
 
                     <table width="100%">
+
                       <tr>
 
                         <td style="
@@ -288,10 +296,11 @@ export async function sendOrderConfirmationEmail({
                             font-weight:500;
                           "
                         >
-                          ₹${total.toLocaleString()}
+                          ₹${total.toLocaleString("en-IN")}
                         </td>
 
                       </tr>
+
                     </table>
 
                   </td>
@@ -392,7 +401,9 @@ export async function sendOrderConfirmationEmail({
 
             </td>
           </tr>
+
         </table>
+
       </div>
     `,
   });
@@ -411,6 +422,64 @@ interface ReservationEmailProps {
   reservationFee: number;
 }
 
+
+/*
+ * Convert product ID into the actual
+ * AVENOR product name.
+ */
+function getReservationProductName(
+  product: string
+) {
+  switch (product) {
+    case "crimson-rose":
+      return "Crimson Rose";
+
+    case "ivory-blush":
+      return "Ivory Blush";
+
+    case "blue-crystal":
+      return "Blue Crystal";
+
+    case "sunset-lilac":
+      return "Sunset Lilac";
+
+    default:
+      return "Selected Piece";
+  }
+}
+
+
+/*
+ * IMPORTANT:
+ *
+ * These paths must match the coverImage
+ * values in your products file.
+ *
+ * If your actual coverImage paths are
+ * different, replace them here.
+ */
+function getReservationCoverImage(
+  product: string
+) {
+  switch (product) {
+    case "crimson-rose":
+      return "/images/crimson-rose/cover.jpg";
+
+    case "ivory-blush":
+      return "/images/ivory-blush/cover.jpg";
+
+    case "blue-crystal":
+      return "/images/blue-crystal/cover.jpg";
+
+    case "sunset-lilac":
+      return "/images/sunset-lilac/cover.jpg";
+
+    default:
+      return "";
+  }
+}
+
+
 export async function sendReservationConfirmationEmail({
   customerEmail,
   customerName,
@@ -419,22 +488,30 @@ export async function sendReservationConfirmationEmail({
   reservationFee,
 }: ReservationEmailProps) {
   const productName =
-    product === "crimson-rose"
-      ? "Crimson Rose"
-      : product === "ivory-blush"
-      ? "Ivory Blush"
-      : product === "blue-crystal"
-      ? "Blue Crystal"
-      : product === "sunset-lilac"
-      ? "Sunset Lilac"
-      : "Selected Piece";
+    getReservationProductName(
+      product
+    );
+
+  const coverImage =
+    getReservationCoverImage(
+      product
+    );
+
+  const coverImageUrl =
+    coverImage
+      ? coverImage.startsWith("http")
+        ? coverImage
+        : `https://avenorcollection.com${coverImage}`
+      : "";
 
   await transporter.sendMail({
-    from: `"Avenor Collection" <${process.env.ZOHO_EMAIL}>`,
+    from:
+      `"Avenor Collection" <${process.env.ZOHO_EMAIL}>`,
 
     to: customerEmail,
 
-    subject: `AVENOR Studio Reservation Confirmed • ${productName}`,
+    subject:
+      `AVENOR Studio Reservation Confirmed • ${productName}`,
 
     html: `
       <div style="
@@ -462,6 +539,7 @@ export async function sendReservationConfirmationEmail({
                 cellpadding="0"
                 cellspacing="0"
                 style="
+                  width:100%;
                   max-width:600px;
                   background:#ffffff;
                   padding:55px 45px;
@@ -483,8 +561,18 @@ export async function sendReservationConfirmationEmail({
                       AVENOR
                     </p>
 
+                    <p style="
+                      margin:12px 0 0;
+                      font-size:10px;
+                      letter-spacing:4px;
+                      color:#999999;
+                    ">
+                      COLLECTION
+                    </p>
+
                   </td>
                 </tr>
+
 
                 <!-- HEADER -->
 
@@ -500,7 +588,7 @@ export async function sendReservationConfirmationEmail({
                       letter-spacing:3px;
                       color:#AF9685;
                     ">
-                      STUDIO RESERVATION
+                      AVENOR STUDIO RESERVATION
                     </p>
 
                     <h1 style="
@@ -536,7 +624,69 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-                <!-- PRODUCT -->
+
+                <!-- PIECE -->
+
+                <tr>
+                  <td
+                    align="center"
+                    style="padding-top:45px;"
+                  >
+
+                    <p style="
+                      margin:0 0 18px;
+                      font-size:10px;
+                      letter-spacing:3px;
+                      color:#999999;
+                    ">
+                      RESERVED FOR
+                    </p>
+
+                    ${
+                      coverImageUrl
+                        ? `
+                          <img
+                            src="${coverImageUrl}"
+                            alt="${productName} — AVENOR Collection"
+                            width="360"
+                            style="
+                              display:block;
+                              width:360px;
+                              max-width:100%;
+                              height:auto;
+                              margin:0 auto;
+                              border:1px solid #eeeeee;
+                            "
+                          />
+                        `
+                        : ""
+                    }
+
+                    <h2 style="
+                      margin:25px 0 0;
+                      font-family:Georgia,serif;
+                      font-size:30px;
+                      line-height:1.2;
+                      font-weight:400;
+                      color:#AF9685;
+                    ">
+                      ${productName}
+                    </h2>
+
+                    <p style="
+                      margin:10px 0 0;
+                      color:#999999;
+                      font-size:10px;
+                      letter-spacing:3px;
+                    ">
+                      AVENOR COLLECTION
+                    </p>
+
+                  </td>
+                </tr>
+
+
+                <!-- PAYMENT -->
 
                 <tr>
                   <td
@@ -550,89 +700,42 @@ export async function sendReservationConfirmationEmail({
                       cellpadding="0"
                       cellspacing="0"
                       style="
-                        border:1px solid #ded6cf;
-                        background:#faf8f5;
+                        border-top:1px solid #eeeeee;
+                        border-bottom:1px solid #eeeeee;
                       "
                     >
 
                       <tr>
 
-                        <td
-                          style="
-                            padding:28px;
-                          "
-                        >
-
-                          <p style="
-                            margin:0;
-                            font-size:10px;
-                            letter-spacing:2px;
-                            color:#999999;
-                          ">
-                            RESERVED FOR
-                          </p>
-
-                          <p style="
-                            margin:10px 0 0;
-                            font-family:Georgia,serif;
-                            font-size:25px;
-                            color:#111111;
-                          ">
-                            ${productName}
-                          </p>
-
-                        </td>
-
-                      </tr>
-
-                    </table>
-
-                  </td>
-                </tr>
-
-                <!-- PAYMENT -->
-
-                <tr>
-                  <td
-                    style="
-                      padding-top:30px;
-                    "
-                  >
-
-                    <table
-                      width="100%"
-                      cellpadding="0"
-                      cellspacing="0"
-                    >
-
-                      <tr>
-
                         <td style="
-                          padding:12px 0;
+                          padding:18px 0;
                           color:#666666;
                           font-size:14px;
                         ">
-                          Reservation Fee
+                          Studio Reservation Fee
                         </td>
 
                         <td
                           align="right"
                           style="
-                            padding:12px 0;
+                            padding:18px 0;
                             color:#111111;
-                            font-size:16px;
+                            font-size:17px;
                             font-weight:500;
                           "
                         >
-                          ₹${reservationFee.toLocaleString()}
+                          ₹${reservationFee.toLocaleString(
+                            "en-IN"
+                          )}
                         </td>
 
                       </tr>
 
+
                       <tr>
 
                         <td style="
-                          padding:12px 0;
+                          padding:18px 0;
                           border-top:1px solid #eeeeee;
                           color:#666666;
                           font-size:14px;
@@ -643,11 +746,12 @@ export async function sendReservationConfirmationEmail({
                         <td
                           align="right"
                           style="
-                            padding:12px 0;
+                            padding:18px 0;
                             border-top:1px solid #eeeeee;
-                            color:#8C9A78;
-                            font-size:14px;
-                            font-weight:500;
+                            color:#75865F;
+                            font-size:13px;
+                            font-weight:600;
+                            letter-spacing:1px;
                           "
                         >
                           PAID
@@ -660,46 +764,97 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-                <!-- MESSAGE -->
+
+                <!-- CONFIRMATION -->
 
                 <tr>
                   <td
                     style="
-                      padding-top:35px;
+                      padding-top:38px;
                       color:#555555;
                       font-size:14px;
                       line-height:1.9;
                     "
                   >
 
-                    Your reservation gives you
-                    priority access to the studio
-                    consultation before the public
-                    release.
+                    <p style="margin:0;">
+                      This payment confirms your
+                      <strong>AVENOR Studio Reservation</strong>
+                      for
+                      <strong>${productName}</strong>.
+                    </p>
 
-                    <br /><br />
+                    <p style="margin:18px 0 0;">
+                      Your studio opportunity was opened
+                      to you before the public release,
+                      providing you with priority access
+                      to the collection.
+                    </p>
 
-                    Our atelier will contact you using
-                    the details provided during your
-                    reservation.
-
-                    <br /><br />
-
-                    Please note that your reservation
-                    does not guarantee garment
-                    allocation or purchase. All AVENOR
-                    pieces remain limited and subject
-                    to availability.
+                    <p style="margin:18px 0 0;">
+                      Our atelier will contact you using
+                      the details provided during your
+                      reservation.
+                    </p>
 
                   </td>
                 </tr>
+
+
+                <!-- IMPORTANT TERMS -->
+
+                <tr>
+                  <td
+                    style="
+                      margin-top:30px;
+                      padding-top:30px;
+                      color:#666666;
+                      font-size:13px;
+                      line-height:1.9;
+                    "
+                  >
+
+                    <p style="
+                      margin:0;
+                      color:#AF9685;
+                      font-size:10px;
+                      letter-spacing:2px;
+                    ">
+                      RESERVATION TERMS
+                    </p>
+
+                    <p style="margin:14px 0 0;">
+                      The reservation fee is
+                      <strong>
+                        non-refundable and
+                        non-compensatory
+                      </strong>.
+                    </p>
+
+                    <p style="margin:14px 0 0;">
+                      If you miss your reserved studio
+                      opportunity, the reservation fee is
+                      forfeited and cannot be refunded,
+                      transferred, or compensated.
+                    </p>
+
+                    <p style="margin:14px 0 0;">
+                      Your reservation does not guarantee
+                      garment allocation or purchase.
+                      All AVENOR pieces remain limited
+                      and subject to availability.
+                    </p>
+
+                  </td>
+                </tr>
+
 
                 <!-- REFERENCE -->
 
                 <tr>
                   <td
                     style="
-                      padding-top:35px;
+                      padding-top:38px;
                     "
                   >
 
@@ -718,8 +873,8 @@ export async function sendReservationConfirmationEmail({
                           style="
                             padding-top:25px;
                             color:#999999;
-                            font-size:11px;
-                            letter-spacing:1px;
+                            font-size:10px;
+                            letter-spacing:2px;
                           "
                         >
                           RESERVATION REFERENCE
@@ -731,7 +886,7 @@ export async function sendReservationConfirmationEmail({
 
                         <td
                           style="
-                            padding-top:8px;
+                            padding-top:9px;
                             color:#555555;
                             font-size:12px;
                             word-break:break-all;
@@ -747,6 +902,7 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
+
                 <!-- SUPPORT -->
 
                 <tr>
@@ -759,7 +915,7 @@ export async function sendReservationConfirmationEmail({
                     "
                   >
 
-                    If you have any questions,
+                    If you have any questions, simply
                     reply to this email or contact us at
 
                     <a
@@ -774,6 +930,7 @@ export async function sendReservationConfirmationEmail({
 
                   </td>
                 </tr>
+
 
                 <!-- FOOTER -->
 
