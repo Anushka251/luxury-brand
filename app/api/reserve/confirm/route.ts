@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Reservation from "@/models/Reservation";
 
+type CashfreePayment = {
+  payment_status?: string;
+  payment_amount?: number | string;
+};
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -18,8 +23,7 @@ export async function POST(req: Request) {
     ) {
       return NextResponse.json(
         {
-          error:
-            "Order ID is required.",
+          error: "Order ID is required.",
         },
         {
           status: 400,
@@ -29,8 +33,7 @@ export async function POST(req: Request) {
 
     /*
      * Only allow AVENOR reservation
-     * orders to be checked through
-     * this endpoint.
+     * orders.
      */
 
     if (
@@ -56,14 +59,12 @@ export async function POST(req: Request) {
     await connectDB();
 
     /*
-     * Find the reservation created
-     * when the Cashfree order was made.
+     * Find the reservation.
      */
 
     const reservation =
       await Reservation.findOne({
-        cashfreeOrderId:
-          orderId,
+        cashfreeOrderId: orderId,
       });
 
     if (!reservation) {
@@ -79,9 +80,8 @@ export async function POST(req: Request) {
     }
 
     /*
-     * If the webhook has already confirmed
-     * the payment, don't needlessly call
-     * Cashfree again.
+     * If webhook already confirmed
+     * the payment, return success.
      */
 
     if (
@@ -95,10 +95,14 @@ export async function POST(req: Request) {
     }
 
     /*
-     * Cashfree API URL.
+     * Ask Cashfree directly for the
+     * payment transactions belonging
+     * to this order.
      *
-     * This matches the production API used
-     * by your existing /api/cashfree route.
+     * IMPORTANT:
+     * This is what tells us whether
+     * the payment actually succeeded,
+     * is pending, or failed.
      */
 
     const cashfreeResponse =
@@ -129,29 +133,33 @@ export async function POST(req: Request) {
         }
       );
 
-    const payments =
+    const cashfreeData =
       await cashfreeResponse.json();
 
     console.log(
       "Cashfree payment verification:",
       JSON.stringify(
-        payments,
+        cashfreeData,
         null,
         2
       )
     );
 
+    /*
+     * Cashfree API error.
+     */
+
     if (!cashfreeResponse.ok) {
       console.error(
         "Cashfree verification failed:",
-        payments
+        cashfreeData
       );
 
       return NextResponse.json(
         {
           error:
-            payments.message ||
-            payments.error ||
+            cashfreeData?.message ||
+            cashfreeData?.error ||
             "Unable to verify payment with Cashfree.",
         },
         {
@@ -162,32 +170,34 @@ export async function POST(req: Request) {
     }
 
     /*
-     * Cashfree returns payment transactions
-     * for the order.
+     * Cashfree returns an array of
+     * payment transactions.
      */
 
-    const transactions =
-      Array.isArray(payments)
-        ? payments
+    const payments: CashfreePayment[] =
+      Array.isArray(cashfreeData)
+        ? cashfreeData
         : [];
 
     /*
-     * Look for a successful ₹2,000 payment.
+     * --------------------------------
+     * SUCCESS
+     * --------------------------------
+     *
+     * If ANY transaction is a
+     * successful ₹2,000 payment,
+     * the reservation is confirmed.
      */
 
     const successfulPayment =
-      transactions.find(
-        (payment: any) =>
-          payment?.payment_status ===
+      payments.find(
+        (payment) =>
+          payment.payment_status ===
             "SUCCESS" &&
           Number(
-            payment?.payment_amount
+            payment.payment_amount
           ) === 2000
       );
-
-    /*
-     * SUCCESS
-     */
 
     if (successfulPayment) {
       reservation.paymentStatus =
@@ -199,7 +209,7 @@ export async function POST(req: Request) {
       await reservation.save();
 
       console.log(
-        `AVENOR reservation confirmed: ${orderId}`
+        `AVENOR reservation payment SUCCESS: ${orderId}`
       );
 
       return NextResponse.json({
@@ -209,14 +219,18 @@ export async function POST(req: Request) {
     }
 
     /*
-     * Check whether there is a pending
-     * payment attempt.
+     * --------------------------------
+     * PENDING
+     * --------------------------------
+     *
+     * If there is a pending transaction,
+     * keep the reservation pending.
      */
 
     const pendingPayment =
-      transactions.find(
-        (payment: any) =>
-          payment?.payment_status ===
+      payments.find(
+        (payment) =>
+          payment.payment_status ===
           "PENDING"
       );
 
@@ -226,6 +240,10 @@ export async function POST(req: Request) {
 
       await reservation.save();
 
+      console.log(
+        `AVENOR reservation payment PENDING: ${orderId}`
+      );
+
       return NextResponse.json({
         paymentStatus: "pending",
         orderId,
@@ -233,16 +251,29 @@ export async function POST(req: Request) {
     }
 
     /*
-     * If Cashfree has returned payment
-     * transactions but none succeeded
-     * or remain pending, mark it failed.
+     * --------------------------------
+     * FAILED
+     * --------------------------------
+     *
+     * Cashfree considers the payment
+     * a failure when there are payment
+     * transactions but none are
+     * SUCCESS or PENDING.
+     *
+     * This includes cases such as
+     * user-dropped payment or
+     * transaction failure.
      */
 
-    if (transactions.length > 0) {
+    if (payments.length > 0) {
       reservation.paymentStatus =
         "failed";
 
       await reservation.save();
+
+      console.log(
+        `AVENOR reservation payment FAILED: ${orderId}`
+      );
 
       return NextResponse.json({
         paymentStatus: "failed",
@@ -251,12 +282,27 @@ export async function POST(req: Request) {
     }
 
     /*
-     * No payment transaction yet.
+     * --------------------------------
+     * NO TRANSACTION YET
+     * --------------------------------
      *
-     * Keep the reservation pending because
-     * the payment may still be processing
-     * or the webhook may arrive shortly.
+     * There is no payment transaction
+     * recorded yet.
+     *
+     * Do NOT call this failed because
+     * Cashfree may still be processing
+     * the payment or the webhook may
+     * arrive shortly.
      */
+
+    reservation.paymentStatus =
+      "pending";
+
+    await reservation.save();
+
+    console.log(
+      `AVENOR reservation payment has no transaction yet: ${orderId}`
+    );
 
     return NextResponse.json({
       paymentStatus: "pending",
