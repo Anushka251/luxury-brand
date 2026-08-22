@@ -55,6 +55,8 @@ export default function Shop() {
                 ? "/reserve/ivory-blush"
                 : p.id === "blue-crystal"
                 ? "/reserve/blue-crystal"
+                : p.id === "sunset-lilac"
+                ? "/reserve/sunset-lilac"
                 : `/product/${p.id}`
             }
             scroll={true}
