@@ -13,20 +13,21 @@ type PaymentState =
   | "pending"
   | "failed";
 
-function PaymentSuccessContent() {
-  const searchParams =
-    useSearchParams();
+type SavedReservation = {
+  product?: string;
+};
 
-  const orderId =
-    searchParams.get("order_id");
+function PaymentSuccessContent() {
+  const searchParams = useSearchParams();
+
+  const orderId = searchParams.get("order_id");
 
   const [status, setStatus] =
     useState<PaymentState>("checking");
 
-  const [message, setMessage] =
-    useState(
-      "Verifying your reservation payment..."
-    );
+  const [message, setMessage] = useState(
+    "Verifying your reservation payment..."
+  );
 
   useEffect(() => {
     if (!orderId) {
@@ -67,6 +68,10 @@ function PaymentSuccessContent() {
           );
         }
 
+        /*
+         * PAYMENT SUCCESS
+         */
+
         if (
           data.paymentStatus ===
           "success"
@@ -77,12 +82,21 @@ function PaymentSuccessContent() {
             "Your studio reservation has been confirmed."
           );
 
+          /*
+           * The temporary reservation
+           * data is no longer needed.
+           */
+
           sessionStorage.removeItem(
             "avenor_reservation"
           );
 
           return;
         }
+
+        /*
+         * PAYMENT PENDING
+         */
 
         if (
           data.paymentStatus ===
@@ -96,6 +110,10 @@ function PaymentSuccessContent() {
 
           return;
         }
+
+        /*
+         * PAYMENT FAILED
+         */
 
         setStatus("failed");
 
@@ -118,6 +136,56 @@ function PaymentSuccessContent() {
 
     verifyPayment();
   }, [orderId]);
+
+  /*
+   * RETRY PAYMENT
+   */
+
+  function handleRetryPayment() {
+    const saved =
+      sessionStorage.getItem(
+        "avenor_reservation"
+      );
+
+    if (saved) {
+      try {
+        const reservation =
+          JSON.parse(
+            saved
+          ) as SavedReservation;
+
+        if (reservation.product) {
+          window.location.href =
+            `/reserve/${reservation.product}`;
+
+          return;
+        }
+      } catch (error) {
+        console.error(
+          "Unable to read saved reservation:",
+          error
+        );
+      }
+    }
+
+    /*
+     * If the temporary reservation
+     * data is unavailable, return
+     * to the collection.
+     */
+
+    window.location.href =
+      "/shop";
+  }
+
+  /*
+   * RETURN TO COLLECTION
+   */
+
+  function handleReturnToCollection() {
+    window.location.href =
+      "/shop";
+  }
 
   return (
     <main className="min-h-screen bg-[#FAF8F5] px-6 py-20">
@@ -144,16 +212,20 @@ function PaymentSuccessContent() {
             ? "Verifying Payment"
             : status === "pending"
             ? "Payment Processing"
-            : "Payment Verification"}
+            : "Payment Unsuccessful"}
         </h1>
 
         {/* STATUS ICON */}
 
         <div className="mt-10 flex justify-center">
 
+          {/* CHECKING */}
+
           {status === "checking" && (
             <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#D9C9BC] border-t-[#AF9685]" />
           )}
+
+          {/* SUCCESS */}
 
           {status === "success" && (
             <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#AF9685] text-2xl text-[#AF9685]">
@@ -161,11 +233,15 @@ function PaymentSuccessContent() {
             </div>
           )}
 
+          {/* PENDING */}
+
           {status === "pending" && (
             <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#D9C9BC] text-2xl text-[#AF9685]">
               …
             </div>
           )}
+
+          {/* FAILED */}
 
           {status === "failed" && (
             <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#D9C9BC] text-2xl text-gray-500">
@@ -181,7 +257,9 @@ function PaymentSuccessContent() {
           {message}
         </p>
 
+        {/* ================================================= */}
         {/* SUCCESS */}
+        {/* ================================================= */}
 
         {status === "success" && (
           <div className="mx-auto mt-10 max-w-xl border border-[#D9C9BC] bg-[#F7F5F2] p-8 text-left">
@@ -191,9 +269,9 @@ function PaymentSuccessContent() {
             </p>
 
             <p className="mt-5 text-sm leading-7 text-gray-600">
-              Your ₹2,000 studio reservation
-              fee has been successfully
-              received.
+              Your ₹2,000 studio
+              reservation fee has been
+              successfully received.
             </p>
 
             <p className="mt-3 text-sm leading-7 text-gray-600">
@@ -228,7 +306,9 @@ function PaymentSuccessContent() {
           </div>
         )}
 
+        {/* ================================================= */}
         {/* PENDING */}
+        {/* ================================================= */}
 
         {status === "pending" && (
           <div className="mx-auto mt-10 max-w-xl border border-[#D9C9BC] bg-[#F7F5F2] p-8">
@@ -246,34 +326,119 @@ function PaymentSuccessContent() {
               the payment is confirmed.
             </p>
 
-          </div>
-        )}
-
-        {/* FAILED */}
-
-        {status === "failed" && (
-          <div className="mx-auto mt-10 max-w-xl border border-[#D9C9BC] bg-[#F7F5F2] p-8">
-
-            <p className="text-sm leading-7 text-gray-600">
-              Please do not immediately
-              make another payment.
-            </p>
-
-            <p className="mt-3 text-sm leading-7 text-gray-500">
-              If money has already been
-              deducted from your account,
-              your payment may still be
-              processing.
-            </p>
-
             {orderId && (
               <p className="mt-5 break-all text-xs leading-6 tracking-[0.08em] text-gray-400">
-                Order reference:
+                Payment reference:
                 <span className="ml-1">
                   {orderId}
                 </span>
               </p>
             )}
+
+          </div>
+        )}
+
+        {/* ================================================= */}
+        {/* FAILED */}
+        {/* ================================================= */}
+
+        {status === "failed" && (
+          <div className="mx-auto mt-10 max-w-xl">
+
+            {/* FAILED INFORMATION */}
+
+            <div className="border border-[#D9C9BC] bg-[#F7F5F2] p-8 text-left">
+
+              <p className="text-xs uppercase tracking-[0.3em] text-[#AF9685]">
+                Payment Unsuccessful
+              </p>
+
+              <p className="mt-5 text-sm leading-7 text-gray-600">
+                Your ₹2,000 studio
+                reservation payment was not
+                successfully confirmed.
+              </p>
+
+              <p className="mt-4 text-sm leading-7 text-gray-500">
+                Your studio slot has
+                therefore not been confirmed.
+              </p>
+
+              <p className="mt-4 text-sm leading-7 text-gray-500">
+                You may return to the
+                reservation form and try the
+                payment again.
+              </p>
+
+              {orderId && (
+                <p className="mt-6 break-all text-xs leading-6 tracking-[0.08em] text-gray-400">
+                  Payment reference:
+                  <span className="ml-1">
+                    {orderId}
+                  </span>
+                </p>
+              )}
+
+            </div>
+
+            {/* RETRY */}
+
+            <div className="mt-8 space-y-4">
+
+              <button
+                type="button"
+                onClick={
+                  handleRetryPayment
+                }
+                className="
+                  w-full
+                  border
+                  border-[#AF9685]
+                  py-4
+                  uppercase
+                  tracking-[0.3em]
+                  text-[#AF9685]
+                  transition-all
+                  duration-300
+                  hover:bg-[#AF9685]
+                  hover:text-white
+                "
+              >
+                Try Payment Again
+              </button>
+
+              <button
+                type="button"
+                onClick={
+                  handleReturnToCollection
+                }
+                className="
+                  w-full
+                  py-4
+                  uppercase
+                  tracking-[0.3em]
+                  text-gray-400
+                  transition-colors
+                  duration-300
+                  hover:text-black
+                "
+              >
+                Return to Collection
+              </button>
+
+            </div>
+
+            {/* MONEY-DEDUCTED WARNING */}
+
+            <p className="mt-8 text-xs leading-6 tracking-[0.08em] text-gray-400">
+              If your bank account was
+              charged despite this message,
+              please do not make another
+              payment immediately. Your
+              payment may still be processing.
+              Please contact AVENOR with
+              your payment reference.
+            </p>
 
           </div>
         )}
@@ -316,6 +481,11 @@ export default function PaymentSuccessPage() {
             <div className="mt-10 flex justify-center">
               <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#D9C9BC] border-t-[#AF9685]" />
             </div>
+
+            <p className="mt-8 text-sm leading-7 text-gray-500">
+              Please wait while we verify
+              your reservation payment.
+            </p>
 
           </div>
         </main>
