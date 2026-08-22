@@ -44,20 +44,12 @@ export default function ReserveForm({
 
   if (!session) {
     signIn(undefined, {
-      callbackUrl:
-        window.location.pathname,
+      callbackUrl: window.location.pathname,
     });
 
     return null;
   }
 
-  /*
-   * Store these as plain strings after
-   * the session check.
-   *
-   * This also fixes the TypeScript error:
-   * "'session' is possibly 'null'."
-   */
   const userName =
     session.user?.name ?? "";
 
@@ -101,7 +93,7 @@ export default function ReserveForm({
 
     try {
       /*
-       * Create the ₹2,000 Cashfree order.
+       * Create the Cashfree order.
        */
       const response = await fetch(
         "/api/cashfree",
@@ -115,21 +107,13 @@ export default function ReserveForm({
 
           body: JSON.stringify({
             product,
-
             fullName: userName,
-
             email: userEmail,
-
             instagram,
-
             phone,
-
             fitPreference,
-
             standardSize,
-
             occasion,
-
             notes,
           }),
         }
@@ -154,14 +138,16 @@ export default function ReserveForm({
       }
 
       /*
-       * Store the reservation information
-       * temporarily.
+       * IMPORTANT:
        *
-       * This is NOT the payment confirmation.
-       * MongoDB already has the pending
-       * reservation created by /api/cashfree.
+       * Save the reservation BEFORE
+       * opening Cashfree.
+       *
+       * The payment-success page uses
+       * this to know which AVENOR piece
+       * was selected and display its
+       * cover image.
        */
-
       sessionStorage.setItem(
         "avenor_reservation",
         JSON.stringify({
@@ -170,9 +156,11 @@ export default function ReserveForm({
 
           product,
 
-          fullName: userName,
+          fullName:
+            userName,
 
-          email: userEmail,
+          email:
+            userEmail,
 
           instagram,
 
@@ -189,8 +177,8 @@ export default function ReserveForm({
       );
 
       /*
-       * Load Cashfree SDK if it isn't
-       * already loaded.
+       * Load Cashfree SDK if it is
+       * not already loaded.
        */
       if (
         !(window as any).Cashfree
@@ -236,7 +224,7 @@ export default function ReserveForm({
         });
 
       /*
-       * Open Cashfree checkout.
+       * Open secure Cashfree checkout.
        */
       await cashfree.checkout({
         paymentSessionId:
@@ -276,7 +264,7 @@ export default function ReserveForm({
             className="mt-4 text-5xl font-light text-[#AF9685]"
             style={{
               fontFamily:
-                "Cormorant Garamond, serif",
+                '"Cormorant Garamond", serif',
             }}
           >
             Studio Reservation Ledger
@@ -496,7 +484,6 @@ export default function ReserveForm({
                   focus:border-[#AF9685]
                 "
               >
-
                 <option value="">
                   Select Size
                 </option>
@@ -520,7 +507,6 @@ export default function ReserveForm({
                 <option value="XL">
                   XL
                 </option>
-
               </select>
 
             </div>
