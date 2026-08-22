@@ -7,9 +7,7 @@ type Props = {
   product: string;
 };
 
-export default function ReserveForm({
-  product,
-}: Props) {
+export default function ReserveForm({ product }: Props) {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
@@ -33,60 +31,44 @@ export default function ReserveForm({
       ? "Crimson Rose"
       : product === "ivory-blush"
       ? "Ivory Blush"
+      : product === "blue-crystal"
+      ? "Blue Crystal"
+      : product === "sunset-lilac"
+      ? "Sunset Lilac"
       : "Selected Piece";
 
-  const [fitPreference, setFitPreference] =
-    useState("custom");
+  const [fitPreference, setFitPreference] = useState("custom");
+  const [instagram, setInstagram] = useState("");
+  const [phone, setPhone] = useState("");
+  const [standardSize, setStandardSize] = useState("");
+  const [occasion, setOccasion] = useState("");
+  const [notes, setNotes] = useState("");
 
-  const [instagram, setInstagram] =
-    useState("");
-
-  const [phone, setPhone] =
-    useState("");
-
-  const [standardSize, setStandardSize] =
-    useState("");
-
-  const [occasion, setOccasion] =
-    useState("");
-
-  const [notes, setNotes] =
-    useState("");
-
-  async function handleSubmit(
-    e: React.FormEvent<HTMLFormElement>
-  ) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    const response = await fetch(
-      "/api/reserve",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
-        body: JSON.stringify({
-          product,
-          fullName: session!.user?.name,
-          email: session!.user?.email,
-          instagram,
-          phone,
-          fitPreference,
-          standardSize,
-          occasion,
-          notes,
-        }),
-      }
-    );
+    const response = await fetch("/api/reserve", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        product,
+        fullName: session!.user?.name,
+        email: session!.user?.email,
+        instagram,
+        phone,
+        fitPreference,
+        standardSize,
+        occasion,
+        notes,
+      }),
+    });
 
     if (response.ok) {
-      window.location.href =
-        "/reserve/success";
+      window.location.href = "/reserve/success";
     } else {
-      alert(
-        "Something went wrong. Please try again."
-      );
+      alert("Something went wrong. Please try again.");
     }
   }
 
@@ -101,29 +83,20 @@ export default function ReserveForm({
           <h1
             className="mt-4 text-5xl font-light text-[#AF9685]"
             style={{
-              fontFamily:
-                "Cormorant Garamond, serif",
+              fontFamily: "Cormorant Garamond, serif",
             }}
           >
             Studio Reservation Ledger
           </h1>
 
           <p className="mt-6 text-sm leading-8 text-gray-500">
-            You are reserving a
-            studio consultation for{" "}
-            <strong>{productName}</strong>.
-            Reservations are
-            available before the
-            public release and do
-            not guarantee
-            allocation.
+            You are reserving a studio consultation for{" "}
+            <strong>{productName}</strong>. Reservations are available before
+            the public release and do not guarantee allocation.
           </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="mt-12 space-y-8"
-        >
+        <form onSubmit={handleSubmit} className="mt-12 space-y-8">
           <div>
             <label className="mb-2 block text-xs uppercase tracking-[0.3em] text-gray-500">
               Full Name
@@ -177,9 +150,7 @@ export default function ReserveForm({
               type="text"
               placeholder="@username"
               value={instagram}
-              onChange={(e) =>
-                setInstagram(e.target.value)
-              }
+              onChange={(e) => setInstagram(e.target.value)}
               className="w-full border border-[#D9C9BC] bg-white px-4 py-4 outline-none focus:border-[#AF9685]"
             />
           </div>
@@ -192,9 +163,7 @@ export default function ReserveForm({
             <input
               type="tel"
               value={phone}
-              onChange={(e) =>
-                setPhone(e.target.value)
-              }
+              onChange={(e) => setPhone(e.target.value)}
               className="w-full border border-[#D9C9BC] bg-white px-4 py-4 outline-none focus:border-[#AF9685]"
             />
           </div>
@@ -209,47 +178,27 @@ export default function ReserveForm({
                 <input
                   type="radio"
                   name="fit"
-                  checked={
-                    fitPreference ===
-                    "custom"
-                  }
-                  onChange={() =>
-                    setFitPreference(
-                      "custom"
-                    )
-                  }
+                  checked={fitPreference === "custom"}
+                  onChange={() => setFitPreference("custom")}
                 />
 
-                <span>
-                  Custom Studio
-                  Measurements
-                </span>
+                <span>Custom Studio Measurements</span>
               </label>
 
               <label className="flex items-center gap-3">
                 <input
                   type="radio"
                   name="fit"
-                  checked={
-                    fitPreference ===
-                    "standard"
-                  }
-                  onChange={() =>
-                    setFitPreference(
-                      "standard"
-                    )
-                  }
+                  checked={fitPreference === "standard"}
+                  onChange={() => setFitPreference("standard")}
                 />
 
-                <span>
-                  Standard Size
-                </span>
+                <span>Standard Size</span>
               </label>
             </div>
           </div>
 
-          {fitPreference ===
-            "standard" && (
+          {fitPreference === "standard" && (
             <div>
               <label className="mb-2 block text-xs uppercase tracking-[0.3em] text-gray-500">
                 Standard Size
@@ -257,32 +206,15 @@ export default function ReserveForm({
 
               <select
                 value={standardSize}
-                onChange={(e) =>
-                  setStandardSize(
-                    e.target.value
-                  )
-                }
+                onChange={(e) => setStandardSize(e.target.value)}
                 className="w-full border border-[#D9C9BC] bg-white px-4 py-4 outline-none focus:border-[#AF9685]"
               >
-                <option value="">
-                  Select Size
-                </option>
-
-                <option value="XS">
-                  XS
-                </option>
-                <option value="S">
-                  S
-                </option>
-                <option value="M">
-                  M
-                </option>
-                <option value="L">
-                  L
-                </option>
-                <option value="XL">
-                  XL
-                </option>
+                <option value="">Select Size</option>
+                <option value="XS">XS</option>
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
               </select>
             </div>
           )}
@@ -296,29 +228,20 @@ export default function ReserveForm({
               type="text"
               placeholder="Wedding, Gala, Reception..."
               value={occasion}
-              onChange={(e) =>
-                setOccasion(
-                  e.target.value
-                )
-              }
+              onChange={(e) => setOccasion(e.target.value)}
               className="w-full border border-[#D9C9BC] bg-white px-4 py-4 outline-none focus:border-[#AF9685]"
             />
           </div>
 
           <div>
             <label className="mb-2 block text-xs uppercase tracking-[0.3em] text-gray-500">
-              Additional Notes
-              (Optional)
+              Additional Notes (Optional)
             </label>
 
             <textarea
               rows={5}
               value={notes}
-              onChange={(e) =>
-                setNotes(
-                  e.target.value
-                )
-              }
+              onChange={(e) => setNotes(e.target.value)}
               className="w-full border border-[#D9C9BC] bg-white px-4 py-4 outline-none focus:border-[#AF9685]"
             />
           </div>
@@ -344,14 +267,9 @@ export default function ReserveForm({
         </form>
 
         <p className="mt-10 text-center text-xs leading-6 tracking-[0.15em] text-gray-400">
-          Studio reservations
-          close 48 hours before
-          the public release.
-          Once reservations
-          close, the collection
-          becomes available to
-          all clients and pieces
-          may sell out.
+          Studio reservations close 48 hours before the public release. Once
+          reservations close, the collection becomes available to all clients
+          and pieces may sell out.
         </p>
       </div>
     </main>
