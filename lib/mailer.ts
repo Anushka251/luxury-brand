@@ -469,7 +469,7 @@ function getReservationCoverImage(
       return "/images/ivory-blush/cover.jpg";
 
     case "blue-crystal":
-      return "/images/blue-crystal/cover.jpg";
+      return "/images/blue-crystal/cover.JPG";
 
     case "sunset-lilac":
       return "/images/sunset-lilac/cover.jpg";
