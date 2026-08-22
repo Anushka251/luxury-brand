@@ -16,7 +16,10 @@ type PaymentState =
   | "failed";
 
 type SavedReservation = {
+  orderId?: string;
   product?: string;
+  fullName?: string;
+  email?: string;
 };
 
 function PaymentSuccessContent() {
@@ -32,20 +35,53 @@ function PaymentSuccessContent() {
     "Verifying your reservation payment..."
   );
 
-  const [reservedProductId, setReservedProductId] =
+  const [productId, setProductId] =
     useState<string>("");
 
   /*
-   * Find the actual product from
-   * lib/products.ts
+   * Find the reserved product directly
+   * from products.ts.
    */
-  const reservedProduct =
-    products.find(
-      (product) =>
-        product.id === reservedProductId
-    );
+  const product = products.find(
+    (item) => item.id === productId
+  );
 
   useEffect(() => {
+    /*
+     * IMPORTANT:
+     *
+     * Read the saved reservation BEFORE
+     * removing it.
+     *
+     * ReserveForm stores the product here:
+     *
+     * avenor_reservation
+     */
+    const saved =
+      sessionStorage.getItem(
+        "avenor_reservation"
+      );
+
+    if (saved) {
+      try {
+        const reservation =
+          JSON.parse(
+            saved
+          ) as SavedReservation;
+
+        if (reservation.product) {
+          setProductId(
+            reservation.product
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Could not read saved reservation:",
+          error
+        );
+      }
+    }
+
     if (!orderId) {
       setStatus("failed");
 
@@ -85,7 +121,7 @@ function PaymentSuccessContent() {
         }
 
         /*
-         * PAYMENT SUCCESS
+         * SUCCESS
          */
 
         if (
@@ -99,28 +135,19 @@ function PaymentSuccessContent() {
           );
 
           /*
-           * Get the exact piece that
-           * was reserved.
+           * DO NOT remove avenor_reservation
+           * here.
+           *
+           * We need it for the product
+           * information and for retrying
+           * payment if necessary.
            */
-          if (data.product) {
-            setReservedProductId(
-              data.product
-            );
-          }
-
-          /*
-           * Remove temporary data only
-           * after successful payment.
-           */
-          sessionStorage.removeItem(
-            "avenor_reservation"
-          );
 
           return;
         }
 
         /*
-         * PAYMENT PENDING
+         * PENDING
          */
 
         if (
@@ -133,21 +160,11 @@ function PaymentSuccessContent() {
             "Your payment is being processed. Your reservation will be confirmed once Cashfree confirms the payment."
           );
 
-          /*
-           * If available, remember the
-           * piece while payment is pending.
-           */
-          if (data.product) {
-            setReservedProductId(
-              data.product
-            );
-          }
-
           return;
         }
 
         /*
-         * PAYMENT FAILED
+         * FAILED
          */
 
         setStatus("failed");
@@ -155,12 +172,6 @@ function PaymentSuccessContent() {
         setMessage(
           "Your reservation payment could not be confirmed."
         );
-
-        /*
-         * Keep the reservation in
-         * sessionStorage so the user
-         * can try payment again.
-         */
       } catch (error) {
         console.error(
           "Payment verification error:",
@@ -197,13 +208,13 @@ function PaymentSuccessContent() {
 
         if (reservation.product) {
           window.location.href =
-            `/reserve/${reservation.product}`;
+            `/reserve/form/${reservation.product}`;
 
           return;
         }
       } catch (error) {
         console.error(
-          "Unable to read saved reservation:",
+          "Unable to read reservation:",
           error
         );
       }
@@ -285,55 +296,51 @@ function PaymentSuccessContent() {
         </p>
 
         {/* ================================================= */}
-        {/* RESERVED PIECE */}
+        {/* PIECE */}
         {/* ================================================= */}
 
-        {(status === "success" ||
-          status === "pending") &&
-          reservedProduct && (
-            <div className="mx-auto mt-12 max-w-md">
+        {product && (
+          <div className="mx-auto mt-12 max-w-md">
 
-              <p className="text-xs uppercase tracking-[0.35em] text-[#AF9685]">
-                Reserved Piece
-              </p>
+            <p className="text-xs uppercase tracking-[0.35em] text-[#AF9685]">
+              {status === "success"
+                ? "Reserved Piece"
+                : "Selected Piece"}
+            </p>
 
-              {/* COVER IMAGE */}
+            {/* COVER IMAGE */}
 
-              <div className="relative mt-6 aspect-[3/4] w-full overflow-hidden border border-[#D9C9BC] bg-[#F7F5F2]">
-                <Image
-                  src={
-                    reservedProduct.coverImage
-                  }
-                  alt={
-                    reservedProduct.name
-                  }
-                  fill
-                  sizes="(max-width: 768px) 90vw, 420px"
-                  className="object-cover"
-                  priority
-                />
-              </div>
-
-              {/* PRODUCT NAME */}
-
-              <h2
-                className="mt-7 text-4xl font-light text-[#AF9685]"
-                style={{
-                  fontFamily:
-                    '"Cormorant Garamond", serif',
-                }}
-              >
-                {reservedProduct.name}
-              </h2>
-
-              {/* PRODUCT TYPE */}
-
-              <p className="mt-3 text-xs uppercase tracking-[0.3em] text-gray-400">
-                {reservedProduct.type}
-              </p>
-
+            <div className="relative mt-6 aspect-[3/4] w-full overflow-hidden border border-[#D9C9BC] bg-[#F7F5F2]">
+              <Image
+                src={product.coverImage}
+                alt={product.name}
+                fill
+                priority
+                sizes="(max-width: 768px) 90vw, 420px"
+                className="object-cover"
+              />
             </div>
-          )}
+
+            {/* NAME */}
+
+            <h2
+              className="mt-7 text-4xl font-light text-[#AF9685]"
+              style={{
+                fontFamily:
+                  '"Cormorant Garamond", serif',
+              }}
+            >
+              {product.name}
+            </h2>
+
+            {/* TYPE */}
+
+            <p className="mt-3 text-xs uppercase tracking-[0.3em] text-gray-400">
+              {product.type}
+            </p>
+
+          </div>
+        )}
 
         {/* ================================================= */}
         {/* SUCCESS */}
@@ -352,12 +359,12 @@ function PaymentSuccessContent() {
               successfully received.
             </p>
 
-            {reservedProduct && (
+            {product && (
               <p className="mt-3 text-sm leading-7 text-gray-600">
                 Your reservation has been
                 recorded for{" "}
                 <strong>
-                  {reservedProduct.name}
+                  {product.name}
                 </strong>
                 .
               </p>
@@ -446,6 +453,16 @@ function PaymentSuccessContent() {
                 successfully confirmed.
               </p>
 
+              {product && (
+                <p className="mt-4 text-sm leading-7 text-gray-500">
+                  The selected piece was{" "}
+                  <strong>
+                    {product.name}
+                  </strong>
+                  .
+                </p>
+              )}
+
               <p className="mt-4 text-sm leading-7 text-gray-500">
                 Your studio slot has
                 therefore not been confirmed.
@@ -514,8 +531,6 @@ function PaymentSuccessContent() {
               </button>
 
             </div>
-
-            {/* MONEY DEDUCTED WARNING */}
 
             <p className="mt-8 text-xs leading-6 tracking-[0.08em] text-gray-400">
               If your bank account was
