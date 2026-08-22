@@ -1,4 +1,8 @@
-import mongoose, { Schema, models, model } from "mongoose";
+import mongoose, {
+  Schema,
+  models,
+  model,
+} from "mongoose";
 
 const ReservationSchema = new Schema(
   {
@@ -56,9 +60,41 @@ const ReservationSchema = new Schema(
       trim: true,
     },
 
+    /*
+     * Cashfree information
+     */
+
+    cashfreeOrderId: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
+
+    reservationFee: {
+      type: Number,
+      required: true,
+      default: 2000,
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: [
+        "pending",
+        "success",
+        "failed",
+      ],
+      default: "pending",
+    },
+
     status: {
       type: String,
-      enum: ["pending", "contacted", "allocated", "closed"],
+      enum: [
+        "pending",
+        "contacted",
+        "allocated",
+        "closed",
+      ],
       default: "pending",
     },
   },
@@ -68,4 +104,7 @@ const ReservationSchema = new Schema(
 );
 
 export default models.Reservation ||
-  model("Reservation", ReservationSchema);
+  model(
+    "Reservation",
+    ReservationSchema
+  );
