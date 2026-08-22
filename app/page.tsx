@@ -228,7 +228,8 @@ export default function Home(): React.JSX.Element {
           </div>
 
           {/* RIGHT COLUMN */}
-          <div>
+          <div className="flex flex-col gap-20">
+
             {/* IVORY BLUSH */}
             <motion.div
               initial={{ opacity: 0, y: 40 }}
@@ -277,8 +278,57 @@ export default function Home(): React.JSX.Element {
                 </div>
               </Link>
             </motion.div>
-          </div>
 
+            {/* SUNSET LILAC */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 1.4, delay: 0.15 }}
+            >
+              <Link
+                href="/reserve/sunset-lilac"
+                className="block hover:opacity-95 transition"
+              >
+                <Image
+                  src="/products/sunset-lilac/cover.jpg"
+                  alt="Sunset Lilac"
+                  width={700}
+                  height={950}
+                  className="w-full h-auto object-cover"
+                />
+
+                <div className="pt-8 text-center">
+                  <p className="text-[11px] tracking-[0.35em] uppercase text-gray-400">
+                    Embroidered Mini Dress
+                  </p>
+
+                  <h2
+                    className="
+                      mt-3
+                      text-4xl
+                      md:text-4xl
+                      lg:text-5xl
+                      font-light
+                      tracking-[0.06em]
+                      text-[#AF9685]
+                      leading-none
+                    "
+                    style={{
+                      fontFamily: '"Cormorant Garamond", serif',
+                    }}
+                  >
+                    Sunset Lilac
+                  </h2>
+
+                  <p className="mt-5 text-xs tracking-[0.35em] text-gray-500">
+                    DISCOVER THE COLLECTION
+                  </p>
+                </div>
+              </Link>
+            </motion.div>
+
+          </div>
         </div>
       </section>
     </main>
