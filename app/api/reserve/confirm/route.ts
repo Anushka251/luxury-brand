@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Reservation from "@/models/Reservation";
+import {
+  sendReservationConfirmationEmail,
+} from "@/lib/mailer";
 
 type CashfreePayment = {
   payment_status?: string;
@@ -32,14 +35,11 @@ export async function POST(req: Request) {
     }
 
     /*
-     * Only allow AVENOR reservation
-     * orders.
+     * Only allow AVENOR reservation orders.
      */
 
     if (
-      !orderId.startsWith(
-        "AVENOR_RES_"
-      )
+      !orderId.startsWith("AVENOR_RES_")
     ) {
       return NextResponse.json(
         {
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     await connectDB();
 
     /*
-     * Find the reservation.
+     * Find reservation.
      */
 
     const reservation =
@@ -80,8 +80,8 @@ export async function POST(req: Request) {
     }
 
     /*
-     * If webhook already confirmed
-     * the payment, return success.
+     * If webhook has already confirmed
+     * payment, return success.
      */
 
     if (
@@ -95,14 +95,8 @@ export async function POST(req: Request) {
     }
 
     /*
-     * Ask Cashfree directly for the
-     * payment transactions belonging
-     * to this order.
-     *
-     * IMPORTANT:
-     * This is what tells us whether
-     * the payment actually succeeded,
-     * is pending, or failed.
+     * Ask Cashfree for all payment
+     * transactions for this order.
      */
 
     const cashfreeResponse =
@@ -170,8 +164,8 @@ export async function POST(req: Request) {
     }
 
     /*
-     * Cashfree returns an array of
-     * payment transactions.
+     * Cashfree returns payment
+     * transactions as an array.
      */
 
     const payments: CashfreePayment[] =
@@ -180,13 +174,9 @@ export async function POST(req: Request) {
         : [];
 
     /*
-     * --------------------------------
+     * =====================================================
      * SUCCESS
-     * --------------------------------
-     *
-     * If ANY transaction is a
-     * successful ₹2,000 payment,
-     * the reservation is confirmed.
+     * =====================================================
      */
 
     const successfulPayment =
@@ -200,6 +190,10 @@ export async function POST(req: Request) {
       );
 
     if (successfulPayment) {
+      /*
+       * Mark reservation as paid.
+       */
+
       reservation.paymentStatus =
         "success";
 
@@ -207,6 +201,49 @@ export async function POST(req: Request) {
         2000;
 
       await reservation.save();
+
+      /*
+       * Send reservation confirmation
+       * email to the customer.
+       */
+
+      try {
+        await sendReservationConfirmationEmail(
+          {
+            customerEmail:
+              reservation.email,
+
+            customerName:
+              reservation.fullName,
+
+            product:
+              reservation.product,
+
+            orderId,
+
+            reservationFee: 2000,
+          }
+        );
+
+        console.log(
+          `Reservation confirmation email sent: ${reservation.email}`
+        );
+      } catch (emailError) {
+        /*
+         * IMPORTANT:
+         *
+         * Do NOT mark the payment as
+         * failed just because the email
+         * failed.
+         *
+         * The payment is still successful.
+         */
+
+        console.error(
+          "Reservation confirmation email failed:",
+          emailError
+        );
+      }
 
       console.log(
         `AVENOR reservation payment SUCCESS: ${orderId}`
@@ -219,12 +256,9 @@ export async function POST(req: Request) {
     }
 
     /*
-     * --------------------------------
+     * =====================================================
      * PENDING
-     * --------------------------------
-     *
-     * If there is a pending transaction,
-     * keep the reservation pending.
+     * =====================================================
      */
 
     const pendingPayment =
@@ -251,18 +285,12 @@ export async function POST(req: Request) {
     }
 
     /*
-     * --------------------------------
+     * =====================================================
      * FAILED
-     * --------------------------------
+     * =====================================================
      *
-     * Cashfree considers the payment
-     * a failure when there are payment
-     * transactions but none are
-     * SUCCESS or PENDING.
-     *
-     * This includes cases such as
-     * user-dropped payment or
-     * transaction failure.
+     * There is a transaction, but it is
+     * neither SUCCESS nor PENDING.
      */
 
     if (payments.length > 0) {
@@ -282,17 +310,13 @@ export async function POST(req: Request) {
     }
 
     /*
-     * --------------------------------
+     * =====================================================
      * NO TRANSACTION YET
-     * --------------------------------
+     * =====================================================
      *
-     * There is no payment transaction
-     * recorded yet.
-     *
-     * Do NOT call this failed because
-     * Cashfree may still be processing
-     * the payment or the webhook may
-     * arrive shortly.
+     * Do not call this failed.
+     * Cashfree may simply not have
+     * recorded the transaction yet.
      */
 
     reservation.paymentStatus =
