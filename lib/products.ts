@@ -119,7 +119,7 @@ Every detail is thoughtfully finished to celebrate the artistry of fine craftsma
     images: [
       "/products/sunset-lilac/1.jpg",
       "/products/sunset-lilac/2.jpg",
-      "/products/sunset-lilac/3.jpg",
+      "/products/sunset-lilac/3.JPG",
     ],
 
     totalPieces: 10,
