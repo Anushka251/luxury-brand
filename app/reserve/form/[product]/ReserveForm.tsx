@@ -51,6 +51,19 @@ export default function ReserveForm({
     return null;
   }
 
+  /*
+   * Store these as plain strings after
+   * the session check.
+   *
+   * This also fixes the TypeScript error:
+   * "'session' is possibly 'null'."
+   */
+  const userName =
+    session.user?.name ?? "";
+
+  const userEmail =
+    session.user?.email ?? "";
+
   const productName =
     product === "crimson-rose"
       ? "Crimson Rose"
@@ -87,6 +100,9 @@ export default function ReserveForm({
     setIsLoading(true);
 
     try {
+      /*
+       * Create the ₹2,000 Cashfree order.
+       */
       const response = await fetch(
         "/api/cashfree",
         {
@@ -100,11 +116,9 @@ export default function ReserveForm({
           body: JSON.stringify({
             product,
 
-            fullName:
-              session.user?.name ?? "",
+            fullName: userName,
 
-            email:
-              session.user?.email ?? "",
+            email: userEmail,
 
             instagram,
 
@@ -143,9 +157,9 @@ export default function ReserveForm({
        * Store the reservation information
        * temporarily.
        *
-       * This is NOT the confirmed reservation.
-       * MongoDB will only receive the reservation
-       * after Cashfree payment is verified.
+       * This is NOT the payment confirmation.
+       * MongoDB already has the pending
+       * reservation created by /api/cashfree.
        */
 
       sessionStorage.setItem(
@@ -156,11 +170,9 @@ export default function ReserveForm({
 
           product,
 
-          fullName:
-            session.user?.name ?? "",
+          fullName: userName,
 
-          email:
-            session.user?.email ?? "",
+          email: userEmail,
 
           instagram,
 
@@ -177,9 +189,9 @@ export default function ReserveForm({
       );
 
       /*
-       * Load Cashfree SDK
+       * Load Cashfree SDK if it isn't
+       * already loaded.
        */
-
       if (
         !(window as any).Cashfree
       ) {
@@ -210,6 +222,9 @@ export default function ReserveForm({
         );
       }
 
+      /*
+       * Initialize Cashfree.
+       */
       const cashfree =
         (window as any).Cashfree({
           mode:
@@ -220,6 +235,9 @@ export default function ReserveForm({
               : "production",
         });
 
+      /*
+       * Open Cashfree checkout.
+       */
       await cashfree.checkout({
         paymentSessionId:
           data.payment_session_id,
@@ -297,9 +315,7 @@ export default function ReserveForm({
 
             <input
               type="text"
-              value={
-                session.user?.name ?? ""
-              }
+              value={userName}
               readOnly
               className="
                 w-full
@@ -323,9 +339,7 @@ export default function ReserveForm({
 
             <input
               type="email"
-              value={
-                session.user?.email ?? ""
-              }
+              value={userEmail}
               readOnly
               className="
                 w-full
@@ -340,7 +354,7 @@ export default function ReserveForm({
             />
           </div>
 
-          {/* INSTAGRAM — OPTIONAL */}
+          {/* INSTAGRAM */}
 
           <div>
             <label className="mb-2 block text-xs uppercase tracking-[0.3em] text-gray-500">
@@ -401,7 +415,7 @@ export default function ReserveForm({
             />
           </div>
 
-          {/* FIT */}
+          {/* FIT PREFERENCE */}
 
           <div>
             <label className="mb-4 block text-xs uppercase tracking-[0.3em] text-gray-500">
