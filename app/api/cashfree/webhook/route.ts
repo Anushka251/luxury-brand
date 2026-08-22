@@ -3,11 +3,24 @@ import crypto from "crypto";
 import { connectDB } from "@/lib/mongodb";
 import Reservation from "@/models/Reservation";
 
+/*
+ * Health check.
+ *
+ * This allows you to open:
+ *
+ * https://avenorcollection.com/api/cashfree/webhook
+ *
+ * in Safari and confirm that the route exists.
+ */
+export async function GET() {
+  return NextResponse.json({
+    status: "ok",
+    service: "AVENOR Cashfree Webhook",
+  });
+}
+
 export async function POST(req: Request) {
   try {
-    /*
-     * Cashfree webhook headers
-     */
     const signature = req.headers.get(
       "x-webhook-signature"
     );
@@ -17,10 +30,6 @@ export async function POST(req: Request) {
     );
 
     if (!signature || !timestamp) {
-      console.error(
-        "Cashfree webhook: missing signature or timestamp."
-      );
-
       return NextResponse.json(
         {
           error:
@@ -34,24 +43,10 @@ export async function POST(req: Request) {
 
     /*
      * IMPORTANT:
-     *
-     * Cashfree signature verification requires
-     * the RAW request body.
-     *
-     * Do NOT call req.json() before this.
+     * Read the RAW body before parsing JSON.
      */
     const rawBody = await req.text();
 
-    /*
-     * Cashfree signature:
-     *
-     * HMAC-SHA256(
-     *   timestamp + rawBody,
-     *   CASHFREE_CLIENT_SECRET
-     * )
-     *
-     * Encoded as Base64.
-     */
     const signedPayload =
       timestamp + rawBody;
 
@@ -65,12 +60,6 @@ export async function POST(req: Request) {
         .update(signedPayload)
         .digest("base64");
 
-    /*
-     * Safely compare signatures.
-     *
-     * timingSafeEqual requires buffers
-     * of the same length.
-     */
     const signatureBuffer =
       Buffer.from(signature);
 
@@ -81,10 +70,6 @@ export async function POST(req: Request) {
       signatureBuffer.length !==
       expectedBuffer.length
     ) {
-      console.error(
-        "Cashfree webhook: invalid signature."
-      );
-
       return NextResponse.json(
         {
           error:
@@ -103,10 +88,6 @@ export async function POST(req: Request) {
       );
 
     if (!signaturesMatch) {
-      console.error(
-        "Cashfree webhook: signature verification failed."
-      );
-
       return NextResponse.json(
         {
           error:
@@ -118,15 +99,11 @@ export async function POST(req: Request) {
       );
     }
 
-    /*
-     * Signature is valid.
-     * Now it is safe to parse the body.
-     */
     const payload =
       JSON.parse(rawBody);
 
     console.log(
-      "Cashfree webhook received:",
+      "Cashfree webhook:",
       JSON.stringify(
         payload,
         null,
@@ -134,9 +111,6 @@ export async function POST(req: Request) {
       )
     );
 
-    /*
-     * Extract payment information.
-     */
     const orderId =
       payload?.data?.order?.order_id;
 
@@ -149,10 +123,6 @@ export async function POST(req: Request) {
         ?.payment_amount;
 
     if (!orderId) {
-      console.error(
-        "Cashfree webhook: order ID missing."
-      );
-
       return NextResponse.json(
         {
           error:
@@ -165,11 +135,8 @@ export async function POST(req: Request) {
     }
 
     /*
-     * We only confirm the reservation
-     * when Cashfree reports SUCCESS.
-     *
-     * Other statuses can be acknowledged
-     * without marking the reservation as paid.
+     * Only successful payments
+     * confirm the reservation.
      */
     if (
       paymentStatus !==
@@ -179,31 +146,23 @@ export async function POST(req: Request) {
         `Cashfree payment ${orderId}: ${paymentStatus}`
       );
 
-      return NextResponse.json(
-        {
-          received: true,
-          processed: false,
-          status: paymentStatus,
-        },
-        {
-          status: 200,
-        }
-      );
+      return NextResponse.json({
+        received: true,
+        processed: false,
+        status: paymentStatus,
+      });
     }
 
     /*
-     * Reservation fee must be exactly ₹2,000.
+     * Reservation fee must be ₹2,000.
      */
     if (
       Number(paymentAmount) !==
       2000
     ) {
       console.error(
-        "Cashfree webhook: incorrect payment amount.",
-        {
-          orderId,
-          paymentAmount,
-        }
+        "Invalid reservation payment amount:",
+        paymentAmount
       );
 
       return NextResponse.json(
@@ -217,15 +176,8 @@ export async function POST(req: Request) {
       );
     }
 
-    /*
-     * Connect to MongoDB.
-     */
     await connectDB();
 
-    /*
-     * Find the pending reservation
-     * created by /api/cashfree.
-     */
     const reservation =
       await Reservation.findOne({
         cashfreeOrderId:
@@ -233,80 +185,46 @@ export async function POST(req: Request) {
       });
 
     if (!reservation) {
-      /*
-       * We acknowledge the webhook rather
-       * than repeatedly retrying forever.
-       *
-       * This should normally never happen
-       * because /api/cashfree creates the
-       * MongoDB reservation before checkout.
-       */
       console.warn(
-        `No reservation found for Cashfree order ${orderId}.`
+        `No reservation found for ${orderId}`
       );
 
-      return NextResponse.json(
-        {
-          received: true,
-          processed: false,
-          reason:
-            "Reservation not found.",
-        },
-        {
-          status: 200,
-        }
-      );
+      return NextResponse.json({
+        received: true,
+        processed: false,
+        reason:
+          "Reservation not found.",
+      });
     }
 
     /*
-     * Idempotency:
-     *
-     * Cashfree may send the same event more
-     * than once. If we already processed it,
-     * do nothing.
+     * Prevent duplicate processing.
      */
     if (
       reservation.paymentStatus ===
       "success"
     ) {
-      console.log(
-        `Reservation ${orderId} already confirmed.`
-      );
-
-      return NextResponse.json(
-        {
-          received: true,
-          processed: true,
-          alreadyProcessed: true,
-        },
-        {
-          status: 200,
-        }
-      );
+      return NextResponse.json({
+        received: true,
+        processed: true,
+        alreadyProcessed: true,
+      });
     }
 
-    /*
-     * Confirm the reservation payment.
-     */
     reservation.paymentStatus =
       "success";
 
     await reservation.save();
 
     console.log(
-      `AVENOR reservation payment confirmed: ${orderId}`
+      `AVENOR reservation confirmed: ${orderId}`
     );
 
-    return NextResponse.json(
-      {
-        received: true,
-        processed: true,
-        orderId,
-      },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json({
+      received: true,
+      processed: true,
+      orderId,
+    });
   } catch (error) {
     console.error(
       "Cashfree webhook error:",
