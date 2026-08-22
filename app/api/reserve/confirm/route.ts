@@ -16,10 +16,6 @@ export async function POST(req: Request) {
 
     const { orderId } = body;
 
-    /*
-     * Validate order ID
-     */
-
     if (
       !orderId ||
       typeof orderId !== "string"
@@ -28,15 +24,9 @@ export async function POST(req: Request) {
         {
           error: "Order ID is required.",
         },
-        {
-          status: 400,
-        }
+        { status: 400 }
       );
     }
-
-    /*
-     * Only allow AVENOR reservation orders.
-     */
 
     if (
       !orderId.startsWith("AVENOR_RES_")
@@ -46,21 +36,11 @@ export async function POST(req: Request) {
           error:
             "Invalid reservation order.",
         },
-        {
-          status: 400,
-        }
+        { status: 400 }
       );
     }
 
-    /*
-     * Connect to MongoDB.
-     */
-
     await connectDB();
-
-    /*
-     * Find reservation.
-     */
 
     const reservation =
       await Reservation.findOne({
@@ -73,15 +53,13 @@ export async function POST(req: Request) {
           error:
             "Reservation not found.",
         },
-        {
-          status: 404,
-        }
+        { status: 404 }
       );
     }
 
     /*
-     * If webhook has already confirmed
-     * payment, return success.
+     * If already successful,
+     * don't verify again.
      */
 
     if (
@@ -95,9 +73,17 @@ export async function POST(req: Request) {
     }
 
     /*
-     * Ask Cashfree for all payment
-     * transactions for this order.
+     * This is the ACTUAL amount that
+     * was created for this reservation.
+     *
+     * Test order = 1
+     * Real order = 2000
      */
+
+    const expectedAmount =
+      Number(
+        reservation.reservationFee
+      );
 
     const cashfreeResponse =
       await fetch(
@@ -139,16 +125,7 @@ export async function POST(req: Request) {
       )
     );
 
-    /*
-     * Cashfree API error.
-     */
-
     if (!cashfreeResponse.ok) {
-      console.error(
-        "Cashfree verification failed:",
-        cashfreeData
-      );
-
       return NextResponse.json(
         {
           error:
@@ -163,20 +140,13 @@ export async function POST(req: Request) {
       );
     }
 
-    /*
-     * Cashfree returns payment
-     * transactions as an array.
-     */
-
     const payments: CashfreePayment[] =
       Array.isArray(cashfreeData)
         ? cashfreeData
         : [];
 
     /*
-     * =====================================================
      * SUCCESS
-     * =====================================================
      */
 
     const successfulPayment =
@@ -186,25 +156,17 @@ export async function POST(req: Request) {
             "SUCCESS" &&
           Number(
             payment.payment_amount
-          ) === 2000
+          ) === expectedAmount
       );
 
     if (successfulPayment) {
-      /*
-       * Mark reservation as paid.
-       */
-
       reservation.paymentStatus =
         "success";
-
-      reservation.reservationFee =
-        2000;
 
       await reservation.save();
 
       /*
-       * Send reservation confirmation
-       * email to the customer.
+       * Send confirmation email.
        */
 
       try {
@@ -221,24 +183,11 @@ export async function POST(req: Request) {
 
             orderId,
 
-            reservationFee: 2000,
+            reservationFee:
+              expectedAmount,
           }
         );
-
-        console.log(
-          `Reservation confirmation email sent: ${reservation.email}`
-        );
       } catch (emailError) {
-        /*
-         * IMPORTANT:
-         *
-         * Do NOT mark the payment as
-         * failed just because the email
-         * failed.
-         *
-         * The payment is still successful.
-         */
-
         console.error(
           "Reservation confirmation email failed:",
           emailError
@@ -256,9 +205,7 @@ export async function POST(req: Request) {
     }
 
     /*
-     * =====================================================
      * PENDING
-     * =====================================================
      */
 
     const pendingPayment =
@@ -274,10 +221,6 @@ export async function POST(req: Request) {
 
       await reservation.save();
 
-      console.log(
-        `AVENOR reservation payment PENDING: ${orderId}`
-      );
-
       return NextResponse.json({
         paymentStatus: "pending",
         orderId,
@@ -285,12 +228,7 @@ export async function POST(req: Request) {
     }
 
     /*
-     * =====================================================
      * FAILED
-     * =====================================================
-     *
-     * There is a transaction, but it is
-     * neither SUCCESS nor PENDING.
      */
 
     if (payments.length > 0) {
@@ -299,10 +237,6 @@ export async function POST(req: Request) {
 
       await reservation.save();
 
-      console.log(
-        `AVENOR reservation payment FAILED: ${orderId}`
-      );
-
       return NextResponse.json({
         paymentStatus: "failed",
         orderId,
@@ -310,23 +244,13 @@ export async function POST(req: Request) {
     }
 
     /*
-     * =====================================================
-     * NO TRANSACTION YET
-     * =====================================================
-     *
-     * Do not call this failed.
-     * Cashfree may simply not have
-     * recorded the transaction yet.
+     * No transaction yet.
      */
 
     reservation.paymentStatus =
       "pending";
 
     await reservation.save();
-
-    console.log(
-      `AVENOR reservation payment has no transaction yet: ${orderId}`
-    );
 
     return NextResponse.json({
       paymentStatus: "pending",
@@ -343,9 +267,7 @@ export async function POST(req: Request) {
         error:
           "Unable to verify reservation payment.",
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 }
