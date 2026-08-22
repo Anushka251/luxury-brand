@@ -10,6 +10,10 @@ export const transporter = nodemailer.createTransport({
   },
 });
 
+/* =========================================================
+   NORMAL ORDER EMAIL
+========================================================= */
+
 interface OrderItem {
   name: string;
   price: number;
@@ -159,10 +163,7 @@ export async function sendOrderConfirmationEmail({
           style="
             background:#f7f7f5;
             padding:40px 20px;
-            font-family:
-              Helvetica,
-              Arial,
-              sans-serif;
+            font-family:Helvetica,Arial,sans-serif;
           "
         >
           <tr>
@@ -178,6 +179,7 @@ export async function sendOrderConfirmationEmail({
                   padding:50px 40px;
                 "
               >
+
                 <tr>
                   <td align="center">
                     <p style="
@@ -194,6 +196,7 @@ export async function sendOrderConfirmationEmail({
 
                 <tr>
                   <td style="padding-top:40px;">
+
                     <p style="
                       margin:0;
                       color:#666;
@@ -222,6 +225,7 @@ export async function sendOrderConfirmationEmail({
                       your order has been received and is
                       now being prepared with care.
                     </p>
+
                   </td>
                 </tr>
 
@@ -231,6 +235,7 @@ export async function sendOrderConfirmationEmail({
                     margin-top:30px;
                     border:1px solid #e5e5e5;
                   ">
+
                     <p style="
                       margin:0;
                       color:#888;
@@ -247,6 +252,7 @@ export async function sendOrderConfirmationEmail({
                     ">
                       ${orderNumber}
                     </p>
+
                   </td>
                 </tr>
 
@@ -263,8 +269,10 @@ export async function sendOrderConfirmationEmail({
                     padding-top:30px;
                     border-top:1px solid #e5e5e5;
                   ">
+
                     <table width="100%">
                       <tr>
+
                         <td style="
                           color:#666;
                           font-size:15px;
@@ -282,8 +290,10 @@ export async function sendOrderConfirmationEmail({
                         >
                           ₹${total.toLocaleString()}
                         </td>
+
                       </tr>
                     </table>
+
                   </td>
                 </tr>
 
@@ -292,6 +302,7 @@ export async function sendOrderConfirmationEmail({
                     align="center"
                     style="padding-top:40px;"
                   >
+
                     <a
                       href="https://avenorcollection.com/account/orders"
                       style="
@@ -306,6 +317,7 @@ export async function sendOrderConfirmationEmail({
                     >
                       VIEW YOUR ORDER
                     </a>
+
                   </td>
                 </tr>
 
@@ -316,6 +328,7 @@ export async function sendOrderConfirmationEmail({
                     font-size:14px;
                     line-height:1.8;
                   ">
+
                     We will notify you again once your
                     order has been shipped.
 
@@ -323,6 +336,7 @@ export async function sendOrderConfirmationEmail({
 
                     If you have any questions, simply
                     reply to this email or contact us at
+
                     <a
                       href="mailto:support@avenorcollection.com"
                       style="
@@ -332,6 +346,7 @@ export async function sendOrderConfirmationEmail({
                     >
                       support@avenorcollection.com
                     </a>.
+
                   </td>
                 </tr>
 
@@ -343,6 +358,7 @@ export async function sendOrderConfirmationEmail({
                       border-top:1px solid #eeeeee;
                     "
                   >
+
                     <p style="
                       margin:0;
                       font-size:12px;
@@ -368,6 +384,7 @@ export async function sendOrderConfirmationEmail({
                       © ${new Date().getFullYear()}
                       Avenor Collection
                     </p>
+
                   </td>
                 </tr>
 
@@ -376,6 +393,436 @@ export async function sendOrderConfirmationEmail({
             </td>
           </tr>
         </table>
+      </div>
+    `,
+  });
+}
+
+
+/* =========================================================
+   AVENOR STUDIO RESERVATION EMAIL
+========================================================= */
+
+interface ReservationEmailProps {
+  customerEmail: string;
+  customerName: string;
+  product: string;
+  orderId: string;
+  reservationFee: number;
+}
+
+export async function sendReservationConfirmationEmail({
+  customerEmail,
+  customerName,
+  product,
+  orderId,
+  reservationFee,
+}: ReservationEmailProps) {
+  const productName =
+    product === "crimson-rose"
+      ? "Crimson Rose"
+      : product === "ivory-blush"
+      ? "Ivory Blush"
+      : product === "blue-crystal"
+      ? "Blue Crystal"
+      : product === "sunset-lilac"
+      ? "Sunset Lilac"
+      : "Selected Piece";
+
+  await transporter.sendMail({
+    from: `"Avenor Collection" <${process.env.ZOHO_EMAIL}>`,
+
+    to: customerEmail,
+
+    subject: `AVENOR Studio Reservation Confirmed • ${productName}`,
+
+    html: `
+      <div style="
+        margin:0;
+        padding:0;
+        background:#f7f5f2;
+      ">
+
+        <table
+          width="100%"
+          cellpadding="0"
+          cellspacing="0"
+          style="
+            background:#f7f5f2;
+            padding:40px 20px;
+            font-family:Helvetica,Arial,sans-serif;
+          "
+        >
+
+          <tr>
+            <td align="center">
+
+              <table
+                width="600"
+                cellpadding="0"
+                cellspacing="0"
+                style="
+                  max-width:600px;
+                  background:#ffffff;
+                  padding:55px 45px;
+                "
+              >
+
+                <!-- LOGO -->
+
+                <tr>
+                  <td align="center">
+
+                    <p style="
+                      margin:0;
+                      font-size:32px;
+                      letter-spacing:10px;
+                      color:#111111;
+                      font-weight:300;
+                    ">
+                      AVENOR
+                    </p>
+
+                  </td>
+                </tr>
+
+                <!-- HEADER -->
+
+                <tr>
+                  <td
+                    align="center"
+                    style="padding-top:50px;"
+                  >
+
+                    <p style="
+                      margin:0;
+                      font-size:11px;
+                      letter-spacing:3px;
+                      color:#AF9685;
+                    ">
+                      STUDIO RESERVATION
+                    </p>
+
+                    <h1 style="
+                      margin:16px 0 0;
+                      font-family:Georgia,serif;
+                      font-size:34px;
+                      line-height:1.2;
+                      font-weight:400;
+                      color:#111111;
+                    ">
+                      Reservation Confirmed
+                    </h1>
+
+                    <p style="
+                      margin:22px 0 0;
+                      color:#666666;
+                      font-size:15px;
+                      line-height:1.8;
+                    ">
+                      Dear ${customerName},
+                    </p>
+
+                    <p style="
+                      margin:10px 0 0;
+                      color:#666666;
+                      font-size:15px;
+                      line-height:1.8;
+                    ">
+                      Your AVENOR studio reservation
+                      has been successfully confirmed.
+                    </p>
+
+                  </td>
+                </tr>
+
+                <!-- PRODUCT -->
+
+                <tr>
+                  <td
+                    style="
+                      padding-top:40px;
+                    "
+                  >
+
+                    <table
+                      width="100%"
+                      cellpadding="0"
+                      cellspacing="0"
+                      style="
+                        border:1px solid #ded6cf;
+                        background:#faf8f5;
+                      "
+                    >
+
+                      <tr>
+
+                        <td
+                          style="
+                            padding:28px;
+                          "
+                        >
+
+                          <p style="
+                            margin:0;
+                            font-size:10px;
+                            letter-spacing:2px;
+                            color:#999999;
+                          ">
+                            RESERVED FOR
+                          </p>
+
+                          <p style="
+                            margin:10px 0 0;
+                            font-family:Georgia,serif;
+                            font-size:25px;
+                            color:#111111;
+                          ">
+                            ${productName}
+                          </p>
+
+                        </td>
+
+                      </tr>
+
+                    </table>
+
+                  </td>
+                </tr>
+
+                <!-- PAYMENT -->
+
+                <tr>
+                  <td
+                    style="
+                      padding-top:30px;
+                    "
+                  >
+
+                    <table
+                      width="100%"
+                      cellpadding="0"
+                      cellspacing="0"
+                    >
+
+                      <tr>
+
+                        <td style="
+                          padding:12px 0;
+                          color:#666666;
+                          font-size:14px;
+                        ">
+                          Reservation Fee
+                        </td>
+
+                        <td
+                          align="right"
+                          style="
+                            padding:12px 0;
+                            color:#111111;
+                            font-size:16px;
+                            font-weight:500;
+                          "
+                        >
+                          ₹${reservationFee.toLocaleString()}
+                        </td>
+
+                      </tr>
+
+                      <tr>
+
+                        <td style="
+                          padding:12px 0;
+                          border-top:1px solid #eeeeee;
+                          color:#666666;
+                          font-size:14px;
+                        ">
+                          Payment Status
+                        </td>
+
+                        <td
+                          align="right"
+                          style="
+                            padding:12px 0;
+                            border-top:1px solid #eeeeee;
+                            color:#8C9A78;
+                            font-size:14px;
+                            font-weight:500;
+                          "
+                        >
+                          PAID
+                        </td>
+
+                      </tr>
+
+                    </table>
+
+                  </td>
+                </tr>
+
+                <!-- MESSAGE -->
+
+                <tr>
+                  <td
+                    style="
+                      padding-top:35px;
+                      color:#555555;
+                      font-size:14px;
+                      line-height:1.9;
+                    "
+                  >
+
+                    Your reservation gives you
+                    priority access to the studio
+                    consultation before the public
+                    release.
+
+                    <br /><br />
+
+                    Our atelier will contact you using
+                    the details provided during your
+                    reservation.
+
+                    <br /><br />
+
+                    Please note that your reservation
+                    does not guarantee garment
+                    allocation or purchase. All AVENOR
+                    pieces remain limited and subject
+                    to availability.
+
+                  </td>
+                </tr>
+
+                <!-- REFERENCE -->
+
+                <tr>
+                  <td
+                    style="
+                      padding-top:35px;
+                    "
+                  >
+
+                    <table
+                      width="100%"
+                      cellpadding="0"
+                      cellspacing="0"
+                      style="
+                        border-top:1px solid #eeeeee;
+                      "
+                    >
+
+                      <tr>
+
+                        <td
+                          style="
+                            padding-top:25px;
+                            color:#999999;
+                            font-size:11px;
+                            letter-spacing:1px;
+                          "
+                        >
+                          RESERVATION REFERENCE
+                        </td>
+
+                      </tr>
+
+                      <tr>
+
+                        <td
+                          style="
+                            padding-top:8px;
+                            color:#555555;
+                            font-size:12px;
+                            word-break:break-all;
+                          "
+                        >
+                          ${orderId}
+                        </td>
+
+                      </tr>
+
+                    </table>
+
+                  </td>
+                </tr>
+
+                <!-- SUPPORT -->
+
+                <tr>
+                  <td
+                    style="
+                      padding-top:40px;
+                      color:#777777;
+                      font-size:13px;
+                      line-height:1.8;
+                    "
+                  >
+
+                    If you have any questions,
+                    reply to this email or contact us at
+
+                    <a
+                      href="mailto:support@avenorcollection.com"
+                      style="
+                        color:#111111;
+                        text-decoration:none;
+                      "
+                    >
+                      support@avenorcollection.com
+                    </a>.
+
+                  </td>
+                </tr>
+
+                <!-- FOOTER -->
+
+                <tr>
+                  <td
+                    align="center"
+                    style="
+                      padding-top:50px;
+                      border-top:1px solid #eeeeee;
+                    "
+                  >
+
+                    <p style="
+                      margin:0;
+                      font-size:12px;
+                      letter-spacing:4px;
+                      color:#999999;
+                    ">
+                      AVENOR
+                    </p>
+
+                    <p style="
+                      margin:12px 0 0;
+                      font-size:12px;
+                      color:#999999;
+                    ">
+                      Quiet luxury. Limited pieces.
+                      Thoughtfully crafted.
+                    </p>
+
+                    <p style="
+                      margin:12px 0 0;
+                      font-size:12px;
+                      color:#999999;
+                    ">
+                      © ${new Date().getFullYear()}
+                      Avenor Collection
+                    </p>
+
+                  </td>
+                </tr>
+
+              </table>
+
+            </td>
+          </tr>
+
+        </table>
+
       </div>
     `,
   });
