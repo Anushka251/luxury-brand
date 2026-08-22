@@ -140,11 +140,12 @@ export default function ReserveForm({
       }
 
       /*
-       * Save the form temporarily.
+       * Store the reservation information
+       * temporarily.
        *
-       * This is NOT the reservation.
-       * The reservation is only created
-       * after Cashfree confirms payment.
+       * This is NOT the confirmed reservation.
+       * MongoDB will only receive the reservation
+       * after Cashfree payment is verified.
        */
 
       sessionStorage.setItem(
@@ -245,6 +246,8 @@ export default function ReserveForm({
     <main className="min-h-screen bg-[#FAF8F5] px-6 py-16">
       <div className="mx-auto max-w-2xl">
 
+        {/* HEADER */}
+
         <div className="mb-12 text-center">
 
           <p className="text-xs uppercase tracking-[0.35em] text-gray-400">
@@ -337,11 +340,14 @@ export default function ReserveForm({
             />
           </div>
 
-          {/* INSTAGRAM */}
+          {/* INSTAGRAM — OPTIONAL */}
 
           <div>
             <label className="mb-2 block text-xs uppercase tracking-[0.3em] text-gray-500">
               Instagram Handle
+              <span className="ml-2 normal-case tracking-normal text-gray-400">
+                (Optional)
+              </span>
             </label>
 
             <input
