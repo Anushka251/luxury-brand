@@ -18,15 +18,9 @@ export async function POST(req: Request) {
       notes,
     } = body;
 
-    /*
-     * Validate required information
-     */
-
     if (!product) {
       return NextResponse.json(
-        {
-          error: "Product is required.",
-        },
+        { error: "Product is required." },
         { status: 400 }
       );
     }
@@ -68,26 +62,20 @@ export async function POST(req: Request) {
     }
 
     /*
-     * IMPORTANT:
+     * TEST MODE
      *
-     * Never trust the amount sent by the browser.
-     *
-     * The AVENOR reservation fee is fixed
-     * on the server at ₹2,000.
+     * true  = ₹1
+     * false = ₹2,000
      */
 
-    const amount = 2000;
+    const isTestMode =
+      process.env.AVENOR_RESERVATION_TEST_MODE ===
+      "true";
 
-    /*
-     * Create a unique Cashfree order ID.
-     */
+    const amount = isTestMode ? 1 : 2000;
 
     const orderId =
       `AVENOR_RES_${Date.now()}`;
-
-    /*
-     * Create Cashfree order.
-     */
 
     const response = await fetch(
       "https://api.cashfree.com/pg/orders",
@@ -161,12 +149,6 @@ export async function POST(req: Request) {
       data
     );
 
-    /*
-     * If Cashfree failed to create
-     * the order, do NOT create a
-     * MongoDB reservation.
-     */
-
     if (!response.ok) {
       return NextResponse.json(
         {
@@ -184,43 +166,27 @@ export async function POST(req: Request) {
       );
     }
 
-    /*
-     * Make sure Cashfree actually
-     * returned a payment session.
-     */
-
     if (!data.payment_session_id) {
       return NextResponse.json(
         {
           error:
             "Cashfree payment session was not created.",
         },
-        {
-          status: 500,
-        }
+        { status: 500 }
       );
     }
 
     /*
-     * Connect to MongoDB.
+     * Create the pending reservation.
+     *
+     * IMPORTANT:
+     * Store the ACTUAL amount.
+     *
+     * Test = 1
+     * Production = 2000
      */
 
     await connectDB();
-
-    /*
-     * Create a PENDING reservation.
-     *
-     * The reservation is NOT considered
-     * paid yet.
-     *
-     * The webhook will later change:
-     *
-     * paymentStatus: "pending"
-     *
-     * to:
-     *
-     * paymentStatus: "success"
-     */
 
     await Reservation.create({
       product,
@@ -258,11 +224,6 @@ export async function POST(req: Request) {
         "pending",
     });
 
-    /*
-     * Send the Cashfree session
-     * back to the browser.
-     */
-
     return NextResponse.json({
       order_id:
         data.order_id,
@@ -284,9 +245,7 @@ export async function POST(req: Request) {
         error:
           "Unable to create payment order.",
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 }
