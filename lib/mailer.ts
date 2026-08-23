@@ -55,8 +55,16 @@ export async function sendOrderConfirmationEmail({
 
       return `
         <tr>
-          <td style="padding:16px 0;border-bottom:1px solid #e5e5e5;">
-            <table width="100%" cellpadding="0" cellspacing="0">
+          <td style="
+            padding:16px 0;
+            border-bottom:1px solid #e5e5e5;
+          ">
+            <table
+              width="100%"
+              cellpadding="0"
+              cellspacing="0"
+              border="0"
+            >
               <tr>
 
                 <td width="90" valign="top">
@@ -138,7 +146,7 @@ export async function sendOrderConfirmationEmail({
                 >
                   ₹${(
                     item.price * item.quantity
-                  ).toLocaleString()}
+                  ).toLocaleString("en-IN")}
                 </td>
 
               </tr>
@@ -151,9 +159,11 @@ export async function sendOrderConfirmationEmail({
 
   await transporter.sendMail({
     from: `"Avenor Collection" <${process.env.ZOHO_EMAIL}>`,
+
     to: customerEmail,
 
-    subject: `Avenor Order Confirmation • ${orderNumber}`,
+    subject:
+      `Avenor Order Confirmation • ${orderNumber}`,
 
     html: `
       <div style="
@@ -161,16 +171,19 @@ export async function sendOrderConfirmationEmail({
         padding:0;
         background:#f7f7f5;
       ">
+
         <table
           width="100%"
           cellpadding="0"
           cellspacing="0"
+          border="0"
           style="
             background:#f7f7f5;
             padding:40px 20px;
             font-family:Helvetica,Arial,sans-serif;
           "
         >
+
           <tr>
             <td align="center">
 
@@ -178,364 +191,12 @@ export async function sendOrderConfirmationEmail({
                 width="600"
                 cellpadding="0"
                 cellspacing="0"
+                border="0"
                 style="
+                  width:100%;
                   max-width:600px;
                   background:#ffffff;
                   padding:50px 40px;
-                "
-              >
-
-                <tr>
-                  <td align="center">
-                    <p style="
-                      margin:0;
-                      font-size:32px;
-                      letter-spacing:10px;
-                      color:#111111;
-                      font-weight:300;
-                    ">
-                      AVENOR
-                    </p>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="padding-top:40px;">
-
-                    <p style="
-                      margin:0;
-                      color:#666;
-                      font-size:12px;
-                      letter-spacing:2px;
-                    ">
-                      ORDER CONFIRMED
-                    </p>
-
-                    <h1 style="
-                      margin:12px 0 0;
-                      color:#111;
-                      font-size:30px;
-                      font-weight:400;
-                    ">
-                      Thank you for your order.
-                    </h1>
-
-                    <p style="
-                      margin:20px 0 0;
-                      color:#555;
-                      font-size:15px;
-                      line-height:1.8;
-                    ">
-                      Dear ${customerName},
-                      your order has been received and is
-                      now being prepared with care.
-                    </p>
-
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="
-                    padding:30px;
-                    margin-top:30px;
-                    border:1px solid #e5e5e5;
-                  ">
-
-                    <p style="
-                      margin:0;
-                      color:#888;
-                      font-size:12px;
-                      letter-spacing:1px;
-                    ">
-                      ORDER NUMBER
-                    </p>
-
-                    <p style="
-                      margin:8px 0 0;
-                      font-size:18px;
-                      color:#111;
-                    ">
-                      ${orderNumber}
-                    </p>
-
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="padding-top:40px;">
-                    <table width="100%">
-                      ${itemsHtml}
-                    </table>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="
-                    padding-top:30px;
-                    border-top:1px solid #e5e5e5;
-                  ">
-
-                    <table width="100%">
-                      <tr>
-
-                        <td style="
-                          color:#666;
-                          font-size:15px;
-                        ">
-                          Total Paid
-                        </td>
-
-                        <td
-                          align="right"
-                          style="
-                            color:#111;
-                            font-size:22px;
-                            font-weight:500;
-                          "
-                        >
-                          ₹${total.toLocaleString()}
-                        </td>
-
-                      </tr>
-                    </table>
-
-                  </td>
-                </tr>
-
-                <tr>
-                  <td
-                    align="center"
-                    style="padding-top:40px;"
-                  >
-
-                    <a
-                      href="https://avenorcollection.com/account/orders"
-                      style="
-                        display:inline-block;
-                        background:#111111;
-                        color:#ffffff;
-                        text-decoration:none;
-                        padding:16px 40px;
-                        font-size:13px;
-                        letter-spacing:2px;
-                      "
-                    >
-                      VIEW YOUR ORDER
-                    </a>
-
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="
-                    padding-top:40px;
-                    color:#666;
-                    font-size:14px;
-                    line-height:1.8;
-                  ">
-
-                    We will notify you again once your
-                    order has been shipped.
-
-                    <br /><br />
-
-                    If you have any questions, simply
-                    reply to this email or contact us at
-
-                    <a
-                      href="mailto:support@avenorcollection.com"
-                      style="
-                        color:#111;
-                        text-decoration:none;
-                      "
-                    >
-                      support@avenorcollection.com
-                    </a>.
-
-                  </td>
-                </tr>
-
-                <tr>
-                  <td
-                    align="center"
-                    style="
-                      padding-top:50px;
-                      border-top:1px solid #eeeeee;
-                    "
-                  >
-
-                    <p style="
-                      margin:0;
-                      font-size:12px;
-                      color:#999;
-                      letter-spacing:4px;
-                    ">
-                      AVENOR
-                    </p>
-
-                    <p style="
-                      margin:12px 0 0;
-                      color:#999;
-                      font-size:12px;
-                    ">
-                      Luxury crafted for everyday elegance.
-                    </p>
-
-                    <p style="
-                      margin:12px 0 0;
-                      color:#999;
-                      font-size:12px;
-                    ">
-                      © ${new Date().getFullYear()}
-                      Avenor Collection
-                    </p>
-
-                  </td>
-                </tr>
-
-              </table>
-
-            </td>
-          </tr>
-        </table>
-      </div>
-    `,
-  });
-}
-
-
-/* =========================================================
-   AVENOR STUDIO RESERVATION EMAIL
-========================================================= */
-
-interface ReservationEmailProps {
-  customerEmail: string;
-  customerName: string;
-  product: string;
-  orderId: string;
-  reservationFee: number;
-}
-
-export async function sendReservationConfirmationEmail({
-  customerEmail,
-  customerName,
-  product,
-  orderId,
-  reservationFee,
-}: ReservationEmailProps) {
-
-  /*
-   * Find the actual product from products.ts.
-   */
-  const selectedProduct =
-    products.find(
-      (item) => item.id === product
-    );
-
-  const productName =
-    selectedProduct?.name ??
-    "Selected Piece";
-
-  /*
-   * Product page.
-   */
-  const productUrl =
-    `https://avenorcollection.com/product/${product}`;
-
-  /*
-   * Actual cover image from products.ts.
-   */
-  const coverImage =
-    selectedProduct?.coverImage ??
-    "";
-
-  /*
-   * CID makes the image part of the
-   * email itself instead of requiring
-   * Gmail/Apple Mail/etc. to fetch it
-   * from your website.
-   */
-  const coverCid =
-    `avenor-${product}-cover`;
-
-  /*
-   * Convert:
-   *
-   * /products/crimson-rose/cover.jpg
-   *
-   * into:
-   *
-   * /project/public/products/crimson-rose/cover.jpg
-   */
-  const coverImagePath =
-    coverImage
-      ? path.join(
-          process.cwd(),
-          "public",
-          coverImage.replace(
-            /^\/+/,
-            ""
-          )
-        )
-      : "";
-
-  await transporter.sendMail({
-    from: `"Avenor Collection" <${process.env.ZOHO_EMAIL}>`,
-
-    to: customerEmail,
-
-    subject:
-      `AVENOR Private Access Confirmed • ${productName}`,
-
-    /*
-     * IMPORTANT:
-     * Attach the actual image file.
-     */
-    attachments:
-      coverImagePath
-        ? [
-            {
-              filename:
-                `${product}-cover.jpg`,
-              path:
-                coverImagePath,
-              cid:
-                coverCid,
-              contentType:
-                "image/jpeg",
-            },
-          ]
-        : [],
-
-    html: `
-      <div style="
-        margin:0;
-        padding:0;
-        background:#f7f5f2;
-      ">
-
-        <table
-          width="100%"
-          cellpadding="0"
-          cellspacing="0"
-          style="
-            background:#f7f5f2;
-            padding:40px 20px;
-            font-family:Helvetica,Arial,sans-serif;
-          "
-        >
-
-          <tr>
-            <td align="center">
-
-              <table
-                width="600"
-                cellpadding="0"
-                cellspacing="0"
-                style="
-                  max-width:600px;
-                  background:#ffffff;
-                  padding:55px 45px;
                 "
               >
 
@@ -547,6 +208,7 @@ export async function sendReservationConfirmationEmail({
                     <p style="
                       margin:0;
                       font-size:32px;
+                      line-height:1;
                       letter-spacing:10px;
                       color:#111111;
                       font-weight:300;
@@ -557,388 +219,168 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-                <!-- PRIVATE ACCESS -->
+                <!-- HEADER -->
 
                 <tr>
-                  <td
-                    align="center"
-                    style="
-                      padding-top:45px;
-                    "
-                  >
+                  <td style="
+                    padding-top:40px;
+                  ">
 
                     <p style="
                       margin:0;
-                      font-size:11px;
-                      letter-spacing:3px;
-                      color:#AF9685;
+                      color:#666666;
+                      font-size:12px;
+                      line-height:1.5;
+                      letter-spacing:2px;
                     ">
-                      PRIVATE ACCESS CONFIRMED
+                      ORDER CONFIRMED
                     </p>
 
                     <h1 style="
-                      margin:16px 0 0;
-                      font-family:Georgia,serif;
-                      font-size:34px;
-                      line-height:1.2;
-                      font-weight:400;
+                      margin:12px 0 0;
                       color:#111111;
+                      font-size:30px;
+                      line-height:1.25;
+                      font-weight:400;
                     ">
-                      Your private slot is booked.
+                      Thank you for your order.
                     </h1>
 
                     <p style="
-                      margin:22px 0 0;
-                      color:#666666;
+                      margin:20px 0 0;
+                      color:#555555;
                       font-size:15px;
                       line-height:1.8;
                     ">
                       Dear ${customerName},
-                    </p>
-
-                    <p style="
-                      margin:10px 0 0;
-                      color:#666666;
-                      font-size:15px;
-                      line-height:1.8;
-                    ">
-                      Your AVENOR private access has
-                      been confirmed successfully.
+                      your order has been received
+                      and is now being prepared
+                      with care.
                     </p>
 
                   </td>
                 </tr>
 
-                <!-- PRODUCT IMAGE -->
+                <!-- ORDER NUMBER -->
 
-                ${
-                  coverImagePath
-                    ? `
-                    <tr>
-                      <td
-                        align="center"
-                        style="
-                          padding-top:40px;
-                        "
-                      >
+                <tr>
+                  <td style="
+                    padding:30px;
+                    margin-top:30px;
+                    border:1px solid #e5e5e5;
+                  ">
 
-                        <a
-                          href="${productUrl}"
-                          target="_blank"
+                    <p style="
+                      margin:0;
+                      color:#888888;
+                      font-size:12px;
+                      line-height:1.5;
+                      letter-spacing:1px;
+                    ">
+                      ORDER NUMBER
+                    </p>
+
+                    <p style="
+                      margin:8px 0 0;
+                      font-size:18px;
+                      line-height:1.5;
+                      color:#111111;
+                    ">
+                      ${orderNumber}
+                    </p>
+
+                  </td>
+                </tr>
+
+                <!-- ITEMS -->
+
+                <tr>
+                  <td style="
+                    padding-top:40px;
+                  ">
+
+                    <table
+                      width="100%"
+                      cellpadding="0"
+                      cellspacing="0"
+                      border="0"
+                    >
+                      ${itemsHtml}
+                    </table>
+
+                  </td>
+                </tr>
+
+                <!-- TOTAL -->
+
+                <tr>
+                  <td style="
+                    padding-top:30px;
+                    border-top:1px solid #e5e5e5;
+                  ">
+
+                    <table
+                      width="100%"
+                      cellpadding="0"
+                      cellspacing="0"
+                      border="0"
+                    >
+
+                      <tr>
+
+                        <td style="
+                          color:#666666;
+                          font-size:15px;
+                        ">
+                          Total Paid
+                        </td>
+
+                        <td
+                          align="right"
                           style="
-                            text-decoration:none;
+                            color:#111111;
+                            font-size:22px;
+                            font-weight:500;
                           "
                         >
+                          ₹${total.toLocaleString(
+                            "en-IN"
+                          )}
+                        </td>
 
-                          <img
-                            src="cid:${coverCid}"
-                            alt="${productName}"
-                            width="420"
-                            style="
-                              display:block;
-                              width:100%;
-                              max-width:420px;
-                              height:auto;
-                              border:0;
-                            "
-                          />
+                      </tr>
 
-                        </a>
+                    </table>
 
-                      </td>
-                    </tr>
-                    `
-                    : ""
-                }
+                  </td>
+                </tr>
 
-                <!-- PRODUCT -->
+                <!-- BUTTON -->
 
                 <tr>
                   <td
                     align="center"
-                    style="
-                      padding-top:30px;
-                    "
-                  >
-
-                    <p style="
-                      margin:0;
-                      font-size:10px;
-                      letter-spacing:3px;
-                      color:#999999;
-                    ">
-                      AVENOR PIECE
-                    </p>
-
-                    <a
-                      href="${productUrl}"
-                      target="_blank"
-                      style="
-                        text-decoration:none;
-                        color:#111111;
-                      "
-                    >
-
-                      <p style="
-                        margin:10px 0 0;
-                        font-family:Georgia,serif;
-                        font-size:28px;
-                        color:#111111;
-                      ">
-                        ${productName}
-                      </p>
-
-                    </a>
-
-                    <p style="
-                      margin:12px 0 0;
-                      font-size:13px;
-                      color:#999999;
-                    ">
-                      Click the piece above to
-                      revisit its collection page.
-                    </p>
-
-                  </td>
-                </tr>
-
-                <!-- RESERVATION -->
-
-                <tr>
-                  <td
                     style="
                       padding-top:40px;
                     "
                   >
 
-                    <table
-                      width="100%"
-                      cellpadding="0"
-                      cellspacing="0"
-                      style="
-                        border:1px solid #ded6cf;
-                        background:#faf8f5;
-                      "
-                    >
-
-                      <tr>
-
-                        <td
-                          style="
-                            padding:28px;
-                          "
-                        >
-
-                          <p style="
-                            margin:0;
-                            font-size:10px;
-                            letter-spacing:2px;
-                            color:#999999;
-                          ">
-                            PRIVATE STUDIO RESERVATION
-                          </p>
-
-                          <p style="
-                            margin:12px 0 0;
-                            color:#555555;
-                            font-size:14px;
-                            line-height:1.8;
-                          ">
-                            Your ₹${reservationFee.toLocaleString()}
-                            reservation fee has been
-                            successfully received.
-                          </p>
-
-                        </td>
-
-                      </tr>
-
-                    </table>
-
-                  </td>
-                </tr>
-
-                <!-- PAYMENT -->
-
-                <tr>
-                  <td
-                    style="
-                      padding-top:25px;
-                    "
-                  >
-
-                    <table
-                      width="100%"
-                      cellpadding="0"
-                      cellspacing="0"
-                    >
-
-                      <tr>
-
-                        <td style="
-                          padding:12px 0;
-                          color:#666666;
-                          font-size:14px;
-                        ">
-                          Reservation Fee
-                        </td>
-
-                        <td
-                          align="right"
-                          style="
-                            padding:12px 0;
-                            color:#111111;
-                            font-size:16px;
-                            font-weight:500;
-                          "
-                        >
-                          ₹${reservationFee.toLocaleString()}
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <td style="
-                          padding:12px 0;
-                          border-top:1px solid #eeeeee;
-                          color:#666666;
-                          font-size:14px;
-                        ">
-                          Payment Status
-                        </td>
-
-                        <td
-                          align="right"
-                          style="
-                            padding:12px 0;
-                            border-top:1px solid #eeeeee;
-                            color:#8C9A78;
-                            font-size:14px;
-                            font-weight:500;
-                          "
-                        >
-                          PAID
-                        </td>
-
-                      </tr>
-
-                    </table>
-
-                  </td>
-                </tr>
-
-                <!-- MESSAGE -->
-
-                <tr>
-                  <td
-                    style="
-                      padding-top:35px;
-                      color:#555555;
-                      font-size:14px;
-                      line-height:1.9;
-                    "
-                  >
-
-                    Your private studio access has
-                    been recorded with AVENOR before
-                    the public release.
-
-                    <br /><br />
-
-                    Our atelier will contact you using
-                    the details provided during your
-                    reservation.
-
-                    <br /><br />
-
-                    Please note that private access
-                    does not guarantee garment
-                    allocation or purchase. All AVENOR
-                    pieces remain limited and subject
-                    to availability.
-
-                  </td>
-                </tr>
-
-                <!-- PRODUCT LINK -->
-
-                <tr>
-                  <td
-                    align="center"
-                    style="
-                      padding-top:35px;
-                    "
-                  >
-
                     <a
-                      href="${productUrl}"
+                      href="https://avenorcollection.com/account/orders"
                       target="_blank"
                       style="
                         display:inline-block;
-                        border:1px solid #AF9685;
-                        color:#AF9685;
+                        background:#111111;
+                        color:#ffffff;
                         text-decoration:none;
-                        padding:15px 30px;
-                        font-size:12px;
+                        padding:16px 40px;
+                        font-size:13px;
+                        line-height:1.5;
                         letter-spacing:2px;
                       "
                     >
-                      VIEW ${productName.toUpperCase()}
+                      VIEW YOUR ORDER
                     </a>
-
-                  </td>
-                </tr>
-
-                <!-- REFERENCE -->
-
-                <tr>
-                  <td
-                    style="
-                      padding-top:35px;
-                    "
-                  >
-
-                    <table
-                      width="100%"
-                      cellpadding="0"
-                      cellspacing="0"
-                      style="
-                        border-top:1px solid #eeeeee;
-                      "
-                    >
-
-                      <tr>
-
-                        <td
-                          style="
-                            padding-top:25px;
-                            color:#999999;
-                            font-size:11px;
-                            letter-spacing:1px;
-                          "
-                        >
-                          RESERVATION REFERENCE
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <td
-                          style="
-                            padding-top:8px;
-                            color:#555555;
-                            font-size:12px;
-                            word-break:break-all;
-                          "
-                        >
-                          ${orderId}
-                        </td>
-
-                      </tr>
-
-                    </table>
 
                   </td>
                 </tr>
@@ -946,17 +388,21 @@ export async function sendReservationConfirmationEmail({
                 <!-- SUPPORT -->
 
                 <tr>
-                  <td
-                    style="
-                      padding-top:40px;
-                      color:#777777;
-                      font-size:13px;
-                      line-height:1.8;
-                    "
-                  >
+                  <td style="
+                    padding-top:40px;
+                    color:#666666;
+                    font-size:14px;
+                    line-height:1.8;
+                  ">
+
+                    We will notify you again once
+                    your order has been shipped.
+
+                    <br /><br />
 
                     If you have any questions,
-                    reply to this email or contact us at
+                    simply reply to this email or
+                    contact us at
 
                     <a
                       href="mailto:support@avenorcollection.com"
@@ -985,16 +431,607 @@ export async function sendReservationConfirmationEmail({
                     <p style="
                       margin:0;
                       font-size:12px;
-                      letter-spacing:4px;
                       color:#999999;
+                      letter-spacing:4px;
                     ">
                       AVENOR
                     </p>
 
                     <p style="
                       margin:12px 0 0;
-                      font-size:12px;
                       color:#999999;
+                      font-size:12px;
+                    ">
+                      Luxury crafted for everyday elegance.
+                    </p>
+
+                    <p style="
+                      margin:12px 0 0;
+                      color:#999999;
+                      font-size:12px;
+                    ">
+                      © ${new Date().getFullYear()}
+                      Avenor Collection
+                    </p>
+
+                  </td>
+                </tr>
+
+              </table>
+
+            </td>
+          </tr>
+
+        </table>
+
+      </div>
+    `,
+  });
+}
+
+
+/* =========================================================
+   AVENOR STUDIO RESERVATION EMAIL
+========================================================= */
+
+interface ReservationEmailProps {
+  customerEmail: string;
+  customerName: string;
+  product: string;
+  orderId: string;
+  reservationFee: number;
+}
+
+export async function sendReservationConfirmationEmail({
+  customerEmail,
+  customerName,
+  product,
+  orderId,
+  reservationFee,
+}: ReservationEmailProps) {
+
+  /*
+   * Find the exact product from products.ts.
+   */
+
+  const productData = products.find(
+    (p) => p.id === product
+  );
+
+  if (!productData) {
+    throw new Error(
+      `Product not found for reservation: ${product}`
+    );
+  }
+
+  /*
+   * Product name.
+   */
+
+  const productName =
+    productData.name;
+
+  /*
+   * Exact image path from products.ts.
+   *
+   * Example:
+   * /products/crimson-rose/cover.jpg
+   *
+   * becomes:
+   * /project/public/products/crimson-rose/cover.jpg
+   */
+
+  const coverImagePath =
+    path.join(
+      process.cwd(),
+      "public",
+      productData.coverImage
+    );
+
+  /*
+   * Product page.
+   *
+   * The image, product name and button
+   * all link to this page.
+   */
+
+  const productUrl =
+    `https://avenorcollection.com/product/${product}`;
+
+  /*
+   * Unique Content-ID.
+   *
+   * The image is embedded directly inside
+   * the email rather than loaded from the
+   * website.
+   */
+
+  const imageCid =
+    `avenor-${product}-${orderId}@avenorcollection.com`;
+
+  await transporter.sendMail({
+    from:
+      `"Avenor Collection" <${process.env.ZOHO_EMAIL}>`,
+
+    to: customerEmail,
+
+    subject:
+      `AVENOR Studio Reservation Confirmed • ${productName}`,
+
+    /*
+     * EMBED THE COVER IMAGE.
+     */
+
+    attachments: [
+      {
+        filename:
+          `${product}-cover`,
+        path: coverImagePath,
+        cid: imageCid,
+      },
+    ],
+
+    html: `
+      <div style="
+        margin:0;
+        padding:0;
+        background:#f7f7f5;
+      ">
+
+        <table
+          width="100%"
+          cellpadding="0"
+          cellspacing="0"
+          border="0"
+          style="
+            background:#f7f7f5;
+            padding:40px 20px;
+            font-family:Helvetica,Arial,sans-serif;
+          "
+        >
+
+          <tr>
+            <td align="center">
+
+              <table
+                width="600"
+                cellpadding="0"
+                cellspacing="0"
+                border="0"
+                style="
+                  width:100%;
+                  max-width:600px;
+                  background:#ffffff;
+                  padding:50px 40px;
+                "
+              >
+
+                <!-- =================================================
+                     AVENOR LOGO
+                ================================================== -->
+
+                <tr>
+                  <td align="center">
+
+                    <p style="
+                      margin:0;
+                      font-size:32px;
+                      line-height:1;
+                      letter-spacing:10px;
+                      color:#111111;
+                      font-weight:300;
+                    ">
+                      AVENOR
+                    </p>
+
+                  </td>
+                </tr>
+
+
+                <!-- =================================================
+                     HEADER
+                ================================================== -->
+
+                <tr>
+                  <td style="
+                    padding-top:40px;
+                  ">
+
+                    <p style="
+                      margin:0;
+                      color:#AF9685;
+                      font-size:12px;
+                      line-height:1.5;
+                      letter-spacing:2px;
+                    ">
+                      AVENOR STUDIO RESERVATION
+                    </p>
+
+                    <h1 style="
+                      margin:12px 0 0;
+                      color:#111111;
+                      font-family:Georgia,serif;
+                      font-size:30px;
+                      line-height:1.25;
+                      font-weight:400;
+                    ">
+                      Private Access Confirmed
+                    </h1>
+
+                    <p style="
+                      margin:20px 0 0;
+                      color:#555555;
+                      font-size:15px;
+                      line-height:1.8;
+                    ">
+                      Dear ${customerName},
+                      your AVENOR private studio
+                      access has been successfully
+                      confirmed.
+                    </p>
+
+                  </td>
+                </tr>
+
+
+                <!-- =================================================
+                     PRODUCT IMAGE
+                ================================================== -->
+
+                <tr>
+                  <td
+                    align="center"
+                    style="
+                      padding-top:35px;
+                    "
+                  >
+
+                    <a
+                      href="${productUrl}"
+                      target="_blank"
+                      style="
+                        display:block;
+                        text-decoration:none;
+                      "
+                    >
+
+                      <img
+                        src="cid:${imageCid}"
+                        alt="${productName} — AVENOR"
+                        width="300"
+                        style="
+                          display:block;
+                          width:300px;
+                          max-width:100%;
+                          height:auto;
+                          margin:0 auto;
+                          border:0;
+                          outline:none;
+                          text-decoration:none;
+                        "
+                      />
+
+                    </a>
+
+                  </td>
+                </tr>
+
+
+                <!-- =================================================
+                     PRODUCT NAME
+                ================================================== -->
+
+                <tr>
+                  <td
+                    align="center"
+                    style="
+                      padding-top:24px;
+                    "
+                  >
+
+                    <p style="
+                      margin:0;
+                      color:#999999;
+                      font-size:11px;
+                      line-height:1.5;
+                      letter-spacing:2px;
+                    ">
+                      PRIVATE ACCESS FOR
+                    </p>
+
+                    <p style="
+                      margin:10px 0 0;
+                      color:#111111;
+                      font-family:Georgia,serif;
+                      font-size:27px;
+                      line-height:1.3;
+                      font-weight:400;
+                    ">
+                      ${productName}
+                    </p>
+
+                    <a
+                      href="${productUrl}"
+                      target="_blank"
+                      style="
+                        display:inline-block;
+                        margin-top:15px;
+                        color:#AF9685;
+                        text-decoration:none;
+                        font-size:12px;
+                        line-height:1.5;
+                        letter-spacing:2px;
+                      "
+                    >
+                      VIEW PIECE →
+                    </a>
+
+                  </td>
+                </tr>
+
+
+                <!-- =================================================
+                     PAYMENT
+                ================================================== -->
+
+                <tr>
+                  <td style="
+                    padding-top:35px;
+                    border-top:1px solid #e5e5e5;
+                  ">
+
+                    <table
+                      width="100%"
+                      cellpadding="0"
+                      cellspacing="0"
+                      border="0"
+                    >
+
+                      <tr>
+
+                        <td style="
+                          color:#666666;
+                          font-size:14px;
+                          line-height:1.5;
+                        ">
+                          Reservation Fee
+                        </td>
+
+                        <td
+                          align="right"
+                          style="
+                            color:#111111;
+                            font-size:18px;
+                            line-height:1.5;
+                            font-weight:500;
+                          "
+                        >
+                          ₹${Number(
+                            reservationFee
+                          ).toLocaleString("en-IN")}
+                        </td>
+
+                      </tr>
+
+                      <tr>
+
+                        <td style="
+                          padding-top:15px;
+                          color:#666666;
+                          font-size:14px;
+                          line-height:1.5;
+                        ">
+                          Payment Status
+                        </td>
+
+                        <td
+                          align="right"
+                          style="
+                            padding-top:15px;
+                            color:#8C9A78;
+                            font-size:13px;
+                            line-height:1.5;
+                            font-weight:500;
+                            letter-spacing:1px;
+                          "
+                        >
+                          PAID
+                        </td>
+
+                      </tr>
+
+                    </table>
+
+                  </td>
+                </tr>
+
+
+                <!-- =================================================
+                     RESERVATION MESSAGE
+                ================================================== -->
+
+                <tr>
+                  <td style="
+                    padding-top:35px;
+                    color:#555555;
+                    font-size:14px;
+                    line-height:1.8;
+                  ">
+
+                    Your private access to
+                    <strong>${productName}</strong>
+                    has been recorded with AVENOR
+                    before the public release.
+
+                    <br /><br />
+
+                    Our atelier will contact you using
+                    the details provided during your
+                    reservation.
+
+                    <br /><br />
+
+                    Your reservation provides priority
+                    access to this piece but does not
+                    itself guarantee final garment
+                    allocation.
+
+                    <br /><br />
+
+                    If the reserved piece becomes
+                    unavailable after your reservation,
+                    AVENOR will contact you directly
+                    regarding the applicable
+                    compensation.
+
+                  </td>
+                </tr>
+
+
+                <!-- =================================================
+                     RESERVATION REFERENCE
+                ================================================== -->
+
+                <tr>
+                  <td style="
+                    padding-top:35px;
+                  ">
+
+                    <table
+                      width="100%"
+                      cellpadding="0"
+                      cellspacing="0"
+                      border="0"
+                      style="
+                        border-top:1px solid #eeeeee;
+                      "
+                    >
+
+                      <tr>
+
+                        <td style="
+                          padding-top:25px;
+                          color:#999999;
+                          font-size:11px;
+                          line-height:1.5;
+                          letter-spacing:1px;
+                        ">
+                          RESERVATION REFERENCE
+                        </td>
+
+                      </tr>
+
+                      <tr>
+
+                        <td style="
+                          padding-top:8px;
+                          color:#555555;
+                          font-size:12px;
+                          line-height:1.5;
+                          word-break:break-all;
+                        ">
+                          ${orderId}
+                        </td>
+
+                      </tr>
+
+                    </table>
+
+                  </td>
+                </tr>
+
+
+                <!-- =================================================
+                     VIEW PRODUCT BUTTON
+                ================================================== -->
+
+                <tr>
+                  <td
+                    align="center"
+                    style="
+                      padding-top:40px;
+                    "
+                  >
+
+                    <a
+                      href="${productUrl}"
+                      target="_blank"
+                      style="
+                        display:inline-block;
+                        background:#111111;
+                        color:#ffffff;
+                        text-decoration:none;
+                        padding:16px 40px;
+                        font-size:13px;
+                        line-height:1.5;
+                        letter-spacing:2px;
+                      "
+                    >
+                      VIEW ${productName.toUpperCase()}
+                    </a>
+
+                  </td>
+                </tr>
+
+
+                <!-- =================================================
+                     SUPPORT
+                ================================================== -->
+
+                <tr>
+                  <td style="
+                    padding-top:40px;
+                    color:#666666;
+                    font-size:14px;
+                    line-height:1.8;
+                  ">
+
+                    If you have any questions,
+                    simply reply to this email or
+                    contact us at
+
+                    <a
+                      href="mailto:support@avenorcollection.com"
+                      style="
+                        color:#111111;
+                        text-decoration:none;
+                      "
+                    >
+                      support@avenorcollection.com
+                    </a>.
+
+                  </td>
+                </tr>
+
+
+                <!-- =================================================
+                     FOOTER
+                ================================================== -->
+
+                <tr>
+                  <td
+                    align="center"
+                    style="
+                      padding-top:50px;
+                      border-top:1px solid #eeeeee;
+                    "
+                  >
+
+                    <p style="
+                      margin:0;
+                      font-size:12px;
+                      line-height:1.5;
+                      color:#999999;
+                      letter-spacing:4px;
+                    ">
+                      AVENOR
+                    </p>
+
+                    <p style="
+                      margin:12px 0 0;
+                      color:#999999;
+                      font-size:12px;
+                      line-height:1.5;
                     ">
                       Quiet luxury. Limited pieces.
                       Thoughtfully crafted.
@@ -1002,8 +1039,9 @@ export async function sendReservationConfirmationEmail({
 
                     <p style="
                       margin:12px 0 0;
-                      font-size:12px;
                       color:#999999;
+                      font-size:12px;
+                      line-height:1.5;
                     ">
                       © ${new Date().getFullYear()}
                       Avenor Collection
