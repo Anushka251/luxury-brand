@@ -49,20 +49,20 @@ export default function ReservationsPage() {
     useState(true);
 
   /*
-   * IMPORTANT:
+   * Get the email safely.
    *
-   * Take the email out of session first.
-   * This prevents the TypeScript
-   * "session is possibly null" error.
+   * This prevents:
+   * "session is possibly null"
    */
+
   const userEmail =
     session?.user?.email ?? "";
 
+  /*
+   * LOAD RESERVATIONS
+   */
+
   useEffect(() => {
-    /*
-     * Don't try to load reservations
-     * until the session is available.
-     */
     if (!userEmail) {
       if (status !== "loading") {
         setLoading(false);
@@ -119,6 +119,7 @@ export default function ReservationsPage() {
     return (
       <main className="min-h-screen bg-[#FAF8F5] px-6 py-20">
         <div className="mx-auto max-w-4xl text-center">
+
           <p className="text-sm tracking-[0.3em] text-gray-400">
             AVENOR
           </p>
@@ -126,6 +127,7 @@ export default function ReservationsPage() {
           <p className="mt-8 text-sm text-gray-400">
             Loading...
           </p>
+
         </div>
       </main>
     );
@@ -149,7 +151,9 @@ export default function ReservationsPage() {
 
       <div className="mx-auto max-w-5xl">
 
+        {/* ================================================= */}
         {/* HEADER */}
+        {/* ================================================= */}
 
         <div className="text-center">
 
@@ -174,19 +178,25 @@ export default function ReservationsPage() {
 
         </div>
 
+        {/* ================================================= */}
         {/* LOADING */}
+        {/* ================================================= */}
 
         {loading && (
           <div className="mt-20 text-center">
+
             <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[#D9C9BC] border-t-[#AF9685]" />
 
             <p className="mt-6 text-sm text-gray-400">
               Loading your reservations...
             </p>
+
           </div>
         )}
 
+        {/* ================================================= */}
         {/* EMPTY */}
+        {/* ================================================= */}
 
         {!loading &&
           reservations.length === 0 && (
@@ -227,7 +237,9 @@ export default function ReservationsPage() {
             </div>
           )}
 
+        {/* ================================================= */}
         {/* RESERVATIONS */}
+        {/* ================================================= */}
 
         {!loading &&
           reservations.length > 0 && (
@@ -235,6 +247,7 @@ export default function ReservationsPage() {
 
               {reservations.map(
                 (reservation) => {
+
                   const name =
                     productNames[
                       reservation.product
@@ -247,13 +260,26 @@ export default function ReservationsPage() {
                     ];
 
                   /*
-                   * Only show reservations
-                   * that have actually been
-                   * paid successfully.
+                   * PAYMENT STATUS
                    */
+
                   const isConfirmed =
                     reservation.paymentStatus ===
                     "success";
+
+                  /*
+                   * RESERVATION PAGE
+                   *
+                   * Example:
+                   *
+                   * /reserve/ivory-blush
+                   * /reserve/crimson-rose
+                   * /reserve/blue-crystal
+                   * /reserve/sunset-lilac
+                   */
+
+                  const reservationUrl =
+                    `/reserve/${reservation.product}`;
 
                   return (
                     <div
@@ -270,10 +296,12 @@ export default function ReservationsPage() {
 
                       <div className="grid grid-cols-1 md:grid-cols-[280px_1fr]">
 
+                        {/* ================================================= */}
                         {/* PRODUCT IMAGE */}
+                        {/* ================================================= */}
 
                         <Link
-                          href={`/product/${reservation.product}`}
+                          href={reservationUrl}
                           className="
                             relative
                             block
@@ -283,6 +311,7 @@ export default function ReservationsPage() {
                             md:min-h-[380px]
                           "
                         >
+
                           {image && (
                             <Image
                               src={image}
@@ -297,17 +326,26 @@ export default function ReservationsPage() {
                               "
                             />
                           )}
+
                         </Link>
 
+                        {/* ================================================= */}
                         {/* DETAILS */}
+                        {/* ================================================= */}
 
                         <div className="p-8 md:p-12">
 
+                          {/* STATUS */}
+
                           <p className="text-xs uppercase tracking-[0.3em] text-[#AF9685]">
+
                             {isConfirmed
                               ? "Private Access Confirmed"
                               : "Reservation Pending"}
+
                           </p>
+
+                          {/* PRODUCT NAME */}
 
                           <h2
                             className="mt-5 text-4xl font-light text-[#111]"
@@ -319,17 +357,26 @@ export default function ReservationsPage() {
                             {name}
                           </h2>
 
+                          {/* DESCRIPTION */}
+
                           <p className="mt-5 text-sm leading-7 text-gray-500">
+
                             {isConfirmed
                               ? "Your private studio reservation for this AVENOR piece has been confirmed."
                               : "Your reservation payment is still being processed."}
+
                           </p>
 
+                          {/* ================================================= */}
                           {/* RESERVATION DETAILS */}
+                          {/* ================================================= */}
 
                           <div className="mt-8 space-y-4 border-t border-[#eeeeee] pt-6">
 
+                            {/* FEE */}
+
                             <div className="flex justify-between gap-6 text-sm">
+
                               <span className="text-gray-400">
                                 Reservation Fee
                               </span>
@@ -342,7 +389,10 @@ export default function ReservationsPage() {
                                   "en-IN"
                                 )}
                               </span>
+
                             </div>
+
+                            {/* STATUS */}
 
                             <div className="flex justify-between gap-6 text-sm">
 
@@ -357,16 +407,20 @@ export default function ReservationsPage() {
                                     : "text-[#AF9685]"
                                 }
                               >
+
                                 {isConfirmed
                                   ? "CONFIRMED"
                                   : "PENDING"}
+
                               </span>
 
                             </div>
 
+                            {/* REFERENCE */}
+
                             <div className="text-xs leading-6 text-gray-400">
 
-                              Reference:
+                              Reservation Reference:
 
                               <br />
 
@@ -380,10 +434,12 @@ export default function ReservationsPage() {
 
                           </div>
 
-                          {/* VIEW PRODUCT */}
+                          {/* ================================================= */}
+                          {/* VIEW PIECE */}
+                          {/* ================================================= */}
 
                           <Link
-                            href={`/product/${reservation.product}`}
+                            href={reservationUrl}
                             className="
                               mt-8
                               inline-block
@@ -417,6 +473,7 @@ export default function ReservationsPage() {
           )}
 
       </div>
+
     </main>
   );
 }
