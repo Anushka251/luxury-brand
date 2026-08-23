@@ -18,20 +18,42 @@ export async function POST(req: Request) {
       notes,
     } = body;
 
-    if (!product) {
+    /*
+     * ==========================================
+     * VALIDATION
+     * ==========================================
+     */
+
+    if (
+      !product ||
+      typeof product !== "string"
+    ) {
       return NextResponse.json(
-        { error: "Product is required." },
-        { status: 400 }
+        {
+          error: "Product is required.",
+        },
+        {
+          status: 400,
+        }
       );
     }
 
-    if (!fullName || !email || !phone) {
+    if (
+      !fullName ||
+      typeof fullName !== "string" ||
+      !email ||
+      typeof email !== "string" ||
+      !phone ||
+      typeof phone !== "string"
+    ) {
       return NextResponse.json(
         {
           error:
             "Name, email and phone are required.",
         },
-        { status: 400 }
+        {
+          status: 400,
+        }
       );
     }
 
@@ -44,7 +66,9 @@ export async function POST(req: Request) {
           error:
             "Invalid fit preference.",
         },
-        { status: 400 }
+        {
+          status: 400,
+        }
       );
     }
 
@@ -57,91 +81,128 @@ export async function POST(req: Request) {
           error:
             "Please select a standard size.",
         },
-        { status: 400 }
+        {
+          status: 400,
+        }
       );
     }
 
     /*
-     * TEST MODE
+     * ==========================================
+     * NORMALIZE DATA
+     * ==========================================
+     */
+
+    const customerEmail =
+      email.trim().toLowerCase();
+
+    const customerName =
+      fullName.trim();
+
+    const customerPhone =
+      phone.trim();
+
+    /*
+     * ==========================================
+     * RESERVATION AMOUNT
+     * ==========================================
      *
-     * true  = ₹1
-     * false = ₹2,000
+     * AVENOR_RESERVATION_TEST_MODE=true
+     *      → ₹1
+     *
+     * AVENOR_RESERVATION_TEST_MODE=false
+     *      → ₹2,000
      */
 
     const isTestMode =
-      process.env.AVENOR_RESERVATION_TEST_MODE ===
+      process.env
+        .AVENOR_RESERVATION_TEST_MODE ===
       "true";
 
-    const amount = isTestMode ? 1 : 2000;
+    const amount =
+      isTestMode ? 1 : 2000;
+
+    /*
+     * ==========================================
+     * CREATE UNIQUE AVENOR ORDER ID
+     * ==========================================
+     */
 
     const orderId =
       `AVENOR_RES_${Date.now()}`;
 
-    const response = await fetch(
-      "https://api.cashfree.com/pg/orders",
-      {
-        method: "POST",
+    /*
+     * ==========================================
+     * CREATE CASHFREE ORDER
+     * ==========================================
+     */
 
-        headers: {
-          "Content-Type":
-            "application/json",
+    const cashfreeResponse =
+      await fetch(
+        "https://api.cashfree.com/pg/orders",
+        {
+          method: "POST",
 
-          Accept:
-            "application/json",
+          headers: {
+            "Content-Type":
+              "application/json",
 
-          "x-client-id":
-            process.env
-              .CASHFREE_CLIENT_ID!,
+            Accept:
+              "application/json",
 
-          "x-client-secret":
-            process.env
-              .CASHFREE_CLIENT_SECRET!,
+            "x-client-id":
+              process.env
+                .CASHFREE_CLIENT_ID!,
 
-          "x-api-version":
-            "2023-08-01",
-        },
+            "x-client-secret":
+              process.env
+                .CASHFREE_CLIENT_SECRET!,
 
-        body: JSON.stringify({
-          order_id: orderId,
-
-          order_amount: amount,
-
-          order_currency: "INR",
-
-          order_note:
-            `AVENOR Studio Reservation - ${product}`,
-
-          order_meta: {
-            return_url:
-              `https://avenorcollection.com/reserve/payment-success?order_id={order_id}`,
-
-            notify_url:
-              "https://avenorcollection.com/api/cashfree/webhook",
+            "x-api-version":
+              "2023-08-01",
           },
 
-          customer_details: {
-            customer_id:
-              `CUST_${Date.now()}`,
+          body: JSON.stringify({
+            order_id: orderId,
 
-            customer_name:
-              fullName,
+            order_amount: amount,
 
-            customer_email:
-              email,
+            order_currency: "INR",
 
-            customer_phone:
-              phone,
-          },
-        }),
-      }
-    );
+            order_note:
+              `AVENOR Studio Reservation - ${product}`,
+
+            order_meta: {
+              return_url:
+                `https://avenorcollection.com/reserve/payment-success?order_id={order_id}`,
+
+              notify_url:
+                "https://avenorcollection.com/api/cashfree/webhook",
+            },
+
+            customer_details: {
+              customer_id:
+                `CUST_${Date.now()}`,
+
+              customer_name:
+                customerName,
+
+              customer_email:
+                customerEmail,
+
+              customer_phone:
+                customerPhone,
+            },
+          }),
+        }
+      );
 
     const data =
-      await response.json();
+      await cashfreeResponse.json();
 
     console.log(
       "Cashfree Status:",
-      response.status
+      cashfreeResponse.status
     );
 
     console.log(
@@ -149,82 +210,119 @@ export async function POST(req: Request) {
       data
     );
 
-    if (!response.ok) {
+    /*
+     * ==========================================
+     * CASHFREE ERROR
+     * ==========================================
+     */
+
+    if (!cashfreeResponse.ok) {
       return NextResponse.json(
         {
           error:
-            data.message ||
-            data.error ||
+            data?.message ||
+            data?.error ||
             "Cashfree API Error",
 
           details: data,
         },
         {
           status:
-            response.status,
+            cashfreeResponse.status,
         }
       );
     }
 
-    if (!data.payment_session_id) {
+    /*
+     * ==========================================
+     * VERIFY PAYMENT SESSION
+     * ==========================================
+     */
+
+    if (
+      !data?.payment_session_id
+    ) {
       return NextResponse.json(
         {
           error:
             "Cashfree payment session was not created.",
         },
-        { status: 500 }
+        {
+          status: 500,
+        }
       );
     }
 
     /*
-     * Create the pending reservation.
+     * ==========================================
+     * SAVE PENDING RESERVATION
+     * ==========================================
      *
-     * IMPORTANT:
-     * Store the ACTUAL amount.
-     *
-     * Test = 1
-     * Production = 2000
+     * This is the SAME reservation that
+     * /api/reserve/confirm will later update.
      */
 
     await connectDB();
 
-    await Reservation.create({
-      product,
+    const reservation =
+      await Reservation.create({
+        product,
 
-      fullName,
+        fullName:
+          customerName,
 
-      email,
+        email:
+          customerEmail,
 
-      instagram:
-        instagram || "",
+        instagram:
+          instagram?.trim() || "",
 
-      phone,
+        phone:
+          customerPhone,
 
-      fitPreference,
+        fitPreference,
 
-      standardSize:
-        standardSize || "",
+        standardSize:
+          standardSize || "",
 
-      occasion:
-        occasion || "",
+        occasion:
+          occasion?.trim() || "",
 
-      notes:
-        notes || "",
+        notes:
+          notes?.trim() || "",
 
-      cashfreeOrderId:
-        data.order_id,
+        cashfreeOrderId:
+          data.order_id,
 
-      reservationFee:
-        amount,
+        reservationFee:
+          amount,
 
-      paymentStatus:
-        "pending",
+        paymentStatus:
+          "pending",
 
-      status:
-        "pending",
-    });
+        status:
+          "pending",
+      });
+
+    console.log(
+      "AVENOR reservation created:",
+      reservation._id.toString()
+    );
+
+    console.log(
+      "AVENOR reservation order:",
+      data.order_id
+    );
+
+    /*
+     * ==========================================
+     * RETURN PAYMENT SESSION
+     * ==========================================
+     */
 
     return NextResponse.json({
+      success: true,
+
       order_id:
         data.order_id,
 
@@ -233,6 +331,14 @@ export async function POST(req: Request) {
 
       payment_session_id:
         data.payment_session_id,
+
+      reservation_id:
+        reservation._id.toString(),
+
+      amount,
+
+      testMode:
+        isTestMode,
     });
   } catch (error) {
     console.error(
@@ -245,7 +351,9 @@ export async function POST(req: Request) {
         error:
           "Unable to create payment order.",
       },
-      { status: 500 }
+      {
+        status: 500,
+      }
     );
   }
 }
