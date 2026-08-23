@@ -57,11 +57,7 @@ function PaymentSuccessContent() {
 
   useEffect(() => {
     /*
-     * Read saved reservation information.
-     *
-     * We keep this in sessionStorage because
-     * it tells this page which piece the
-     * customer reserved.
+     * Read the product that was reserved.
      */
 
     const saved =
@@ -102,6 +98,10 @@ function PaymentSuccessContent() {
 
       return;
     }
+
+    /*
+     * Verify payment with our server.
+     */
 
     async function verifyPayment() {
       try {
@@ -148,11 +148,10 @@ function PaymentSuccessContent() {
           );
 
           /*
-           * DO NOT remove sessionStorage.
+           * Keep sessionStorage.
            *
-           * We keep it so the customer can
-           * still see the reserved product
-           * on this page.
+           * It allows this page to continue
+           * displaying the reserved product.
            */
 
           return;
@@ -257,13 +256,17 @@ function PaymentSuccessContent() {
     <main className="min-h-screen bg-[#FAF8F5] px-6 py-20">
       <div className="mx-auto max-w-2xl text-center">
 
+        {/* ================================= */}
         {/* BRAND */}
+        {/* ================================= */}
 
         <p className="text-xs uppercase tracking-[0.35em] text-gray-400">
           AVENOR
         </p>
 
+        {/* ================================= */}
         {/* TITLE */}
+        {/* ================================= */}
 
         <h1
           className="mt-6 text-5xl font-light text-[#AF9685]"
@@ -281,7 +284,9 @@ function PaymentSuccessContent() {
             : "Payment Unsuccessful"}
         </h1>
 
+        {/* ================================= */}
         {/* STATUS ICON */}
+        {/* ================================= */}
 
         <div className="mt-10 flex justify-center">
 
@@ -309,15 +314,17 @@ function PaymentSuccessContent() {
 
         </div>
 
+        {/* ================================= */}
         {/* MESSAGE */}
+        {/* ================================= */}
 
         <p className="mx-auto mt-8 max-w-xl text-sm leading-8 text-gray-500">
           {message}
         </p>
 
-        {/* ================================================= */}
+        {/* ================================= */}
         {/* RESERVED PIECE */}
-        {/* ================================================= */}
+        {/* ================================= */}
 
         {product && (
           <div className="mx-auto mt-12 max-w-md">
@@ -328,16 +335,21 @@ function PaymentSuccessContent() {
                 : "Selected Piece"}
             </p>
 
-            {/* CLICKABLE PRODUCT IMAGE */}
+            {/* ================================= */}
+            {/* CLICKABLE RESERVED PRODUCT */}
+            {/* ================================= */}
 
             <Link
-              href={`/product/${product.id}`}
+              href={`/reserve/${product.id}`}
               className="
                 group
                 block
                 mt-6
               "
             >
+
+              {/* PRODUCT IMAGE */}
+
               <div
                 className="
                   relative
@@ -354,6 +366,7 @@ function PaymentSuccessContent() {
                   width={800}
                   height={1000}
                   priority
+                  sizes="(max-width: 768px) 90vw, 420px"
                   className="
                     block
                     h-auto
@@ -386,28 +399,54 @@ function PaymentSuccessContent() {
                 {product.name}
               </h2>
 
-              {/* TYPE */}
+              {/* PRODUCT TYPE */}
 
               <p className="mt-3 text-xs uppercase tracking-[0.3em] text-gray-400">
                 {product.type}
               </p>
 
-              <p className="mt-5 text-xs uppercase tracking-[0.25em] text-gray-400 transition-colors duration-300 group-hover:text-black">
-                View Piece →
+              {/* LINK TEXT */}
+
+              <p className="
+                mt-5
+                text-xs
+                uppercase
+                tracking-[0.25em]
+                text-gray-400
+                transition-colors
+                duration-300
+                group-hover:text-black
+              ">
+                View Reserved Piece →
               </p>
+
             </Link>
 
           </div>
         )}
 
-        {/* ================================================= */}
+        {/* ================================= */}
         {/* SUCCESS */}
-        {/* ================================================= */}
+        {/* ================================= */}
 
         {status === "success" && (
-          <div className="mx-auto mt-10 max-w-xl border border-[#D9C9BC] bg-[#F7F5F2] p-8 text-left">
+          <div className="
+            mx-auto
+            mt-10
+            max-w-xl
+            border
+            border-[#D9C9BC]
+            bg-[#F7F5F2]
+            p-8
+            text-left
+          ">
 
-            <p className="text-xs uppercase tracking-[0.3em] text-[#AF9685]">
+            <p className="
+              text-xs
+              uppercase
+              tracking-[0.3em]
+              text-[#AF9685]
+            ">
               Private Access Confirmed
             </p>
 
@@ -440,7 +479,13 @@ function PaymentSuccessContent() {
               during your reservation.
             </p>
 
-            <p className="mt-6 text-xs leading-6 tracking-[0.08em] text-gray-400">
+            <p className="
+              mt-6
+              text-xs
+              leading-6
+              tracking-[0.08em]
+              text-gray-400
+            ">
               Reservation fee:
               <span className="ml-1">
                 ₹2,000
@@ -448,7 +493,14 @@ function PaymentSuccessContent() {
             </p>
 
             {orderId && (
-              <p className="mt-2 break-all text-xs leading-6 tracking-[0.08em] text-gray-400">
+              <p className="
+                mt-2
+                break-all
+                text-xs
+                leading-6
+                tracking-[0.08em]
+                text-gray-400
+              ">
                 Reservation reference:
                 <span className="ml-1">
                   {orderId}
@@ -459,12 +511,20 @@ function PaymentSuccessContent() {
           </div>
         )}
 
-        {/* ================================================= */}
+        {/* ================================= */}
         {/* PENDING */}
-        {/* ================================================= */}
+        {/* ================================= */}
 
         {status === "pending" && (
-          <div className="mx-auto mt-10 max-w-xl border border-[#D9C9BC] bg-[#F7F5F2] p-8">
+          <div className="
+            mx-auto
+            mt-10
+            max-w-xl
+            border
+            border-[#D9C9BC]
+            bg-[#F7F5F2]
+            p-8
+          ">
 
             <p className="text-sm leading-7 text-gray-600">
               Please do not make another
@@ -480,7 +540,14 @@ function PaymentSuccessContent() {
             </p>
 
             {orderId && (
-              <p className="mt-5 break-all text-xs leading-6 tracking-[0.08em] text-gray-400">
+              <p className="
+                mt-5
+                break-all
+                text-xs
+                leading-6
+                tracking-[0.08em]
+                text-gray-400
+              ">
                 Payment reference:
                 <span className="ml-1">
                   {orderId}
@@ -491,16 +558,27 @@ function PaymentSuccessContent() {
           </div>
         )}
 
-        {/* ================================================= */}
+        {/* ================================= */}
         {/* FAILED */}
-        {/* ================================================= */}
+        {/* ================================= */}
 
         {status === "failed" && (
           <div className="mx-auto mt-10 max-w-xl">
 
-            <div className="border border-[#D9C9BC] bg-[#F7F5F2] p-8 text-left">
+            <div className="
+              border
+              border-[#D9C9BC]
+              bg-[#F7F5F2]
+              p-8
+              text-left
+            ">
 
-              <p className="text-xs uppercase tracking-[0.3em] text-[#AF9685]">
+              <p className="
+                text-xs
+                uppercase
+                tracking-[0.3em]
+                text-[#AF9685]
+              ">
                 Payment Unsuccessful
               </p>
 
@@ -527,12 +605,19 @@ function PaymentSuccessContent() {
 
               <p className="mt-4 text-sm leading-7 text-gray-500">
                 You may return to the
-                reservation form and try the
+                reservation page and try the
                 payment again.
               </p>
 
               {orderId && (
-                <p className="mt-6 break-all text-xs leading-6 tracking-[0.08em] text-gray-400">
+                <p className="
+                  mt-6
+                  break-all
+                  text-xs
+                  leading-6
+                  tracking-[0.08em]
+                  text-gray-400
+                ">
                   Payment reference:
                   <span className="ml-1">
                     {orderId}
@@ -589,7 +674,13 @@ function PaymentSuccessContent() {
 
             </div>
 
-            <p className="mt-8 text-xs leading-6 tracking-[0.08em] text-gray-400">
+            <p className="
+              mt-8
+              text-xs
+              leading-6
+              tracking-[0.08em]
+              text-gray-400
+            ">
               If your bank account was
               charged despite this message,
               please do not make another
@@ -602,7 +693,9 @@ function PaymentSuccessContent() {
           </div>
         )}
 
+        {/* ================================= */}
         {/* RETURN TO COLLECTION */}
+        {/* ================================= */}
 
         {status === "success" && (
           <Link
@@ -624,9 +717,17 @@ function PaymentSuccessContent() {
           </Link>
         )}
 
+        {/* ================================= */}
         {/* FOOTER */}
+        {/* ================================= */}
 
-        <p className="mt-12 text-xs leading-6 tracking-[0.15em] text-gray-400">
+        <p className="
+          mt-12
+          text-xs
+          leading-6
+          tracking-[0.15em]
+          text-gray-400
+        ">
           AVENOR
           <br />
           Quiet luxury. Limited pieces.
@@ -660,7 +761,15 @@ export default function PaymentSuccessPage() {
             </h1>
 
             <div className="mt-10 flex justify-center">
-              <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#D9C9BC] border-t-[#AF9685]" />
+              <div className="
+                h-10
+                w-10
+                animate-spin
+                rounded-full
+                border-2
+                border-[#D9C9BC]
+                border-t-[#AF9685]
+              " />
             </div>
 
             <p className="mt-8 text-sm leading-7 text-gray-500">
