@@ -8,17 +8,22 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
-    const reservation = await Reservation.create({
-      product: body.product,
-      fullName: body.fullName,
-      email: body.email,
-      instagram: body.instagram,
-      phone: body.phone,
-      fitPreference: body.fitPreference,
-      standardSize: body.standardSize || "",
-      occasion: body.occasion || "",
-      notes: body.notes || "",
-    });
+    const reservation =
+      await Reservation.create({
+        product: body.product,
+        fullName: body.fullName,
+        email: body.email,
+        instagram: body.instagram,
+        phone: body.phone,
+        fitPreference:
+          body.fitPreference,
+        standardSize:
+          body.standardSize || "",
+        occasion:
+          body.occasion || "",
+        notes:
+          body.notes || "",
+      });
 
     return NextResponse.json(
       {
@@ -30,12 +35,16 @@ export async function POST(req: Request) {
       }
     );
   } catch (error) {
-    console.error(error);
+    console.error(
+      "Reservation creation error:",
+      error
+    );
 
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to create reservation.",
+        message:
+          "Failed to create reservation.",
       },
       {
         status: 500,
