@@ -89,7 +89,7 @@ export async function POST(req: Request) {
 
     /*
      * ==========================================
-     * NORMALIZE DATA
+     * NORMALIZE CUSTOMER DATA
      * ==========================================
      */
 
@@ -107,11 +107,15 @@ export async function POST(req: Request) {
      * RESERVATION AMOUNT
      * ==========================================
      *
+     * TEST MODE:
+     *
      * AVENOR_RESERVATION_TEST_MODE=true
-     *      → ₹1
+     *     → ₹1
+     *
+     * PRODUCTION:
      *
      * AVENOR_RESERVATION_TEST_MODE=false
-     *      → ₹2,000
+     *     → ₹2,000
      */
 
     const isTestMode =
@@ -258,8 +262,14 @@ export async function POST(req: Request) {
      * SAVE PENDING RESERVATION
      * ==========================================
      *
-     * This is the SAME reservation that
-     * /api/reserve/confirm will later update.
+     * IMPORTANT:
+     *
+     * This creates the reservation BEFORE
+     * the customer completes payment.
+     *
+     * /api/reserve/confirm later changes
+     * paymentStatus from "pending"
+     * to "success".
      */
 
     await connectDB();
