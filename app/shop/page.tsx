@@ -21,7 +21,8 @@ export default function Shop() {
             tracking-[0.08em]
           "
           style={{
-            fontFamily: '"Cormorant Garamond", serif',
+            fontFamily:
+              '"Cormorant Garamond", serif',
           }}
         >
           COLLECTION I
@@ -64,14 +65,26 @@ export default function Shop() {
           >
             {/* IMAGE */}
 
-            <div className="relative aspect-[3/4] overflow-hidden bg-[#f8f8f8]">
+            <div
+              className="
+                relative
+                aspect-[3/4]
+                overflow-hidden
+                bg-[#F8F7F4]
+              "
+            >
               <Image
                 src={p.coverImage}
                 alt={p.name}
                 fill
                 priority
+                sizes="
+                  (max-width: 768px) 100vw,
+                  (max-width: 1200px) 45vw,
+                  520px
+                "
                 className="
-                  object-cover
+                  object-contain
                   transition-transform
                   duration-700
                   group-hover:scale-[1.02]
@@ -97,7 +110,8 @@ export default function Shop() {
                   text-[#AF9685]
                 "
                 style={{
-                  fontFamily: '"Cormorant Garamond", serif',
+                  fontFamily:
+                    '"Cormorant Garamond", serif',
                 }}
               >
                 {p.name}
