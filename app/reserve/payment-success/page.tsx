@@ -7,6 +7,7 @@ import {
 } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { products } from "@/lib/products";
 
 type PaymentState =
@@ -39,24 +40,30 @@ function PaymentSuccessContent() {
     useState<string>("");
 
   /*
-   * Find the reserved product directly
-   * from products.ts.
+   * ==========================================
+   * FIND PRODUCT
+   * ==========================================
    */
+
   const product = products.find(
     (item) => item.id === productId
   );
 
+  /*
+   * ==========================================
+   * VERIFY PAYMENT
+   * ==========================================
+   */
+
   useEffect(() => {
     /*
-     * IMPORTANT:
+     * Read saved reservation information.
      *
-     * Read the saved reservation BEFORE
-     * removing it.
-     *
-     * ReserveForm stores the product here:
-     *
-     * avenor_reservation
+     * We keep this in sessionStorage because
+     * it tells this page which piece the
+     * customer reserved.
      */
+
     const saved =
       sessionStorage.getItem(
         "avenor_reservation"
@@ -81,6 +88,10 @@ function PaymentSuccessContent() {
         );
       }
     }
+
+    /*
+     * No Cashfree order ID.
+     */
 
     if (!orderId) {
       setStatus("failed");
@@ -121,7 +132,9 @@ function PaymentSuccessContent() {
         }
 
         /*
+         * ======================================
          * SUCCESS
+         * ======================================
          */
 
         if (
@@ -131,23 +144,24 @@ function PaymentSuccessContent() {
           setStatus("success");
 
           setMessage(
-            "Your studio reservation has been confirmed."
+            "Your private studio access has been confirmed."
           );
 
           /*
-           * DO NOT remove avenor_reservation
-           * here.
+           * DO NOT remove sessionStorage.
            *
-           * We need it for the product
-           * information and for retrying
-           * payment if necessary.
+           * We keep it so the customer can
+           * still see the reserved product
+           * on this page.
            */
 
           return;
         }
 
         /*
+         * ======================================
          * PENDING
+         * ======================================
          */
 
         if (
@@ -157,14 +171,16 @@ function PaymentSuccessContent() {
           setStatus("pending");
 
           setMessage(
-            "Your payment is being processed. Your reservation will be confirmed once Cashfree confirms the payment."
+            "Your payment is being processed. Your private access will be confirmed once Cashfree confirms the payment."
           );
 
           return;
         }
 
         /*
+         * ======================================
          * FAILED
+         * ======================================
          */
 
         setStatus("failed");
@@ -190,7 +206,9 @@ function PaymentSuccessContent() {
   }, [orderId]);
 
   /*
+   * ==========================================
    * RETRY PAYMENT
+   * ==========================================
    */
 
   function handleRetryPayment() {
@@ -208,7 +226,7 @@ function PaymentSuccessContent() {
 
         if (reservation.product) {
           window.location.href =
-            `/reserve/form/${reservation.product}`;
+            `/reserve/${reservation.product}`;
 
           return;
         }
@@ -225,7 +243,9 @@ function PaymentSuccessContent() {
   }
 
   /*
+   * ==========================================
    * RETURN TO COLLECTION
+   * ==========================================
    */
 
   function handleReturnToCollection() {
@@ -253,7 +273,7 @@ function PaymentSuccessContent() {
           }}
         >
           {status === "success"
-            ? "Reservation Confirmed"
+            ? "Private Access Confirmed"
             : status === "checking"
             ? "Verifying Payment"
             : status === "pending"
@@ -296,7 +316,7 @@ function PaymentSuccessContent() {
         </p>
 
         {/* ================================================= */}
-        {/* PIECE */}
+        {/* RESERVED PIECE */}
         {/* ================================================= */}
 
         {product && (
@@ -304,40 +324,78 @@ function PaymentSuccessContent() {
 
             <p className="text-xs uppercase tracking-[0.35em] text-[#AF9685]">
               {status === "success"
-                ? "Reserved Piece"
+                ? "Private Access"
                 : "Selected Piece"}
             </p>
 
-            {/* COVER IMAGE */}
+            {/* CLICKABLE PRODUCT IMAGE */}
 
-            <div className="relative mt-6 aspect-[3/4] w-full overflow-hidden border border-[#D9C9BC] bg-[#F7F5F2]">
-              <Image
-                src={product.coverImage}
-                alt={product.name}
-                fill
-                priority
-                sizes="(max-width: 768px) 90vw, 420px"
-                className="object-cover"
-              />
-            </div>
-
-            {/* NAME */}
-
-            <h2
-              className="mt-7 text-4xl font-light text-[#AF9685]"
-              style={{
-                fontFamily:
-                  '"Cormorant Garamond", serif',
-              }}
+            <Link
+              href={`/product/${product.id}`}
+              className="
+                group
+                block
+                mt-6
+              "
             >
-              {product.name}
-            </h2>
+              <div
+                className="
+                  relative
+                  w-full
+                  overflow-hidden
+                  border
+                  border-[#D9C9BC]
+                  bg-[#F7F5F2]
+                "
+              >
+                <Image
+                  src={product.coverImage}
+                  alt={product.name}
+                  width={800}
+                  height={1000}
+                  priority
+                  className="
+                    block
+                    h-auto
+                    w-full
+                    object-contain
+                    transition-transform
+                    duration-700
+                    group-hover:scale-[1.015]
+                  "
+                />
+              </div>
 
-            {/* TYPE */}
+              {/* PRODUCT NAME */}
 
-            <p className="mt-3 text-xs uppercase tracking-[0.3em] text-gray-400">
-              {product.type}
-            </p>
+              <h2
+                className="
+                  mt-7
+                  text-4xl
+                  font-light
+                  text-[#AF9685]
+                  transition-opacity
+                  duration-300
+                  group-hover:opacity-60
+                "
+                style={{
+                  fontFamily:
+                    '"Cormorant Garamond", serif',
+                }}
+              >
+                {product.name}
+              </h2>
+
+              {/* TYPE */}
+
+              <p className="mt-3 text-xs uppercase tracking-[0.3em] text-gray-400">
+                {product.type}
+              </p>
+
+              <p className="mt-5 text-xs uppercase tracking-[0.25em] text-gray-400 transition-colors duration-300 group-hover:text-black">
+                View Piece →
+              </p>
+            </Link>
 
           </div>
         )}
@@ -350,18 +408,18 @@ function PaymentSuccessContent() {
           <div className="mx-auto mt-10 max-w-xl border border-[#D9C9BC] bg-[#F7F5F2] p-8 text-left">
 
             <p className="text-xs uppercase tracking-[0.3em] text-[#AF9685]">
-              Studio Reservation
+              Private Access Confirmed
             </p>
 
             <p className="mt-5 text-sm leading-7 text-gray-600">
-              Your ₹2,000 studio
-              reservation fee has been
-              successfully received.
+              Your ₹2,000 studio reservation
+              fee has been successfully
+              received.
             </p>
 
             {product && (
               <p className="mt-3 text-sm leading-7 text-gray-600">
-                Your reservation has been
+                Your private access has been
                 recorded for{" "}
                 <strong>
                   {product.name}
@@ -371,16 +429,15 @@ function PaymentSuccessContent() {
             )}
 
             <p className="mt-3 text-sm leading-7 text-gray-600">
-              Your reserved consultation
-              opportunity has been recorded
-              with AVENOR before the public
-              release.
+              Your reservation gives you
+              priority access before the
+              public release.
             </p>
 
             <p className="mt-3 text-sm leading-7 text-gray-600">
               Our atelier will contact you
-              using the details provided in
-              your reservation.
+              using the details provided
+              during your reservation.
             </p>
 
             <p className="mt-6 text-xs leading-6 tracking-[0.08em] text-gray-400">
@@ -417,9 +474,9 @@ function PaymentSuccessContent() {
             <p className="mt-3 text-sm leading-7 text-gray-500">
               Cashfree may still be
               confirming your payment.
-              Your reservation will be
-              updated automatically once
-              the payment is confirmed.
+              Your private access will be
+              updated once the payment is
+              confirmed.
             </p>
 
             {orderId && (
@@ -464,7 +521,7 @@ function PaymentSuccessContent() {
               )}
 
               <p className="mt-4 text-sm leading-7 text-gray-500">
-                Your studio slot has
+                Your private access has
                 therefore not been confirmed.
               </p>
 
@@ -543,6 +600,28 @@ function PaymentSuccessContent() {
             </p>
 
           </div>
+        )}
+
+        {/* RETURN TO COLLECTION */}
+
+        {status === "success" && (
+          <Link
+            href="/shop"
+            className="
+              mt-10
+              inline-block
+              py-4
+              text-xs
+              uppercase
+              tracking-[0.3em]
+              text-gray-400
+              transition-colors
+              duration-300
+              hover:text-black
+            "
+          >
+            Return to Collection →
+          </Link>
         )}
 
         {/* FOOTER */}
