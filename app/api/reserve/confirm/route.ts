@@ -16,6 +16,12 @@ export async function POST(req: Request) {
 
     const { orderId } = body;
 
+    /*
+     * ==========================================
+     * VALIDATE ORDER ID
+     * ==========================================
+     */
+
     if (
       !orderId ||
       typeof orderId !== "string"
@@ -24,21 +30,33 @@ export async function POST(req: Request) {
         {
           error: "Order ID is required.",
         },
-        { status: 400 }
+        {
+          status: 400,
+        }
       );
     }
 
     if (
-      !orderId.startsWith("AVENOR_RES_")
+      !orderId.startsWith(
+        "AVENOR_RES_"
+      )
     ) {
       return NextResponse.json(
         {
           error:
             "Invalid reservation order.",
         },
-        { status: 400 }
+        {
+          status: 400,
+        }
       );
     }
+
+    /*
+     * ==========================================
+     * DATABASE
+     * ==========================================
+     */
 
     await connectDB();
 
@@ -53,13 +71,19 @@ export async function POST(req: Request) {
           error:
             "Reservation not found.",
         },
-        { status: 404 }
+        {
+          status: 404,
+        }
       );
     }
 
     /*
-     * If already successful,
-     * don't verify again.
+     * ==========================================
+     * ALREADY CONFIRMED
+     * ==========================================
+     *
+     * Do not send another email if the
+     * reservation has already been confirmed.
      */
 
     if (
@@ -73,17 +97,51 @@ export async function POST(req: Request) {
     }
 
     /*
-     * This is the ACTUAL amount that
-     * was created for this reservation.
+     * ==========================================
+     * EXPECTED PAYMENT AMOUNT
+     * ==========================================
      *
-     * Test order = 1
-     * Real order = 2000
+     * This comes directly from the reservation.
+     *
+     * Test mode:
+     * ₹1
+     *
+     * Production:
+     * ₹2,000
      */
 
     const expectedAmount =
       Number(
         reservation.reservationFee
       );
+
+    if (
+      !Number.isFinite(
+        expectedAmount
+      ) ||
+      expectedAmount <= 0
+    ) {
+      console.error(
+        "Invalid reservation fee:",
+        reservation.reservationFee
+      );
+
+      return NextResponse.json(
+        {
+          error:
+            "Invalid reservation payment amount.",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    /*
+     * ==========================================
+     * ASK CASHFREE FOR PAYMENT STATUS
+     * ==========================================
+     */
 
     const cashfreeResponse =
       await fetch(
@@ -125,7 +183,18 @@ export async function POST(req: Request) {
       )
     );
 
+    /*
+     * ==========================================
+     * CASHFREE API ERROR
+     * ==========================================
+     */
+
     if (!cashfreeResponse.ok) {
+      console.error(
+        "Cashfree verification failed:",
+        cashfreeData
+      );
+
       return NextResponse.json(
         {
           error:
@@ -140,13 +209,21 @@ export async function POST(req: Request) {
       );
     }
 
+    /*
+     * ==========================================
+     * PAYMENT TRANSACTIONS
+     * ==========================================
+     */
+
     const payments: CashfreePayment[] =
       Array.isArray(cashfreeData)
         ? cashfreeData
         : [];
 
     /*
+     * ==========================================
      * SUCCESS
+     * ==========================================
      */
 
     const successfulPayment =
@@ -163,10 +240,15 @@ export async function POST(req: Request) {
       reservation.paymentStatus =
         "success";
 
+      reservation.status =
+        "confirmed";
+
       await reservation.save();
 
       /*
-       * Send confirmation email.
+       * ========================================
+       * SEND CONFIRMATION EMAIL
+       * ========================================
        */
 
       try {
@@ -187,7 +269,17 @@ export async function POST(req: Request) {
               expectedAmount,
           }
         );
+
+        console.log(
+          `AVENOR reservation email sent: ${orderId}`
+        );
       } catch (emailError) {
+        /*
+         * Do NOT turn a successful payment
+         * into a failed payment just because
+         * the email failed.
+         */
+
         console.error(
           "Reservation confirmation email failed:",
           emailError
@@ -205,7 +297,9 @@ export async function POST(req: Request) {
     }
 
     /*
+     * ==========================================
      * PENDING
+     * ==========================================
      */
 
     const pendingPayment =
@@ -219,7 +313,14 @@ export async function POST(req: Request) {
       reservation.paymentStatus =
         "pending";
 
+      reservation.status =
+        "pending";
+
       await reservation.save();
+
+      console.log(
+        `AVENOR reservation payment PENDING: ${orderId}`
+      );
 
       return NextResponse.json({
         paymentStatus: "pending",
@@ -228,14 +329,26 @@ export async function POST(req: Request) {
     }
 
     /*
+     * ==========================================
      * FAILED
+     * ==========================================
+     *
+     * A transaction exists, but there is
+     * no successful or pending payment.
      */
 
     if (payments.length > 0) {
       reservation.paymentStatus =
         "failed";
 
+      reservation.status =
+        "failed";
+
       await reservation.save();
+
+      console.log(
+        `AVENOR reservation payment FAILED: ${orderId}`
+      );
 
       return NextResponse.json({
         paymentStatus: "failed",
@@ -244,13 +357,27 @@ export async function POST(req: Request) {
     }
 
     /*
-     * No transaction yet.
+     * ==========================================
+     * NO PAYMENT TRANSACTION YET
+     * ==========================================
+     *
+     * Do not mark this failed.
+     *
+     * Cashfree may still be processing it,
+     * or the webhook may arrive shortly.
      */
 
     reservation.paymentStatus =
       "pending";
 
+    reservation.status =
+      "pending";
+
     await reservation.save();
+
+    console.log(
+      `AVENOR reservation has no payment transaction yet: ${orderId}`
+    );
 
     return NextResponse.json({
       paymentStatus: "pending",
@@ -267,7 +394,9 @@ export async function POST(req: Request) {
         error:
           "Unable to verify reservation payment.",
       },
-      { status: 500 }
+      {
+        status: 500,
+      }
     );
   }
 }
