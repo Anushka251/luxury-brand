@@ -82,8 +82,11 @@ export async function POST(req: Request) {
      * ALREADY CONFIRMED
      * ==========================================
      *
-     * Do not send another email if the
-     * reservation has already been confirmed.
+     * Once payment has successfully been
+     * confirmed, the customer permanently
+     * has private access.
+     *
+     * Do not send the confirmation email again.
      */
 
     if (
@@ -92,6 +95,8 @@ export async function POST(req: Request) {
     ) {
       return NextResponse.json({
         paymentStatus: "success",
+        reservationStatus:
+          reservation.status,
         orderId,
       });
     }
@@ -101,9 +106,10 @@ export async function POST(req: Request) {
      * EXPECTED PAYMENT AMOUNT
      * ==========================================
      *
-     * This comes directly from the reservation.
+     * This is taken from the reservation
+     * itself rather than trusting the client.
      *
-     * Test mode:
+     * Test:
      * ₹1
      *
      * Production:
@@ -224,6 +230,18 @@ export async function POST(req: Request) {
      * ==========================================
      * SUCCESS
      * ==========================================
+     *
+     * This is the important transition:
+     *
+     * paymentStatus:
+     * pending → success
+     *
+     * status:
+     * pending → confirmed
+     *
+     * "confirmed" means the customer now
+     * permanently has PRIVATE ACCESS for
+     * this product.
      */
 
     const successfulPayment =
@@ -271,13 +289,12 @@ export async function POST(req: Request) {
         );
 
         console.log(
-          `AVENOR reservation email sent: ${orderId}`
+          `AVENOR reservation confirmation email sent: ${orderId}`
         );
       } catch (emailError) {
         /*
-         * Do NOT turn a successful payment
-         * into a failed payment just because
-         * the email failed.
+         * Email failure must NOT undo
+         * the successful payment.
          */
 
         console.error(
@@ -287,11 +304,17 @@ export async function POST(req: Request) {
       }
 
       console.log(
-        `AVENOR reservation payment SUCCESS: ${orderId}`
+        `AVENOR PRIVATE ACCESS CONFIRMED: ${orderId}`
       );
 
       return NextResponse.json({
         paymentStatus: "success",
+
+        reservationStatus:
+          "confirmed",
+
+        privateAccess: true,
+
         orderId,
       });
     }
@@ -300,6 +323,11 @@ export async function POST(req: Request) {
      * ==========================================
      * PENDING
      * ==========================================
+     *
+     * Payment has not completed yet.
+     *
+     * The customer does NOT have private
+     * access yet.
      */
 
     const pendingPayment =
@@ -324,6 +352,12 @@ export async function POST(req: Request) {
 
       return NextResponse.json({
         paymentStatus: "pending",
+
+        reservationStatus:
+          "pending",
+
+        privateAccess: false,
+
         orderId,
       });
     }
@@ -333,16 +367,36 @@ export async function POST(req: Request) {
      * FAILED
      * ==========================================
      *
-     * A transaction exists, but there is
-     * no successful or pending payment.
+     * IMPORTANT:
+     *
+     * We only change paymentStatus here.
+     *
+     * We DO NOT set:
+     *
+     * reservation.status = "failed"
+     *
+     * because "failed" is not a valid
+     * reservation status in the new schema.
      */
 
     if (payments.length > 0) {
       reservation.paymentStatus =
         "failed";
 
+      /*
+       * Keep reservation.status as pending.
+       *
+       * This means:
+       *
+       * payment failed
+       * ↓
+       * private access NOT granted
+       * ↓
+       * customer can try again
+       */
+
       reservation.status =
-        "failed";
+        "pending";
 
       await reservation.save();
 
@@ -352,6 +406,12 @@ export async function POST(req: Request) {
 
       return NextResponse.json({
         paymentStatus: "failed",
+
+        reservationStatus:
+          "pending",
+
+        privateAccess: false,
+
         orderId,
       });
     }
@@ -361,10 +421,11 @@ export async function POST(req: Request) {
      * NO PAYMENT TRANSACTION YET
      * ==========================================
      *
-     * Do not mark this failed.
+     * Cashfree may still be processing the
+     * payment.
      *
-     * Cashfree may still be processing it,
-     * or the webhook may arrive shortly.
+     * Never mark this as failed simply because
+     * there is no transaction yet.
      */
 
     reservation.paymentStatus =
@@ -381,6 +442,12 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       paymentStatus: "pending",
+
+      reservationStatus:
+        "pending",
+
+      privateAccess: false,
+
       orderId,
     });
   } catch (error) {
