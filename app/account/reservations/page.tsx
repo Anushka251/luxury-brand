@@ -183,7 +183,7 @@ export default function ReservationsPage() {
             className="mt-5 text-5xl font-light text-[#AF9685]"
             style={{
               fontFamily:
-                '"Cormorant Garamond", serif",
+                '"Cormorant Garamond", serif',
             }}
           >
             Reservations
