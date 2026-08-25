@@ -1,3 +1,9 @@
+export type CollectionPhase =
+  | "private_access"
+  | "private_purchase"
+  | "public"
+  | "sold_out";
+
 export type Product = {
   id: string;
   name: string;
@@ -8,6 +14,26 @@ export type Product = {
   coverImage: string;
   images: string[];
   totalPieces: number;
+
+  /*
+   * ==========================================
+   * AVENOR COLLECTION PHASE
+   * ==========================================
+   *
+   * private_access
+   * → People can apply for private access.
+   *
+   * private_purchase
+   * → Only confirmed private-access clients
+   *   can purchase.
+   *
+   * public
+   * → Everyone can purchase.
+   *
+   * sold_out
+   * → Nobody can purchase.
+   */
+  collectionPhase: CollectionPhase;
 };
 
 export const products: Product[] = [
@@ -26,7 +52,8 @@ Crimson Rose is crafted from luxurious dual-tone satin that shifts gracefully be
 Every detail reflects precision craftsmanship—from the clean construction to the lustrous finish of the satin. Produced in strictly limited quantities, Crimson Rose embodies AVENOR's philosophy of quiet luxury, timeless design, and enduring sophistication.
     `,
 
-    coverImage: "/products/crimson-rose/cover.jpg",
+    coverImage:
+      "/products/crimson-rose/cover.jpg",
 
     images: [
       "/products/crimson-rose/1.jpg",
@@ -40,6 +67,9 @@ Every detail reflects precision craftsmanship—from the clean construction to t
     ],
 
     totalPieces: 1,
+
+    collectionPhase:
+      "private_access",
   },
 
   {
@@ -57,7 +87,8 @@ Ivory Blush is an expression of refined femininity, crafted in a soft dusty gold
 Every gown is meticulously constructed with exceptional attention to detail, celebrating the artistry of fine craftsmanship. Produced in limited quantities, Ivory Blush reflects AVENOR's commitment to exclusivity, quiet luxury, and contemporary elegance.
     `,
 
-    coverImage: "/products/ivory-blush/cover.jpg",
+    coverImage:
+      "/products/ivory-blush/cover.jpg",
 
     images: [
       "/products/ivory-blush/1.jpg",
@@ -71,6 +102,9 @@ Every gown is meticulously constructed with exceptional attention to detail, cel
     ],
 
     totalPieces: 5,
+
+    collectionPhase:
+      "private_access",
   },
 
   {
@@ -88,7 +122,8 @@ Blue Crystal is a refined expression of contemporary glamour, crafted as an intr
 Every detail is thoughtfully finished to celebrate the artistry of fine craftsmanship. Produced in limited quantities, Blue Crystal embodies AVENOR's philosophy of quiet luxury, individuality, and contemporary sophistication.
     `,
 
-    coverImage: "/products/blue-crystal/cover.JPG",
+    coverImage:
+      "/products/blue-crystal/cover.JPG",
 
     images: [
       "/products/blue-crystal/1.JPG",
@@ -97,6 +132,9 @@ Every detail is thoughtfully finished to celebrate the artistry of fine craftsma
     ],
 
     totalPieces: 3,
+
+    collectionPhase:
+      "private_access",
   },
 
   {
@@ -114,7 +152,8 @@ Sunset Lilac is a romantic expression of contemporary elegance, crafted in a del
 Every detail is thoughtfully finished to celebrate the artistry of fine craftsmanship. Produced in limited quantities, Sunset Lilac embodies AVENOR's philosophy of quiet luxury, individuality, and effortless sophistication.
     `,
 
-    coverImage: "/products/sunset-lilac/cover.jpg",
+    coverImage:
+      "/products/sunset-lilac/cover.jpg",
 
     images: [
       "/products/sunset-lilac/1.jpg",
@@ -123,5 +162,8 @@ Every detail is thoughtfully finished to celebrate the artistry of fine craftsma
     ],
 
     totalPieces: 10,
+
+    collectionPhase:
+      "private_access",
   },
 ];
