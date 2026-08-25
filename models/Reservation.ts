@@ -130,8 +130,10 @@ const ReservationSchema = new Schema(
       type: String,
       enum: [
         "pending",
-        "success",
-        "failed",
+        "confirmed",
+        "purchased",
+        "refunded",
+        "closed",
       ],
       default: "pending",
       index: true,
