@@ -6,10 +6,23 @@ import mongoose, {
 
 const ReservationSchema = new Schema(
   {
+    /*
+     * ==========================================
+     * PRODUCT
+     * ==========================================
+     */
+
     product: {
       type: String,
       required: true,
+      trim: true,
     },
+
+    /*
+     * ==========================================
+     * CUSTOMER
+     * ==========================================
+     */
 
     fullName: {
       type: String,
@@ -22,6 +35,7 @@ const ReservationSchema = new Schema(
       required: true,
       lowercase: true,
       trim: true,
+      index: true,
     },
 
     instagram: {
@@ -36,6 +50,12 @@ const ReservationSchema = new Schema(
       trim: true,
     },
 
+    /*
+     * ==========================================
+     * FIT INFORMATION
+     * ==========================================
+     */
+
     fitPreference: {
       type: String,
       enum: ["custom", "standard"],
@@ -44,7 +64,14 @@ const ReservationSchema = new Schema(
 
     standardSize: {
       type: String,
-      enum: ["XS", "S", "M", "L", "XL", ""],
+      enum: [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "",
+      ],
       default: "",
     },
 
@@ -60,7 +87,12 @@ const ReservationSchema = new Schema(
       trim: true,
     },
 
-    // Cashfree order ID
+    /*
+     * ==========================================
+     * CASHFREE
+     * ==========================================
+     */
+
     cashfreeOrderId: {
       type: String,
       required: true,
@@ -68,14 +100,32 @@ const ReservationSchema = new Schema(
       index: true,
     },
 
-    // Studio reservation fee
+    /*
+     * ==========================================
+     * RESERVATION FEE
+     * ==========================================
+     *
+     * Production:
+     * ₹2,000
+     *
+     * Test mode:
+     * ₹1
+     *
+     * The actual amount paid is stored here.
+     */
+
     reservationFee: {
       type: Number,
       required: true,
       default: 2000,
     },
 
-    // Cashfree payment status
+    /*
+     * ==========================================
+     * PAYMENT STATUS
+     * ==========================================
+     */
+
     paymentStatus: {
       type: String,
       enum: [
@@ -84,18 +134,99 @@ const ReservationSchema = new Schema(
         "failed",
       ],
       default: "pending",
+      index: true,
     },
 
-    // Internal reservation status
+    /*
+     * ==========================================
+     * RESERVATION STATUS
+     * ==========================================
+     *
+     * pending
+     * → Reservation/payment has not yet
+     *   been successfully completed.
+     *
+     * confirmed
+     * → Customer successfully paid the
+     *   reservation fee.
+     * → Customer has PRIVATE ACCESS.
+     *
+     * purchased
+     * → Customer used their private access
+     *   and purchased the piece.
+     *
+     * refunded
+     * → Customer's private opportunity ended
+     *   without purchase and the reservation
+     *   fee is being/has been returned.
+     */
+
     status: {
       type: String,
+
       enum: [
         "pending",
-        "contacted",
-        "allocated",
-        "closed",
+        "confirmed",
+        "purchased",
+        "refunded",
       ],
+
       default: "pending",
+
+      index: true,
+    },
+
+    /*
+     * ==========================================
+     * OPTIONAL PURCHASE INFORMATION
+     * ==========================================
+     *
+     * When the customer eventually purchases
+     * the piece, we can store the normal
+     * order number here.
+     *
+     * This makes it easy to connect:
+     *
+     * Reservation → Order
+     */
+
+    orderNumber: {
+      type: String,
+      default: "",
+      trim: true,
+      index: true,
+    },
+
+    /*
+     * ==========================================
+     * REFUND INFORMATION
+     * ==========================================
+     *
+     * We will use these later when implementing
+     * the private-window refund logic.
+     */
+
+    refundStatus: {
+      type: String,
+
+      enum: [
+        "not_required",
+        "pending",
+        "processed",
+        "failed",
+      ],
+
+      default: "not_required",
+    },
+
+    refundAmount: {
+      type: Number,
+      default: 0,
+    },
+
+    refundedAt: {
+      type: Date,
+      default: null,
     },
   },
   {
