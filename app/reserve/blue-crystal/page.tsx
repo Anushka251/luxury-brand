@@ -2,28 +2,15 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import ProductGallery from "@/app/product-components/ProductGallery";
 import { useEffect, useState } from "react";
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import ProductGallery from "@/app/product-components/ProductGallery";
 import { products } from "@/lib/products";
 
 type Reservation = {
   product: string;
-
-  paymentStatus:
-    | "pending"
-    | "confirmed"
-    | "purchased"
-    | "refunded"
-    | "closed"
-    | string;
-
-  status?:
-    | "pending"
-    | "confirmed"
-    | "purchased"
-    | "refunded"
-    | string;
+  paymentStatus: string;
+  status?: string;
 };
 
 export default function BlueCrystalReservationPage() {
@@ -40,12 +27,8 @@ export default function BlueCrystalReservationPage() {
 
   /*
    * =========================================================
-   * FIND PRODUCT
+   * PRODUCT
    * =========================================================
-   *
-   * Blue Crystal is defined in:
-   *
-   * lib/products.ts
    */
 
   const product = products.find(
@@ -54,14 +37,8 @@ export default function BlueCrystalReservationPage() {
 
   /*
    * =========================================================
-   * PRODUCT SAFETY CHECK
+   * SAFETY CHECK
    * =========================================================
-   *
-   * TypeScript correctly knows that
-   * Array.find() can return undefined.
-   *
-   * Handle that case before using
-   * product.id anywhere below.
    */
 
   if (!product) {
@@ -141,10 +118,6 @@ export default function BlueCrystalReservationPage() {
     const email =
       session?.user?.email ?? "";
 
-    /*
-     * User is not logged in.
-     */
-
     if (!email) {
       setHasPrivateAccess(false);
       setCheckingAccess(false);
@@ -173,27 +146,9 @@ export default function BlueCrystalReservationPage() {
         const data =
           await response.json();
 
-        const reservations: Reservation[] =
-          Array.isArray(data.reservations)
-            ? data.reservations
-            : [];
-
-        /*
-         * IMPORTANT:
-         *
-         * Your Reservation schema now uses:
-         *
-         * paymentStatus:
-         * "pending"
-         * "confirmed"
-         * "purchased"
-         * "refunded"
-         * "closed"
-         *
-         * Therefore DO NOT check:
-         *
-         * paymentStatus === "success"
-         */
+        const reservations:
+          Reservation[] =
+          data.reservations ?? [];
 
         const confirmed =
           reservations.some(
@@ -211,7 +166,7 @@ export default function BlueCrystalReservationPage() {
         );
       } catch (error) {
         console.error(
-          "Private access check error:",
+          "Blue Crystal private access check error:",
           error
         );
 
@@ -238,7 +193,7 @@ export default function BlueCrystalReservationPage() {
 
   /*
    * =========================================================
-   * BUTTON DEFAULT
+   * BUTTON STATE
    * =========================================================
    */
 
@@ -252,12 +207,8 @@ export default function BlueCrystalReservationPage() {
 
   /*
    * =========================================================
-   * PHASE 1
-   *
-   * PRIVATE ACCESS
+   * PHASE 1 — PRIVATE ACCESS
    * =========================================================
-   *
-   * Anyone can apply for private access.
    */
 
   if (
@@ -275,40 +226,23 @@ export default function BlueCrystalReservationPage() {
 
   /*
    * =========================================================
-   * PHASE 2
-   *
-   * PRIVATE PURCHASE
+   * PHASE 2 — PRIVATE PURCHASE
    * =========================================================
-   *
-   * Only customers with confirmed
-   * private access can purchase.
    */
 
   if (
     phase ===
     "private_purchase"
   ) {
-    /*
-     * Still checking account.
-     */
-
     if (
-      sessionStatus ===
-        "loading" ||
+      sessionStatus === "loading" ||
       checkingAccess
     ) {
       buttonText =
         "Checking Private Access";
 
       buttonDisabled = true;
-    }
-
-    /*
-     * Logged in and has confirmed
-     * private access.
-     */
-
-    else if (
+    } else if (
       session &&
       hasPrivateAccess
     ) {
@@ -316,16 +250,10 @@ export default function BlueCrystalReservationPage() {
         "Claim Private Allocation";
 
       buttonHref =
-        `/product/${product.id}`;
+        "/product/blue-crystal";
 
       buttonDisabled = false;
-    }
-
-    /*
-     * User does not have private access.
-     */
-
-    else {
+    } else {
       buttonText =
         "Reserved for Private Access";
 
@@ -335,12 +263,8 @@ export default function BlueCrystalReservationPage() {
 
   /*
    * =========================================================
-   * PHASE 3
-   *
-   * PUBLIC
+   * PHASE 3 — PUBLIC
    * =========================================================
-   *
-   * Everyone can purchase.
    */
 
   if (
@@ -351,16 +275,14 @@ export default function BlueCrystalReservationPage() {
       "Acquire From Collection";
 
     buttonHref =
-      `/product/${product.id}`;
+      "/product/blue-crystal";
 
     buttonDisabled = false;
   }
 
   /*
    * =========================================================
-   * PHASE 4
-   *
-   * SOLD OUT
+   * PHASE 4 — SOLD OUT
    * =========================================================
    */
 
@@ -372,55 +294,6 @@ export default function BlueCrystalReservationPage() {
       "Edition Exhausted";
 
     buttonDisabled = true;
-  }
-
-  /*
-   * =========================================================
-   * PRIVATE PURCHASE HANDLER
-   * =========================================================
-   */
-
-  function handlePrivatePurchase() {
-    /*
-     * Safety check.
-     */
-
-    if (
-      phase !==
-      "private_purchase"
-    ) {
-      return;
-    }
-
-    /*
-     * Customer must be logged in.
-     */
-
-    if (!session) {
-      signIn("google", {
-        callbackUrl:
-          "/reserve/blue-crystal",
-      });
-
-      return;
-    }
-
-    /*
-     * Customer must have confirmed
-     * private access.
-     */
-
-    if (!hasPrivateAccess) {
-      return;
-    }
-
-    /*
-     * Send customer to the actual
-     * product purchase page.
-     */
-
-    window.location.href =
-      `/product/${product.id}`;
   }
 
   return (
@@ -489,7 +362,7 @@ export default function BlueCrystalReservationPage() {
           </p>
 
           {/* ================================================= */}
-          {/* PHASE MESSAGE */}
+          {/* COLLECTION PHASE */}
           {/* ================================================= */}
 
           <div className="mt-10">
@@ -528,125 +401,89 @@ export default function BlueCrystalReservationPage() {
           {/* ACTION */}
           {/* ================================================= */}
 
-          <div className="mt-8 flex justify-center">
+          <div className="mt-12 flex justify-center">
 
-            {phase ===
-              "private_purchase" ? (
-
-              <button
-                type="button"
-                disabled={
+            <Link
+              href={
+                buttonDisabled
+                  ? "#"
+                  : buttonHref
+              }
+              aria-disabled={
+                buttonDisabled
+              }
+              onClick={(event) => {
+                if (
                   buttonDisabled
+                ) {
+                  event.preventDefault();
                 }
-                onClick={
-                  handlePrivatePurchase
-                }
-                className={`
-                  border
-                  px-12
-                  py-4
-                  text-xs
-                  uppercase
-                  tracking-[0.35em]
-                  transition-all
-                  duration-300
-                  ${
-                    buttonDisabled
-                      ? "cursor-not-allowed border-gray-300 text-gray-400"
-                      : "border-[#AF9685] text-[#AF9685] hover:bg-[#AF9685] hover:text-white"
-                  }
-                `}
-              >
-                {buttonText}
-              </button>
-
-            ) : (
-
-              <Link
-                href={
+              }}
+              className={`
+                border
+                px-12
+                py-4
+                text-xs
+                uppercase
+                tracking-[0.35em]
+                transition-all
+                duration-300
+                ${
                   buttonDisabled
-                    ? "#"
-                    : buttonHref
+                    ? "cursor-not-allowed border-gray-300 text-gray-400"
+                    : "border-[#AF9685] text-[#AF9685] hover:bg-[#AF9685] hover:text-white"
                 }
-                aria-disabled={
-                  buttonDisabled
-                }
-                onClick={(event) => {
-                  if (
-                    buttonDisabled
-                  ) {
-                    event.preventDefault();
-                  }
-                }}
-                className={`
-                  border
-                  px-12
-                  py-4
-                  text-xs
-                  uppercase
-                  tracking-[0.35em]
-                  transition-all
-                  duration-300
-                  ${
-                    buttonDisabled
-                      ? "cursor-not-allowed border-gray-300 text-gray-400"
-                      : "border-[#AF9685] text-[#AF9685] hover:bg-[#AF9685] hover:text-white"
-                  }
-                `}
-              >
-                {buttonText}
-              </Link>
-
-            )}
+              `}
+            >
+              {buttonText}
+            </Link>
 
           </div>
 
           {/* ================================================= */}
-          {/* PRIVATE PURCHASE EXPLANATION */}
+          {/* PRIVATE PURCHASE MESSAGE */}
           {/* ================================================= */}
 
           {phase ===
             "private_purchase" && (
             <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
-
               {hasPrivateAccess
                 ? "Your private access gives you priority to claim this limited piece before the collection opens publicly."
                 : "This edition is currently reserved for clients with confirmed private access. Public access will follow if pieces remain available."}
-
             </p>
           )}
 
           {/* ================================================= */}
-          {/* PRIVATE ACCESS EXPLANATION */}
+          {/* PRIVATE ACCESS MESSAGE */}
           {/* ================================================= */}
 
           {phase ===
             "private_access" && (
             <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
-              Studio reservations close before
-              the private allocation window.
-              Private access is available to
-              clients who complete the studio
-              reservation process.
+              Studio reservations close 48 hours
+              before the collection is released
+              publicly. Clients who complete the
+              reservation process receive priority
+              access before the public release.
             </p>
           )}
 
           {/* ================================================= */}
-          {/* PUBLIC EXPLANATION */}
+          {/* PUBLIC MESSAGE */}
           {/* ================================================= */}
 
           {phase ===
             "public" && (
             <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
               The private allocation window has
-              concluded. This edition is now
+              concluded. Blue Crystal is now
               available to all clients while
               pieces remain.
             </p>
           )}
 
           {/* ================================================= */}
-          {/* SOLD OUT */}
+          {/* SOLD OUT MESSAGE */}
           {/* ================================================= */}
 
           {phase ===
