@@ -28,22 +28,18 @@ export async function POST(req: Request) {
     ) {
       return NextResponse.json(
         {
-          error:
-            "Order ID is required.",
+          error: "Order ID is required.",
         },
         { status: 400 }
       );
     }
 
     if (
-      !orderId.startsWith(
-        "AVENOR_RES_"
-      )
+      !orderId.startsWith("AVENOR_RES_")
     ) {
       return NextResponse.json(
         {
-          error:
-            "Invalid reservation order.",
+          error: "Invalid reservation order.",
         },
         { status: 400 }
       );
@@ -51,7 +47,7 @@ export async function POST(req: Request) {
 
     /*
      * =========================================================
-     * CONNECT DATABASE
+     * DATABASE
      * =========================================================
      */
 
@@ -65,8 +61,7 @@ export async function POST(req: Request) {
     if (!reservation) {
       return NextResponse.json(
         {
-          error:
-            "Reservation not found.",
+          error: "Reservation not found.",
         },
         { status: 404 }
       );
@@ -85,14 +80,9 @@ export async function POST(req: Request) {
         "confirmed"
     ) {
       return NextResponse.json({
-        paymentStatus:
-          "confirmed",
-
-        reservationStatus:
-          "confirmed",
-
+        paymentStatus: "confirmed",
+        reservationStatus: "confirmed",
         privateAccess: true,
-
         orderId,
       });
     }
@@ -104,18 +94,13 @@ export async function POST(req: Request) {
      */
 
     if (
-      reservation.status ===
-      "purchased"
+      reservation.status === "purchased"
     ) {
       return NextResponse.json({
         paymentStatus:
           reservation.paymentStatus,
-
-        reservationStatus:
-          "purchased",
-
+        reservationStatus: "purchased",
         privateAccess: true,
-
         orderId,
       });
     }
@@ -127,26 +112,27 @@ export async function POST(req: Request) {
      */
 
     if (
-      reservation.status ===
-      "refunded"
+      reservation.status === "refunded"
     ) {
       return NextResponse.json({
         paymentStatus:
           reservation.paymentStatus,
-
-        reservationStatus:
-          "refunded",
-
+        reservationStatus: "refunded",
         privateAccess: false,
-
         orderId,
       });
     }
 
     /*
      * =========================================================
-     * EXPECTED AMOUNT
+     * EXPECTED PAYMENT AMOUNT
      * =========================================================
+     *
+     * The amount comes from MongoDB.
+     *
+     * Current reservation fee:
+     *
+     * ₹2,000
      */
 
     const expectedAmount =
@@ -178,14 +164,26 @@ export async function POST(req: Request) {
      * =========================================================
      * CASHFREE ENVIRONMENT
      * =========================================================
+     *
+     * IMPORTANT:
+     *
+     * This MUST match app/api/reserve/route.ts
+     *
+     * CASHFREE_MODE=sandbox
+     *     → Sandbox
+     *
+     * CASHFREE_MODE=production
+     *     → Production
      */
 
-    const isTestMode =
-      process.env.AVENOR_RESERVATION_TEST_MODE ===
-      "true";
+    const cashfreeMode =
+      process.env.CASHFREE_MODE ===
+      "sandbox"
+        ? "sandbox"
+        : "production";
 
     const cashfreeBaseUrl =
-      isTestMode
+      cashfreeMode === "sandbox"
         ? "https://sandbox.cashfree.com/pg"
         : "https://api.cashfree.com/pg";
 
@@ -199,6 +197,10 @@ export async function POST(req: Request) {
       !process.env.CASHFREE_CLIENT_ID ||
       !process.env.CASHFREE_CLIENT_SECRET
     ) {
+      console.error(
+        "Cashfree credentials are missing."
+      );
+
       return NextResponse.json(
         {
           error:
@@ -272,6 +274,9 @@ export async function POST(req: Request) {
             cashfreeData?.message ||
             cashfreeData?.error ||
             "Unable to verify payment with Cashfree.",
+
+          details:
+            cashfreeData,
         },
         {
           status:
@@ -282,7 +287,7 @@ export async function POST(req: Request) {
 
     /*
      * =========================================================
-     * PAYMENTS
+     * PAYMENT TRANSACTIONS
      * =========================================================
      */
 
@@ -294,8 +299,18 @@ export async function POST(req: Request) {
 
     /*
      * =========================================================
-     * SUCCESS
+     * SUCCESSFUL PAYMENT
      * =========================================================
+     *
+     * Cashfree must report:
+     *
+     * payment_status = SUCCESS
+     *
+     * AND
+     *
+     * payment_amount = ₹2,000
+     *
+     * Only then is private access granted.
      */
 
     const successfulPayment =
@@ -320,7 +335,9 @@ export async function POST(req: Request) {
       await reservation.save();
 
       /*
-       * EMAIL
+       * =======================================================
+       * CONFIRMATION EMAIL
+       * =======================================================
        */
 
       try {
@@ -346,6 +363,11 @@ export async function POST(req: Request) {
           `AVENOR confirmation email sent: ${orderId}`
         );
       } catch (emailError) {
+        /*
+         * Email failure must NOT
+         * cancel successful access.
+         */
+
         console.error(
           "Reservation confirmation email failed:",
           emailError
@@ -371,7 +393,7 @@ export async function POST(req: Request) {
 
     /*
      * =========================================================
-     * PENDING
+     * PENDING PAYMENT
      * =========================================================
      */
 
@@ -410,6 +432,11 @@ export async function POST(req: Request) {
      * =========================================================
      * FAILED / OTHER TRANSACTION
      * =========================================================
+     *
+     * Do NOT grant private access.
+     *
+     * Keep the reservation pending so
+     * the customer can retry.
      */
 
     if (payments.length > 0) {
@@ -436,7 +463,7 @@ export async function POST(req: Request) {
 
     /*
      * =========================================================
-     * NO TRANSACTION YET
+     * NO PAYMENT TRANSACTION YET
      * =========================================================
      */
 
