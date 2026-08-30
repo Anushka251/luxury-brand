@@ -1,32 +1,7 @@
 import { NextResponse } from "next/server";
 
-/*
- * =========================================================
- * VERIFY ACTUAL PRODUCT PAYMENT
- * =========================================================
- *
- * This endpoint verifies an ACTUAL GARMENT PURCHASE
- * with Cashfree.
- *
- * It is NOT used for the ₹2,000 reservation.
- *
- * Reservation payment:
- *
- * /api/reserve/confirm
- *
- * Product payment:
- *
- * /api/verify-order
- */
-
 export async function GET(req: Request) {
   try {
-    /*
-     * =======================================================
-     * GET ORDER ID
-     * =======================================================
-     */
-
     const { searchParams } =
       new URL(req.url);
 
@@ -50,19 +25,8 @@ export async function GET(req: Request) {
     }
 
     /*
-     * =======================================================
-     * PREVENT RESERVATION ORDER FROM BEING VERIFIED HERE
-     * =======================================================
-     *
-     * Reservation orders look like:
-     *
-     * AVENOR_RES_xxxxx
-     *
-     * They must be verified by:
-     *
-     * /api/reserve/confirm
-     *
-     * This endpoint is for actual garment orders.
+     * Reservation payments have their own
+     * verification route.
      */
 
     if (
@@ -74,7 +38,7 @@ export async function GET(req: Request) {
         {
           success: false,
           error:
-            "Reservation orders must be verified through /api/reserve/confirm.",
+            "Reservation payments must be verified using /api/reserve/confirm.",
         },
         {
           status: 400,
@@ -82,33 +46,21 @@ export async function GET(req: Request) {
       );
     }
 
-    /*
-     * =======================================================
-     * CASHFREE CONFIGURATION
-     * =======================================================
-     */
-
     const clientId =
-      process.env
-        .CASHFREE_CLIENT_ID;
+      process.env.CASHFREE_CLIENT_ID;
 
     const clientSecret =
-      process.env
-        .CASHFREE_CLIENT_SECRET;
+      process.env.CASHFREE_CLIENT_SECRET;
 
     if (
       !clientId ||
       !clientSecret
     ) {
-      console.error(
-        "Cashfree environment variables are missing."
-      );
-
       return NextResponse.json(
         {
           success: false,
           error:
-            "Payment gateway configuration is missing.",
+            "Cashfree configuration is missing.",
         },
         {
           status: 500,
@@ -117,9 +69,8 @@ export async function GET(req: Request) {
     }
 
     /*
-     * =======================================================
-     * ASK CASHFREE FOR ORDER DETAILS
-     * =======================================================
+     * Ask Cashfree for the actual
+     * product order status.
      */
 
     const response =
@@ -148,31 +99,15 @@ export async function GET(req: Request) {
         }
       );
 
-    /*
-     * =======================================================
-     * READ CASHFREE RESPONSE
-     * =======================================================
-     */
-
     const data =
       await response.json();
 
-    console.log(
-      "Cashfree product order verification:",
-      JSON.stringify(
-        data,
-        null,
-        2
-      )
-    );
-
-    /*
-     * =======================================================
-     * CASHFREE ERROR
-     * =======================================================
-     */
-
     if (!response.ok) {
+      console.error(
+        "Cashfree verification error:",
+        data
+      );
+
       return NextResponse.json(
         {
           success: false,
@@ -181,9 +116,6 @@ export async function GET(req: Request) {
             data?.message ||
             data?.error ||
             "Unable to verify order.",
-
-          order_id:
-            orderId,
         },
         {
           status:
@@ -193,13 +125,16 @@ export async function GET(req: Request) {
     }
 
     /*
-     * =======================================================
-     * RETURN VERIFIED ORDER INFORMATION
-     * =======================================================
+     * Only expose the information
+     * required by your frontend.
      */
 
     return NextResponse.json({
       success: true,
+
+      paid:
+        data?.order_status ===
+        "PAID",
 
       order_status:
         data?.order_status,
@@ -218,13 +153,10 @@ export async function GET(req: Request) {
 
       customer_details:
         data?.customer_details,
-
-      order_meta:
-        data?.order_meta,
     });
   } catch (error) {
     console.error(
-      "Verify product order error:",
+      "Verify order error:",
       error
     );
 
