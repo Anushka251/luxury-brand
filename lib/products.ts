@@ -14,25 +14,6 @@ export type Product = {
   coverImage: string;
   images: string[];
   totalPieces: number;
-
-  /*
-   * ==========================================
-   * AVENOR COLLECTION PHASE
-   * ==========================================
-   *
-   * private_access
-   * → People can apply for private access.
-   *
-   * private_purchase
-   * → Only confirmed private-access clients
-   *   can purchase.
-   *
-   * public
-   * → Everyone can purchase.
-   *
-   * sold_out
-   * → Nobody can purchase.
-   */
   collectionPhase: CollectionPhase;
 };
 
