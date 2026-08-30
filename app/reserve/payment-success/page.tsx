@@ -27,6 +27,10 @@ function PaymentSuccessContent() {
   const searchParams = useSearchParams();
 
   /*
+   * =========================================================
+   * CASHFREE ORDER ID
+   * =========================================================
+   *
    * Cashfree redirects back with:
    *
    * ?order_id=...
@@ -34,6 +38,12 @@ function PaymentSuccessContent() {
 
   const orderId =
     searchParams.get("order_id");
+
+  /*
+   * =========================================================
+   * PAYMENT STATE
+   * =========================================================
+   */
 
   const [status, setStatus] =
     useState<PaymentState>("checking");
@@ -44,6 +54,26 @@ function PaymentSuccessContent() {
 
   const [productId, setProductId] =
     useState<string>("");
+
+  /*
+   * =========================================================
+   * RESERVATION FEE DISPLAY
+   * =========================================================
+   *
+   * TEST MODE:
+   * ₹1
+   *
+   * PRODUCTION:
+   * ₹2,000
+   */
+
+  const isTestMode =
+    process.env
+      .NEXT_PUBLIC_AVENOR_RESERVATION_TEST_MODE ===
+    "true";
+
+  const reservationFee =
+    isTestMode ? 1 : 2000;
 
   /*
    * =========================================================
@@ -123,21 +153,24 @@ function PaymentSuccessContent() {
           "Verifying your reservation payment..."
         );
 
-        const response = await fetch(
-          "/api/reserve/confirm",
-          {
-            method: "POST",
+        const response =
+          await fetch(
+            "/api/reserve/confirm",
+            {
+              method: "POST",
 
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
 
-            body: JSON.stringify({
-              orderId,
-            }),
-          }
-        );
+              body: JSON.stringify({
+                orderId,
+              }),
+
+              cache: "no-store",
+            }
+          );
 
         const data =
           await response.json();
@@ -163,17 +196,20 @@ function PaymentSuccessContent() {
 
         /*
          * -------------------------------------------------------
-         * PAYMENT STATUS
+         * NORMALIZE PAYMENT STATUS
          * -------------------------------------------------------
          *
-         * NEW AVENOR STANDARD:
+         * Our API uses:
          *
-         * paymentStatus = "confirmed"
-         * status        = "confirmed"
+         * confirmed
+         * pending
+         * failed
          *
-         * We also accept "success" here temporarily
-         * so an older confirm endpoint does not break
-         * the payment result page during migration.
+         * The page uses:
+         *
+         * success
+         * pending
+         * failed
          */
 
         const paymentStatus =
@@ -184,10 +220,23 @@ function PaymentSuccessContent() {
               ""
           ).toLowerCase();
 
+        console.log(
+          "Normalized payment status:",
+          paymentStatus
+        );
+
         /*
          * -------------------------------------------------------
          * SUCCESS
          * -------------------------------------------------------
+         *
+         * API:
+         *
+         * paymentStatus = "confirmed"
+         *
+         * UI:
+         *
+         * status = "success"
          */
 
         if (
@@ -260,8 +309,8 @@ function PaymentSuccessContent() {
          * UNKNOWN
          * -------------------------------------------------------
          *
-         * Do not pretend an unknown response
-         * is successful.
+         * Never assume an unknown response
+         * means payment success.
          */
 
         console.warn(
@@ -584,8 +633,8 @@ function PaymentSuccessContent() {
             </p>
 
             <p className="mt-5 text-sm leading-7 text-gray-600">
-              Your ₹2,000 studio reservation
-              fee has been successfully
+              Your ₹{reservationFee.toLocaleString("en-IN")} studio
+              reservation fee has been successfully
               received.
             </p>
 
@@ -623,7 +672,7 @@ function PaymentSuccessContent() {
             >
               Reservation fee:
               <span className="ml-1">
-                ₹2,000
+                ₹{reservationFee.toLocaleString("en-IN")}
               </span>
             </p>
 
@@ -728,8 +777,9 @@ function PaymentSuccessContent() {
               </p>
 
               <p className="mt-5 text-sm leading-7 text-gray-600">
-                Your ₹2,000 studio reservation
-                payment could not be confirmed.
+                Your ₹{reservationFee.toLocaleString("en-IN")} studio
+                reservation payment could not be
+                confirmed.
               </p>
 
               {product && (
