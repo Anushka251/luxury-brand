@@ -7,23 +7,25 @@ import {
 
 /*
  * =========================================================
- * CREATE / SAVE ORDER
+ * CREATE ACTUAL PRODUCT ORDER
  * =========================================================
  *
- * This endpoint saves the ACTUAL GARMENT PURCHASE
- * in MongoDB.
+ * This is for the ACTUAL GARMENT PURCHASE.
  *
- * It is NOT the ₹2,000 reservation.
+ * It is separate from:
  *
- * Reservation:
- *   Reservation model
+ * /api/reserve/confirm
  *
- * Actual garment purchase:
- *   Order model
+ * which handles the ₹2,000 reservation.
  *
  * IMPORTANT:
- * The payment should already have been verified
- * before creating the order.
+ *
+ * The frontend must NOT be trusted to say:
+ *
+ * paymentStatus: "PAID"
+ *
+ * The Cashfree order must first be verified
+ * through /api/verify-order.
  */
 
 export async function POST(req: Request) {
@@ -34,7 +36,7 @@ export async function POST(req: Request) {
 
     /*
      * =======================================================
-     * VALIDATE REQUIRED INFORMATION
+     * REQUIRED FIELDS
      * =======================================================
      */
 
@@ -47,6 +49,22 @@ export async function POST(req: Request) {
           success: false,
           message:
             "Order number is required.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    if (
+      !body.cashfreeOrderId ||
+      typeof body.cashfreeOrderId !== "string"
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Cashfree order ID is required.",
         },
         {
           status: 400,
@@ -88,6 +106,29 @@ export async function POST(req: Request) {
 
     /*
      * =======================================================
+     * RESERVATION ORDERS ARE NOT PRODUCT ORDERS
+     * =======================================================
+     */
+
+    if (
+      body.cashfreeOrderId.startsWith(
+        "AVENOR_RES_"
+      )
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Reservation payments cannot be saved as product orders.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    /*
+     * =======================================================
      * NORMALIZE CUSTOMER DATA
      * =======================================================
      */
@@ -100,7 +141,7 @@ export async function POST(req: Request) {
     const customerName =
       typeof body.customerName === "string"
         ? body.customerName.trim()
-        : "";
+        : "Customer";
 
     const customerPhone =
       typeof body.customerPhone === "string"
@@ -109,40 +150,248 @@ export async function POST(req: Request) {
 
     /*
      * =======================================================
-     * PREVENT DUPLICATE ORDERS
+     * VERIFY CASHFREE PAYMENT
      * =======================================================
      *
-     * If the same Cashfree order has already been
-     * successfully saved, return the existing order.
+     * IMPORTANT:
+     *
+     * We do NOT trust:
+     *
+     * body.paymentStatus
+     *
+     * Instead we ask Cashfree directly.
      */
 
-    if (
-      body.cashfreeOrderId &&
-      typeof body.cashfreeOrderId === "string"
-    ) {
-      const existingOrder =
-        await Order.findOne({
-          cashfreeOrderId:
-            body.cashfreeOrderId,
-        });
+    const clientId =
+      process.env.CASHFREE_CLIENT_ID;
 
-      if (existingOrder) {
-        return NextResponse.json({
-          success: true,
-          order: existingOrder,
-          alreadyExists: true,
+    const clientSecret =
+      process.env.CASHFREE_CLIENT_SECRET;
+
+    if (
+      !clientId ||
+      !clientSecret
+    ) {
+      console.error(
+        "Cashfree credentials are missing."
+      );
+
+      return NextResponse.json(
+        {
+          success: false,
           message:
-            "Order already exists.",
-        });
-      }
+            "Payment gateway configuration is missing.",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    const cashfreeResponse =
+      await fetch(
+        `https://api.cashfree.com/pg/orders/${encodeURIComponent(
+          body.cashfreeOrderId
+        )}`,
+        {
+          method: "GET",
+
+          headers: {
+            Accept:
+              "application/json",
+
+            "x-client-id":
+              clientId,
+
+            "x-client-secret":
+              clientSecret,
+
+            "x-api-version":
+              "2023-08-01",
+          },
+
+          cache: "no-store",
+        }
+      );
+
+    const cashfreeData =
+      await cashfreeResponse.json();
+
+    console.log(
+      "Cashfree product order verification:",
+      JSON.stringify(
+        cashfreeData,
+        null,
+        2
+      )
+    );
+
+    /*
+     * =======================================================
+     * CASHFREE VERIFICATION FAILED
+     * =======================================================
+     */
+
+    if (!cashfreeResponse.ok) {
+      console.error(
+        "Cashfree order verification failed:",
+        cashfreeData
+      );
+
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            cashfreeData?.message ||
+            cashfreeData?.error ||
+            "Unable to verify payment.",
+        },
+        {
+          status:
+            cashfreeResponse.status,
+        }
+      );
     }
 
     /*
      * =======================================================
-     * CREATE ORDER
+     * PAYMENT MUST BE PAID
      * =======================================================
      *
-     * This represents the ACTUAL PRODUCT PURCHASE.
+     * Cashfree order_status must be PAID.
+     */
+
+    if (
+      cashfreeData?.order_status !==
+      "PAID"
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message:
+            "Payment has not been successfully completed.",
+
+          paymentStatus:
+            cashfreeData?.order_status ||
+            "UNKNOWN",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    /*
+     * =======================================================
+     * VERIFY ORDER AMOUNT
+     * =======================================================
+     *
+     * Never blindly trust the amount sent
+     * from the browser.
+     *
+     * Cashfree's amount is the trusted value.
+     */
+
+    const paidAmount =
+      Number(
+        cashfreeData?.order_amount
+      );
+
+    const requestedTotal =
+      Number(body.total);
+
+    if (
+      !Number.isFinite(
+        paidAmount
+      ) ||
+      !Number.isFinite(
+        requestedTotal
+      )
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Invalid payment amount.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    if (
+      paidAmount !==
+      requestedTotal
+    ) {
+      console.error(
+        "Order amount mismatch:",
+        {
+          orderId:
+            body.cashfreeOrderId,
+
+          cashfreeAmount:
+            paidAmount,
+
+          requestedAmount:
+            requestedTotal,
+        }
+      );
+
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Payment amount does not match order amount.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    /*
+     * =======================================================
+     * PREVENT DUPLICATE ORDER
+     * =======================================================
+     */
+
+    const existingOrder =
+      await Order.findOne({
+        cashfreeOrderId:
+          body.cashfreeOrderId,
+      });
+
+    if (existingOrder) {
+      return NextResponse.json({
+        success: true,
+
+        order:
+          existingOrder,
+
+        alreadyExists:
+          true,
+
+        paymentStatus:
+          "PAID",
+      });
+    }
+
+    /*
+     * =======================================================
+     * CREATE ACTUAL ORDER
+     * =======================================================
+     *
+     * At this point:
+     *
+     * Cashfree says PAID
+     * +
+     * amount matches
+     * +
+     * order doesn't already exist
+     *
+     * Therefore we can create the order.
      */
 
     const order =
@@ -150,15 +399,8 @@ export async function POST(req: Request) {
         orderNumber:
           body.orderNumber.trim(),
 
-        /*
-         * Cashfree ID is optional because
-         * the database should not crash if
-         * an order was created through another
-         * payment method in the future.
-         */
-
         cashfreeOrderId:
-          body.cashfreeOrderId || "",
+          body.cashfreeOrderId,
 
         customerEmail,
 
@@ -173,47 +415,48 @@ export async function POST(req: Request) {
           body.items,
 
         total:
-          Number(body.total) || 0,
+          paidAmount,
 
         /*
          * IMPORTANT:
          *
-         * This endpoint should normally only be
-         * called AFTER payment has been verified.
+         * This value is determined
+         * by the server.
          *
-         * Defaulting to PAID keeps compatibility
-         * with your existing checkout flow.
+         * The browser cannot change it.
          */
 
         paymentStatus:
-          body.paymentStatus ||
           "PAID",
       });
+
+    console.log(
+      `AVENOR product order created: ${order.orderNumber}`
+    );
 
     /*
      * =======================================================
      * SEND ORDER CONFIRMATION EMAIL
      * =======================================================
      *
-     * Email failure must NOT delete the order.
+     * Email failure does NOT undo
+     * the successful purchase.
      */
 
     try {
       await sendOrderConfirmationEmail({
         customerEmail,
 
-        customerName:
-          customerName ||
-          "Customer",
+        customerName,
 
         orderNumber:
           order.orderNumber,
 
         items:
-          body.items || [],
+          body.items,
 
         total:
-          Number(body.total) || 0,
+          paidAmount,
       });
 
       console.log(
@@ -228,14 +471,18 @@ export async function POST(req: Request) {
 
     /*
      * =======================================================
-     * RETURN CREATED ORDER
+     * RETURN SUCCESS
      * =======================================================
      */
 
     return NextResponse.json(
       {
         success: true,
+
         order,
+
+        paymentStatus:
+          "PAID",
       },
       {
         status: 201,
@@ -243,7 +490,7 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     console.error(
-      "Order save error:",
+      "Order creation error:",
       error
     );
 
@@ -251,7 +498,7 @@ export async function POST(req: Request) {
       {
         success: false,
         message:
-          "Failed to save order.",
+          "Failed to create order.",
       },
       {
         status: 500,
@@ -269,8 +516,6 @@ export async function POST(req: Request) {
  * Used by:
  *
  * /account/orders
- *
- * to retrieve the customer's actual purchases.
  */
 
 export async function GET(req: Request) {
