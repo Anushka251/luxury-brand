@@ -600,7 +600,7 @@ export default function ReservationsPage() {
                   ) {
                     action = (
                       <Link
-                        href={`/product/${product.id}`}
+                        href={`/reserve/${product.id}`}
                         className="
                           mt-8
                           inline-block
