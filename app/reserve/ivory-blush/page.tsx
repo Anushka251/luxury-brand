@@ -37,6 +37,215 @@ export default function IvoryBlushReservationPage() {
 
   /*
    * =========================================================
+   * CHECK PRIVATE ACCESS
+   * =========================================================
+   *
+   * A customer has private access ONLY when:
+   *
+   * product === "ivory-blush"
+   * paymentStatus === "confirmed"
+   * status === "confirmed"
+   *
+   * The DATABASE is the source of truth.
+   * We do NOT rely on sessionStorage here.
+   */
+
+  useEffect(() => {
+    if (sessionStatus === "loading") {
+      return;
+    }
+
+    const email =
+      session?.user?.email ?? "";
+
+    /*
+     * No logged-in customer
+     */
+
+    if (!email) {
+      setHasPrivateAccess(false);
+      setCheckingAccess(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function checkPrivateAccess() {
+      try {
+        setCheckingAccess(true);
+
+        const response = await fetch(
+          `/api/reservations?email=${encodeURIComponent(
+            email
+          )}`,
+          {
+            method: "GET",
+            cache: "no-store",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            "Unable to check private access."
+          );
+        }
+
+        const data =
+          await response.json();
+
+        const reservations: Reservation[] =
+          Array.isArray(
+            data.reservations
+          )
+            ? data.reservations
+            : [];
+
+        /*
+         * Find a CONFIRMED reservation
+         * specifically for Ivory Blush.
+         */
+
+        const confirmed =
+          reservations.some(
+            (reservation) =>
+              reservation.product ===
+                "ivory-blush" &&
+              String(
+                reservation.paymentStatus
+              ).toLowerCase() ===
+                "confirmed" &&
+              String(
+                reservation.status ?? ""
+              ).toLowerCase() ===
+                "confirmed"
+          );
+
+        if (!cancelled) {
+          setHasPrivateAccess(
+            confirmed
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Ivory Blush private access check error:",
+          error
+        );
+
+        if (!cancelled) {
+          setHasPrivateAccess(false);
+        }
+      } finally {
+        if (!cancelled) {
+          setCheckingAccess(false);
+        }
+      }
+    }
+
+    checkPrivateAccess();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    session,
+    sessionStatus,
+  ]);
+
+  /*
+   * =========================================================
+   * REFRESH ACCESS WHEN CUSTOMER RETURNS TO PAGE
+   * =========================================================
+   *
+   * This helps if the customer completes payment
+   * in another page/tab and then comes back here.
+   */
+
+  useEffect(() => {
+    if (sessionStatus === "loading") {
+      return;
+    }
+
+    const email =
+      session?.user?.email ?? "";
+
+    if (!email) {
+      return;
+    }
+
+    async function refreshAccess() {
+      try {
+        const response = await fetch(
+          `/api/reservations?email=${encodeURIComponent(
+            email
+          )}`,
+          {
+            method: "GET",
+            cache: "no-store",
+          }
+        );
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data =
+          await response.json();
+
+        const reservations: Reservation[] =
+          Array.isArray(
+            data.reservations
+          )
+            ? data.reservations
+            : [];
+
+        const confirmed =
+          reservations.some(
+            (reservation) =>
+              reservation.product ===
+                "ivory-blush" &&
+              String(
+                reservation.paymentStatus
+              ).toLowerCase() ===
+                "confirmed" &&
+              String(
+                reservation.status ?? ""
+              ).toLowerCase() ===
+                "confirmed"
+          );
+
+        setHasPrivateAccess(
+          confirmed
+        );
+      } catch (error) {
+        console.error(
+          "Private access refresh error:",
+          error
+        );
+      }
+    }
+
+    function handleFocus() {
+      refreshAccess();
+    }
+
+    window.addEventListener(
+      "focus",
+      handleFocus
+    );
+
+    return () => {
+      window.removeEventListener(
+        "focus",
+        handleFocus
+      );
+    };
+  }, [
+    session,
+    sessionStatus,
+  ]);
+
+  /*
+   * =========================================================
    * PRODUCT SAFETY CHECK
    * =========================================================
    */
@@ -94,89 +303,6 @@ export default function IvoryBlushReservationPage() {
 
   /*
    * =========================================================
-   * CHECK PRIVATE ACCESS
-   * =========================================================
-   *
-   * Private access is granted only when:
-   *
-   * product === "ivory-blush"
-   * paymentStatus === "confirmed"
-   * status === "confirmed"
-   */
-
-  useEffect(() => {
-    if (sessionStatus === "loading") {
-      return;
-    }
-
-    const email =
-      session?.user?.email ?? "";
-
-    if (!email) {
-      setHasPrivateAccess(false);
-      setCheckingAccess(false);
-      return;
-    }
-
-    async function checkPrivateAccess() {
-      try {
-        setCheckingAccess(true);
-
-        const response = await fetch(
-          `/api/reservations?email=${encodeURIComponent(
-            email
-          )}`,
-          {
-            cache: "no-store",
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            "Unable to check private access."
-          );
-        }
-
-        const data =
-          await response.json();
-
-        const reservations: Reservation[] =
-          data.reservations ?? [];
-
-        const confirmed =
-          reservations.some(
-            (reservation) =>
-              reservation.product ===
-                "ivory-blush" &&
-              reservation.paymentStatus ===
-                "confirmed" &&
-              reservation.status ===
-                "confirmed"
-          );
-
-        setHasPrivateAccess(
-          confirmed
-        );
-      } catch (error) {
-        console.error(
-          "Ivory Blush private access check error:",
-          error
-        );
-
-        setHasPrivateAccess(false);
-      } finally {
-        setCheckingAccess(false);
-      }
-    }
-
-    checkPrivateAccess();
-  }, [
-    session,
-    sessionStatus,
-  ]);
-
-  /*
-   * =========================================================
    * COLLECTION PHASE
    * =========================================================
    */
@@ -202,19 +328,53 @@ export default function IvoryBlushReservationPage() {
    * =========================================================
    * PHASE 1 — PRIVATE ACCESS
    * =========================================================
+   *
+   * BEFORE PAYMENT:
+   * Reserve Private Access
+   *
+   * AFTER SUCCESSFUL PAYMENT:
+   * Private Access Reserved
    */
 
   if (
     phase ===
     "private_access"
   ) {
-    buttonText =
-      "Reserve Private Access";
+    if (
+      sessionStatus === "loading" ||
+      checkingAccess
+    ) {
+      buttonText =
+        "Checking Private Access";
 
-    buttonHref =
-      "/reserve/form/ivory-blush";
+      buttonDisabled = true;
+    } else if (
+      session &&
+      hasPrivateAccess
+    ) {
+      buttonText =
+        "Private Access Reserved";
 
-    buttonDisabled = false;
+      /*
+       * Do NOT send the customer
+       * back to the reservation form.
+       *
+       * Send them to their reservations.
+       */
+
+      buttonHref =
+        "/account/reservations";
+
+      buttonDisabled = false;
+    } else {
+      buttonText =
+        "Reserve Private Access";
+
+      buttonHref =
+        "/reserve/form/ivory-blush";
+
+      buttonDisabled = false;
+    }
   }
 
   /*
@@ -239,21 +399,27 @@ export default function IvoryBlushReservationPage() {
       session &&
       hasPrivateAccess
     ) {
+      /*
+       * Confirmed reservation.
+       *
+       * Customer can now claim
+       * the private allocation.
+       */
+
       buttonText =
         "Claim Private Allocation";
-
-      /*
-       * Use the fixed route instead of
-       * product.id so TypeScript cannot
-       * complain about product possibly
-       * being undefined.
-       */
 
       buttonHref =
         "/product/ivory-blush";
 
       buttonDisabled = false;
     } else {
+      /*
+       * Private purchase is open,
+       * but this customer did not
+       * reserve access.
+       */
+
       buttonText =
         "Reserved for Private Access";
 
@@ -375,14 +541,18 @@ export default function IvoryBlushReservationPage() {
             {phase ===
               "private_access" && (
               <p className="text-xs uppercase tracking-[0.28em] text-[#AF9685]">
-                Private Access Applications Open
+                {hasPrivateAccess
+                  ? "Private Access Reserved"
+                  : "Private Access Applications Open"}
               </p>
             )}
 
             {phase ===
               "private_purchase" && (
               <p className="text-xs uppercase tracking-[0.28em] text-[#AF9685]">
-                Private Allocation Window
+                {hasPrivateAccess
+                  ? "Your Private Allocation Window"
+                  : "Private Allocation Window"}
               </p>
             )}
 
@@ -465,12 +635,9 @@ export default function IvoryBlushReservationPage() {
           {phase ===
             "private_access" && (
             <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
-              Studio reservations close 48 hours
-              before the collection is released
-              publicly. Clients who complete the
-              reservation process receive priority
-              access to the collection before the
-              public release.
+              {hasPrivateAccess
+                ? "Your ₹2,000 reservation has been successfully confirmed. Your private access is secured for this piece."
+                : "Studio reservations close 48 hours before the collection is released publicly. Clients who complete the reservation process receive priority access to the collection before the public release."}
             </p>
           )}
 
