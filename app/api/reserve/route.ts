@@ -100,26 +100,22 @@ export async function POST(req: Request) {
 
     /*
      * =========================================================
-     * CASHFREE MODE
+     * CASHFREE ENVIRONMENT
      * =========================================================
      *
-     * Set:
+     * TEST MODE:
+     * AVENOR_RESERVATION_TEST_MODE=true
      *
-     * CASHFREE_MODE=sandbox
-     *
-     * OR
-     *
-     * CASHFREE_MODE=production
+     * Production:
+     * AVENOR_RESERVATION_TEST_MODE=false
      */
 
-    const cashfreeMode =
-      process.env.CASHFREE_MODE ===
-      "sandbox"
-        ? "sandbox"
-        : "production";
+    const isTestMode =
+      process.env.AVENOR_RESERVATION_TEST_MODE ===
+      "true";
 
     const cashfreeBaseUrl =
-      cashfreeMode === "sandbox"
+      isTestMode
         ? "https://sandbox.cashfree.com/pg"
         : "https://api.cashfree.com/pg";
 
@@ -135,14 +131,32 @@ export async function POST(req: Request) {
      * ₹2,000
      */
 
-    const isTestMode =
-      cashfreeMode === "sandbox" ||
-      process.env
-        .AVENOR_RESERVATION_TEST_MODE ===
-        "true";
-
     const reservationFee =
       isTestMode ? 1 : 2000;
+
+    /*
+     * =========================================================
+     * CASHFREE CREDENTIAL CHECK
+     * =========================================================
+     */
+
+    if (
+      !process.env.CASHFREE_CLIENT_ID ||
+      !process.env.CASHFREE_CLIENT_SECRET
+    ) {
+      console.error(
+        "Cashfree credentials are missing."
+      );
+
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Cashfree configuration is incomplete.",
+        },
+        { status: 500 }
+      );
+    }
 
     /*
      * =========================================================
@@ -176,11 +190,11 @@ export async function POST(req: Request) {
 
             "x-client-id":
               process.env
-                .CASHFREE_CLIENT_ID!,
+                .CASHFREE_CLIENT_ID,
 
             "x-client-secret":
               process.env
-                .CASHFREE_CLIENT_SECRET!,
+                .CASHFREE_CLIENT_SECRET,
 
             "x-api-version":
               "2023-08-01",
@@ -251,9 +265,6 @@ export async function POST(req: Request) {
             cashfreeData?.message ||
             cashfreeData?.error ||
             "Unable to create Cashfree payment.",
-
-          details:
-            cashfreeData,
         },
         {
           status:
@@ -272,7 +283,7 @@ export async function POST(req: Request) {
       !cashfreeData?.payment_session_id
     ) {
       console.error(
-        "Cashfree response missing payment_session_id:",
+        "Missing payment_session_id:",
         cashfreeData
       );
 
@@ -282,9 +293,6 @@ export async function POST(req: Request) {
 
           error:
             "Cashfree payment session was not created.",
-
-          details:
-            cashfreeData,
         },
         {
           status: 500,
@@ -389,8 +397,6 @@ export async function POST(req: Request) {
 
       testMode:
         isTestMode,
-
-      cashfreeMode,
     });
   } catch (error) {
     console.error(
