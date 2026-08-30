@@ -100,22 +100,23 @@ export async function POST(req: Request) {
 
     /*
      * =========================================================
-     * CASHFREE ENVIRONMENT
+     * CASHFREE MODE
      * =========================================================
      *
-     * TEST MODE:
-     * AVENOR_RESERVATION_TEST_MODE=true
+     * Set CASHFREE_MODE=sandbox while testing.
      *
-     * Production:
-     * AVENOR_RESERVATION_TEST_MODE=false
+     * Set CASHFREE_MODE=production when
+     * using your live Cashfree credentials.
      */
 
-    const isTestMode =
-      process.env.AVENOR_RESERVATION_TEST_MODE ===
-      "true";
+    const cashfreeMode =
+      process.env.CASHFREE_MODE ===
+      "sandbox"
+        ? "sandbox"
+        : "production";
 
     const cashfreeBaseUrl =
-      isTestMode
+      cashfreeMode === "sandbox"
         ? "https://sandbox.cashfree.com/pg"
         : "https://api.cashfree.com/pg";
 
@@ -124,39 +125,12 @@ export async function POST(req: Request) {
      * RESERVATION FEE
      * =========================================================
      *
-     * TEST:
-     * ₹1
+     * FIXED RESERVATION FEE
      *
-     * PRODUCTION:
      * ₹2,000
      */
 
-    const reservationFee =
-      isTestMode ? 1 : 2000;
-
-    /*
-     * =========================================================
-     * CASHFREE CREDENTIAL CHECK
-     * =========================================================
-     */
-
-    if (
-      !process.env.CASHFREE_CLIENT_ID ||
-      !process.env.CASHFREE_CLIENT_SECRET
-    ) {
-      console.error(
-        "Cashfree credentials are missing."
-      );
-
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            "Cashfree configuration is incomplete.",
-        },
-        { status: 500 }
-      );
-    }
+    const reservationFee = 2000;
 
     /*
      * =========================================================
@@ -190,11 +164,11 @@ export async function POST(req: Request) {
 
             "x-client-id":
               process.env
-                .CASHFREE_CLIENT_ID,
+                .CASHFREE_CLIENT_ID!,
 
             "x-client-secret":
               process.env
-                .CASHFREE_CLIENT_SECRET,
+                .CASHFREE_CLIENT_SECRET!,
 
             "x-api-version":
               "2023-08-01",
@@ -265,6 +239,9 @@ export async function POST(req: Request) {
             cashfreeData?.message ||
             cashfreeData?.error ||
             "Unable to create Cashfree payment.",
+
+          details:
+            cashfreeData,
         },
         {
           status:
@@ -283,7 +260,7 @@ export async function POST(req: Request) {
       !cashfreeData?.payment_session_id
     ) {
       console.error(
-        "Missing payment_session_id:",
+        "Cashfree response missing payment_session_id:",
         cashfreeData
       );
 
@@ -293,6 +270,9 @@ export async function POST(req: Request) {
 
           error:
             "Cashfree payment session was not created.",
+
+          details:
+            cashfreeData,
         },
         {
           status: 500,
@@ -312,6 +292,11 @@ export async function POST(req: Request) {
      * =========================================================
      * CREATE PENDING RESERVATION
      * =========================================================
+     *
+     * The reservation starts as pending.
+     *
+     * Private access is granted only after
+     * Cashfree confirms the ₹2,000 payment.
      */
 
     const reservation =
@@ -395,8 +380,7 @@ export async function POST(req: Request) {
       amount:
         reservationFee,
 
-      testMode:
-        isTestMode,
+      cashfreeMode,
     });
   } catch (error) {
     console.error(
