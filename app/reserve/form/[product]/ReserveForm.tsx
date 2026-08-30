@@ -34,6 +34,12 @@ export default function ReserveForm({
   const [isLoading, setIsLoading] =
     useState(false);
 
+  /*
+   * ==========================================
+   * SESSION LOADING
+   * ==========================================
+   */
+
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -42,19 +48,38 @@ export default function ReserveForm({
     );
   }
 
+  /*
+   * ==========================================
+   * REQUIRE LOGIN
+   * ==========================================
+   */
+
   if (!session) {
     signIn(undefined, {
-      callbackUrl: window.location.pathname,
+      callbackUrl:
+        window.location.pathname,
     });
 
     return null;
   }
+
+  /*
+   * ==========================================
+   * CUSTOMER INFORMATION
+   * ==========================================
+   */
 
   const userName =
     session.user?.name ?? "";
 
   const userEmail =
     session.user?.email ?? "";
+
+  /*
+   * ==========================================
+   * PRODUCT NAME
+   * ==========================================
+   */
 
   const productName =
     product === "crimson-rose"
@@ -67,17 +92,32 @@ export default function ReserveForm({
       ? "Sunset Lilac"
       : "Selected Piece";
 
+  /*
+   * ==========================================
+   * SUBMIT RESERVATION
+   * ==========================================
+   */
+
   async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>
   ) {
     e.preventDefault();
 
+    /*
+     * Validate phone
+     */
+
     if (!phone.trim()) {
       alert(
         "Please enter your contact number."
       );
+
       return;
     }
+
+    /*
+     * Validate standard size
+     */
 
     if (
       fitPreference === "standard" &&
@@ -86,6 +126,7 @@ export default function ReserveForm({
       alert(
         "Please select your standard size."
       );
+
       return;
     }
 
@@ -93,10 +134,20 @@ export default function ReserveForm({
 
     try {
       /*
-       * Create the Cashfree order.
+       * ========================================
+       * CREATE RESERVATION + CASHFREE ORDER
+       * ========================================
+       *
+       * IMPORTANT:
+       *
+       * /api/reserve now handles BOTH:
+       *
+       * 1. Cashfree order creation
+       * 2. Pending reservation creation
        */
+
       const response = await fetch(
-        "/api/cashfree",
+        "/api/reserve",
         {
           method: "POST",
 
@@ -107,13 +158,23 @@ export default function ReserveForm({
 
           body: JSON.stringify({
             product,
-            fullName: userName,
-            email: userEmail,
+
+            fullName:
+              userName,
+
+            email:
+              userEmail,
+
             instagram,
+
             phone,
+
             fitPreference,
+
             standardSize,
+
             occasion,
+
             notes,
           }),
         }
@@ -122,12 +183,24 @@ export default function ReserveForm({
       const data =
         await response.json();
 
+      /*
+       * ========================================
+       * API ERROR
+       * ========================================
+       */
+
       if (!response.ok) {
         throw new Error(
           data.error ||
-            "Unable to create payment."
+            "Unable to create reservation."
         );
       }
+
+      /*
+       * ========================================
+       * PAYMENT SESSION CHECK
+       * ========================================
+       */
 
       if (
         !data.payment_session_id
@@ -138,21 +211,25 @@ export default function ReserveForm({
       }
 
       /*
-       * IMPORTANT:
+       * ========================================
+       * SAVE RESERVATION INFORMATION
+       * ========================================
        *
-       * Save the reservation BEFORE
-       * opening Cashfree.
+       * The payment-success page uses this
+       * to identify the selected product.
        *
-       * The payment-success page uses
-       * this to know which AVENOR piece
-       * was selected and display its
-       * cover image.
+       * We intentionally keep this in
+       * sessionStorage.
        */
+
       sessionStorage.setItem(
         "avenor_reservation",
         JSON.stringify({
           orderId:
             data.order_id,
+
+          reservationId:
+            data.reservation_id,
 
           product,
 
@@ -177,14 +254,19 @@ export default function ReserveForm({
       );
 
       /*
-       * Load Cashfree SDK if it is
-       * not already loaded.
+       * ========================================
+       * LOAD CASHFREE SDK
+       * ========================================
        */
+
       if (
         !(window as any).Cashfree
       ) {
         await new Promise<void>(
-          (resolve, reject) => {
+          (
+            resolve,
+            reject
+          ) => {
             const script =
               document.createElement(
                 "script"
@@ -211,8 +293,11 @@ export default function ReserveForm({
       }
 
       /*
-       * Initialize Cashfree.
+       * ========================================
+       * INITIALIZE CASHFREE
+       * ========================================
        */
+
       const cashfree =
         (window as any).Cashfree({
           mode:
@@ -224,13 +309,17 @@ export default function ReserveForm({
         });
 
       /*
-       * Open secure Cashfree checkout.
+       * ========================================
+       * OPEN CASHFREE CHECKOUT
+       * ========================================
        */
+
       await cashfree.checkout({
         paymentSessionId:
           data.payment_session_id,
 
-        redirectTarget: "_self",
+        redirectTarget:
+          "_self",
       });
     } catch (error) {
       console.error(
@@ -252,7 +341,9 @@ export default function ReserveForm({
     <main className="min-h-screen bg-[#FAF8F5] px-6 py-16">
       <div className="mx-auto max-w-2xl">
 
-        {/* HEADER */}
+        {/* ==========================================
+            HEADER
+        ========================================== */}
 
         <div className="mb-12 text-center">
 
@@ -271,23 +362,33 @@ export default function ReserveForm({
           </h1>
 
           <p className="mt-6 text-sm leading-8 text-gray-500">
-            You are reserving a studio
-            consultation for{" "}
+            You are requesting private
+            access to{" "}
             <strong>
               {productName}
-            </strong>.
-            Reservations are available
-            before the public release and
-            do not guarantee allocation.
+            </strong>
+            .
+          </p>
+
+          <p className="mt-4 text-sm leading-8 text-gray-500">
+            Your private-access reservation
+            is available before the public
+            release and gives you priority
+            access during the private
+            purchasing window.
           </p>
 
           <p className="mt-5 text-sm font-medium text-[#AF9685]">
-            Your studio slot is secured
+            Your private access is secured
             only after successful payment
             of the ₹2,000 reservation fee.
           </p>
 
         </div>
+
+        {/* ==========================================
+            FORM
+        ========================================== */}
 
         <form
           onSubmit={handleSubmit}
@@ -573,12 +674,14 @@ export default function ReserveForm({
 
           </div>
 
-          {/* RESERVATION FEE */}
+          {/* ==========================================
+              RESERVATION FEE
+          ========================================== */}
 
           <div className="border border-[#D9C9BC] bg-[#F7F5F2] p-6">
 
             <p className="text-xs uppercase tracking-[0.3em] text-[#AF9685]">
-              Studio Reservation Fee
+              Private Access Reservation
             </p>
 
             <p className="mt-4 text-sm leading-7 text-gray-600">
@@ -586,52 +689,55 @@ export default function ReserveForm({
               <strong>
                 ₹2,000 reservation fee
               </strong>{" "}
-              is required to secure
-              your studio slot.
+              is required to secure your
+              private access.
             </p>
 
             <p className="mt-3 text-sm leading-7 text-gray-600">
-              Your reservation will only
-              be confirmed once the
-              payment has been
-              successfully completed.
+              Your private access is
+              confirmed only after the
+              payment has been successfully
+              verified.
             </p>
 
             <p className="mt-3 text-sm leading-7 text-gray-600">
-              This fee is strictly{" "}
-              <strong>
-                non-refundable and
-                non-compensatory
-              </strong>.
+              Once confirmed, you receive
+              priority access to this piece
+              during its private purchasing
+              window before the public
+              release.
             </p>
 
             <p className="mt-3 text-sm leading-7 text-gray-600">
-              Your slot is being opened
-              to you before the public
-              release, providing
-              priority access to the
-              collection.
+              If the piece becomes fully
+              sold out during the private
+              purchasing window before you
+              are able to purchase it, your
+              ₹2,000 reservation fee will be
+              returned.
             </p>
 
             <p className="mt-3 text-sm leading-7 text-gray-600">
-              If you miss your reserved
-              slot, the reservation fee
-              will be forfeited and
-              cannot be refunded,
-              transferred, or compensated.
+              If you choose not to purchase
+              while your private purchasing
+              window is open, the reservation
+              fee is not refundable.
             </p>
 
             <p className="mt-4 text-xs leading-6 tracking-[0.08em] text-gray-400">
-              Reservation does not
-              guarantee garment
-              allocation or purchase.
-              All pieces remain limited
-              and subject to availability.
+              Private access does not
+              guarantee that a piece will
+              remain available. Quantities
+              are strictly limited and
+              allocations are subject to
+              availability.
             </p>
 
           </div>
 
-          {/* PAYMENT BUTTON */}
+          {/* ==========================================
+              PAYMENT BUTTON
+          ========================================== */}
 
           <button
             type="submit"
@@ -659,12 +765,18 @@ export default function ReserveForm({
 
         </form>
 
+        {/* ==========================================
+            FOOTER
+        ========================================== */}
+
         <p className="mt-10 text-center text-xs leading-6 tracking-[0.15em] text-gray-400">
-          Studio reservations close 48
-          hours before the public release.
-          Once reservations close, the
-          collection becomes available to
-          all clients and pieces may sell out.
+          Private access closes before
+          the collection enters its private
+          purchasing window.
+          <br />
+          Once the private window ends,
+          the collection may open publicly
+          and pieces may sell out.
         </p>
 
       </div>
