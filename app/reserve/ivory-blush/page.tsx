@@ -140,8 +140,7 @@ export default function IvoryBlushReservationPage() {
         const data =
           await response.json();
 
-        const reservations:
-          Reservation[] =
+        const reservations: Reservation[] =
           data.reservations ?? [];
 
         const confirmed =
@@ -203,8 +202,6 @@ export default function IvoryBlushReservationPage() {
    * =========================================================
    * PHASE 1 — PRIVATE ACCESS
    * =========================================================
-   *
-   * Anyone can apply for private access.
    */
 
   if (
@@ -224,10 +221,6 @@ export default function IvoryBlushReservationPage() {
    * =========================================================
    * PHASE 2 — PRIVATE PURCHASE
    * =========================================================
-   *
-   * Only customers with confirmed
-   * private access should be able
-   * to purchase.
    */
 
   if (
@@ -249,8 +242,15 @@ export default function IvoryBlushReservationPage() {
       buttonText =
         "Claim Private Allocation";
 
+      /*
+       * Use the fixed route instead of
+       * product.id so TypeScript cannot
+       * complain about product possibly
+       * being undefined.
+       */
+
       buttonHref =
-        `/product/${product.id}`;
+        "/product/ivory-blush";
 
       buttonDisabled = false;
     } else {
@@ -275,7 +275,7 @@ export default function IvoryBlushReservationPage() {
       "Acquire From Collection";
 
     buttonHref =
-      `/product/${product.id}`;
+      "/product/ivory-blush";
 
     buttonDisabled = false;
   }
