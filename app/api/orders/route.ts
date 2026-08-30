@@ -5,17 +5,48 @@ import {
   sendOrderConfirmationEmail,
 } from "@/lib/mailer";
 
+/*
+ * =========================================================
+ * CREATE / SAVE ORDER
+ * =========================================================
+ *
+ * This endpoint saves the ACTUAL GARMENT PURCHASE
+ * in MongoDB.
+ *
+ * It is NOT the ₹2,000 reservation.
+ *
+ * Reservation:
+ *   Reservation model
+ *
+ * Actual garment purchase:
+ *   Order model
+ *
+ * IMPORTANT:
+ * The payment should already have been verified
+ * before creating the order.
+ */
+
 export async function POST(req: Request) {
   try {
     await connectDB();
 
     const body = await req.json();
 
-    if (!body.orderNumber) {
+    /*
+     * =======================================================
+     * VALIDATE REQUIRED INFORMATION
+     * =======================================================
+     */
+
+    if (
+      !body.orderNumber ||
+      typeof body.orderNumber !== "string"
+    ) {
       return NextResponse.json(
         {
           success: false,
-          message: "Order number is required",
+          message:
+            "Order number is required.",
         },
         {
           status: 400,
@@ -23,8 +54,72 @@ export async function POST(req: Request) {
       );
     }
 
-    // ✅ Prevent duplicate orders
-    if (body.cashfreeOrderId) {
+    if (
+      !body.customerEmail ||
+      typeof body.customerEmail !== "string"
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Customer email is required.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    if (
+      !Array.isArray(body.items) ||
+      body.items.length === 0
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Order items are required.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    /*
+     * =======================================================
+     * NORMALIZE CUSTOMER DATA
+     * =======================================================
+     */
+
+    const customerEmail =
+      body.customerEmail
+        .trim()
+        .toLowerCase();
+
+    const customerName =
+      typeof body.customerName === "string"
+        ? body.customerName.trim()
+        : "";
+
+    const customerPhone =
+      typeof body.customerPhone === "string"
+        ? body.customerPhone.trim()
+        : "";
+
+    /*
+     * =======================================================
+     * PREVENT DUPLICATE ORDERS
+     * =======================================================
+     *
+     * If the same Cashfree order has already been
+     * successfully saved, return the existing order.
+     */
+
+    if (
+      body.cashfreeOrderId &&
+      typeof body.cashfreeOrderId === "string"
+    ) {
       const existingOrder =
         await Order.findOne({
           cashfreeOrderId:
@@ -35,70 +130,117 @@ export async function POST(req: Request) {
         return NextResponse.json({
           success: true,
           order: existingOrder,
+          alreadyExists: true,
           message:
-            "Order already exists",
+            "Order already exists.",
         });
       }
     }
 
-    const order = await Order.create({
-      orderNumber: body.orderNumber,
+    /*
+     * =======================================================
+     * CREATE ORDER
+     * =======================================================
+     *
+     * This represents the ACTUAL PRODUCT PURCHASE.
+     */
 
-      cashfreeOrderId:
-        body.cashfreeOrderId,
+    const order =
+      await Order.create({
+        orderNumber:
+          body.orderNumber.trim(),
 
-      customerEmail:
-        body.customerEmail,
+        /*
+         * Cashfree ID is optional because
+         * the database should not crash if
+         * an order was created through another
+         * payment method in the future.
+         */
 
-      customerName:
-        body.customerName,
+        cashfreeOrderId:
+          body.cashfreeOrderId || "",
 
-      customerPhone:
-        body.customerPhone,
+        customerEmail,
 
-      shippingAddress:
-        body.shippingAddress,
+        customerName,
 
-      items: body.items,
+        customerPhone,
 
-      total: body.total,
+        shippingAddress:
+          body.shippingAddress,
 
-      paymentStatus:
-        body.paymentStatus || "PAID",
-    });
+        items:
+          body.items,
 
-    // Send confirmation email
-    if (body.customerEmail) {
-      try {
-        await sendOrderConfirmationEmail({
-          customerEmail:
-            body.customerEmail,
+        total:
+          Number(body.total) || 0,
 
-          customerName:
-            body.customerName ||
-            "Customer",
+        /*
+         * IMPORTANT:
+         *
+         * This endpoint should normally only be
+         * called AFTER payment has been verified.
+         *
+         * Defaulting to PAID keeps compatibility
+         * with your existing checkout flow.
+         */
 
-          orderNumber:
-            body.orderNumber,
+        paymentStatus:
+          body.paymentStatus ||
+          "PAID",
+      });
 
-          items:
-            body.items || [],
+    /*
+     * =======================================================
+     * SEND ORDER CONFIRMATION EMAIL
+     * =======================================================
+     *
+     * Email failure must NOT delete the order.
+     */
 
-          total:
-            body.total || 0,
-        });
-      } catch (emailError) {
-        console.error(
-          "Order email error:",
-          emailError
-        );
-      }
+    try {
+      await sendOrderConfirmationEmail({
+        customerEmail,
+
+        customerName:
+          customerName ||
+          "Customer",
+
+        orderNumber:
+          order.orderNumber,
+
+        items:
+          body.items || [],
+
+        total:
+          Number(body.total) || 0,
+      });
+
+      console.log(
+        `Order confirmation email sent: ${order.orderNumber}`
+      );
+    } catch (emailError) {
+      console.error(
+        "Order confirmation email failed:",
+        emailError
+      );
     }
 
-    return NextResponse.json({
-      success: true,
-      order,
-    });
+    /*
+     * =======================================================
+     * RETURN CREATED ORDER
+     * =======================================================
+     */
+
+    return NextResponse.json(
+      {
+        success: true,
+        order,
+      },
+      {
+        status: 201,
+      }
+    );
   } catch (error) {
     console.error(
       "Order save error:",
@@ -109,7 +251,7 @@ export async function POST(req: Request) {
       {
         success: false,
         message:
-          "Failed to save order",
+          "Failed to save order.",
       },
       {
         status: 500,
@@ -117,6 +259,19 @@ export async function POST(req: Request) {
     );
   }
 }
+
+
+/*
+ * =========================================================
+ * GET CUSTOMER ORDERS
+ * =========================================================
+ *
+ * Used by:
+ *
+ * /account/orders
+ *
+ * to retrieve the customer's actual purchases.
+ */
 
 export async function GET(req: Request) {
   try {
@@ -128,12 +283,15 @@ export async function GET(req: Request) {
     const email =
       searchParams.get("email");
 
-    if (!email) {
+    if (
+      !email ||
+      typeof email !== "string"
+    ) {
       return NextResponse.json(
         {
           success: false,
           message:
-            "Email is required",
+            "Email is required.",
         },
         {
           status: 400,
@@ -141,11 +299,17 @@ export async function GET(req: Request) {
       );
     }
 
-    const orders = await Order.find({
-      customerEmail: email,
-    }).sort({
-      createdAt: -1,
-    });
+    const customerEmail =
+      email
+        .trim()
+        .toLowerCase();
+
+    const orders =
+      await Order.find({
+        customerEmail,
+      }).sort({
+        createdAt: -1,
+      });
 
     return NextResponse.json({
       success: true,
@@ -161,7 +325,7 @@ export async function GET(req: Request) {
       {
         success: false,
         message:
-          "Failed to fetch orders",
+          "Failed to fetch orders.",
       },
       {
         status: 500,
