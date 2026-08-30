@@ -10,6 +10,12 @@ export async function GET(req: Request) {
     const email =
       searchParams.get("email");
 
+    /*
+     * =========================================================
+     * VALIDATE EMAIL
+     * =========================================================
+     */
+
     if (!email) {
       return NextResponse.json(
         {
@@ -22,16 +28,50 @@ export async function GET(req: Request) {
       );
     }
 
+    const normalizedEmail =
+      email.trim().toLowerCase();
+
+    /*
+     * =========================================================
+     * CONNECT DATABASE
+     * =========================================================
+     */
+
     await connectDB();
+
+    /*
+     * =========================================================
+     * GET RESERVATIONS
+     * =========================================================
+     *
+     * The complete reservation document is returned.
+     *
+     * This includes:
+     *
+     * paymentStatus
+     * status
+     * product
+     * reservationFee
+     * cashfreeOrderId
+     * email
+     * fullName
+     * etc.
+     */
 
     const reservations =
       await Reservation.find({
-        email: email.toLowerCase(),
+        email: normalizedEmail,
       })
         .sort({
           createdAt: -1,
         })
         .lean();
+
+    /*
+     * =========================================================
+     * RESPONSE
+     * =========================================================
+     */
 
     return NextResponse.json({
       success: true,
