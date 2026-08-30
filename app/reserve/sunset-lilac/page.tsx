@@ -37,8 +37,93 @@ export default function SunsetLilacReservationPage() {
 
   /*
    * =========================================================
+   * CHECK PRIVATE ACCESS
+   * =========================================================
+   *
+   * Private access requires:
+   *
+   * paymentStatus === "confirmed"
+   * AND
+   * status === "confirmed"
+   */
+
+  useEffect(() => {
+    if (sessionStatus === "loading") {
+      return;
+    }
+
+    const email =
+      session?.user?.email ?? "";
+
+    if (!email) {
+      setHasPrivateAccess(false);
+      setCheckingAccess(false);
+      return;
+    }
+
+    async function checkPrivateAccess() {
+      try {
+        setCheckingAccess(true);
+
+        const response = await fetch(
+          `/api/reservations?email=${encodeURIComponent(
+            email
+          )}`,
+          {
+            cache: "no-store",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            "Unable to check private access."
+          );
+        }
+
+        const data =
+          await response.json();
+
+        const reservations: Reservation[] =
+          data.reservations ?? [];
+
+        const confirmed =
+          reservations.some(
+            (reservation) =>
+              reservation.product ===
+                "sunset-lilac" &&
+              reservation.paymentStatus ===
+                "confirmed" &&
+              reservation.status ===
+                "confirmed"
+          );
+
+        setHasPrivateAccess(
+          confirmed
+        );
+      } catch (error) {
+        console.error(
+          "Sunset Lilac private access check error:",
+          error
+        );
+
+        setHasPrivateAccess(false);
+      } finally {
+        setCheckingAccess(false);
+      }
+    }
+
+    checkPrivateAccess();
+  }, [
+    session,
+    sessionStatus,
+  ]);
+
+  /*
+   * =========================================================
    * PRODUCT SAFETY CHECK
    * =========================================================
+   *
+   * Array.find() can return undefined.
    */
 
   if (!product) {
@@ -94,90 +179,6 @@ export default function SunsetLilacReservationPage() {
 
   /*
    * =========================================================
-   * CHECK PRIVATE ACCESS
-   * =========================================================
-   *
-   * Private access requires:
-   *
-   * paymentStatus === "confirmed"
-   * AND
-   * status === "confirmed"
-   */
-
-  useEffect(() => {
-    if (sessionStatus === "loading") {
-      return;
-    }
-
-    const email =
-      session?.user?.email ?? "";
-
-    if (!email) {
-      setHasPrivateAccess(false);
-      setCheckingAccess(false);
-      return;
-    }
-
-    async function checkPrivateAccess() {
-      try {
-        setCheckingAccess(true);
-
-        const response = await fetch(
-          `/api/reservations?email=${encodeURIComponent(
-            email
-          )}`,
-          {
-            cache: "no-store",
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            "Unable to check private access."
-          );
-        }
-
-        const data =
-          await response.json();
-
-        const reservations:
-          Reservation[] =
-          data.reservations ?? [];
-
-        const confirmed =
-          reservations.some(
-            (reservation) =>
-              reservation.product ===
-                "sunset-lilac" &&
-              reservation.paymentStatus ===
-                "confirmed" &&
-              reservation.status ===
-                "confirmed"
-          );
-
-        setHasPrivateAccess(
-          confirmed
-        );
-      } catch (error) {
-        console.error(
-          "Sunset Lilac private access check error:",
-          error
-        );
-
-        setHasPrivateAccess(false);
-      } finally {
-        setCheckingAccess(false);
-      }
-    }
-
-    checkPrivateAccess();
-  }, [
-    session,
-    sessionStatus,
-  ]);
-
-  /*
-   * =========================================================
    * COLLECTION PHASE
    * =========================================================
    */
@@ -201,7 +202,7 @@ export default function SunsetLilacReservationPage() {
 
   /*
    * =========================================================
-   * PRIVATE ACCESS
+   * PHASE 1 — PRIVATE ACCESS
    * =========================================================
    */
 
@@ -220,7 +221,7 @@ export default function SunsetLilacReservationPage() {
 
   /*
    * =========================================================
-   * PRIVATE PURCHASE
+   * PHASE 2 — PRIVATE PURCHASE
    * =========================================================
    */
 
@@ -243,8 +244,15 @@ export default function SunsetLilacReservationPage() {
       buttonText =
         "Claim Private Allocation";
 
+      /*
+       * Fixed route.
+       *
+       * This avoids TypeScript's possible
+       * undefined warning from product.id.
+       */
+
       buttonHref =
-        `/product/${product.id}`;
+        "/product/sunset-lilac";
 
       buttonDisabled = false;
     } else {
@@ -257,7 +265,7 @@ export default function SunsetLilacReservationPage() {
 
   /*
    * =========================================================
-   * PUBLIC
+   * PHASE 3 — PUBLIC
    * =========================================================
    */
 
@@ -269,14 +277,14 @@ export default function SunsetLilacReservationPage() {
       "Acquire From Collection";
 
     buttonHref =
-      `/product/${product.id}`;
+      "/product/sunset-lilac";
 
     buttonDisabled = false;
   }
 
   /*
    * =========================================================
-   * SOLD OUT
+   * PHASE 4 — SOLD OUT
    * =========================================================
    */
 
