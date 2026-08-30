@@ -20,10 +20,6 @@ export default function CrimsonRoseReservationPage() {
    * =========================================================
    * PRODUCT SAFETY CHECK
    * =========================================================
-   *
-   * Array.find() can technically return undefined.
-   * Handle that before accessing product.id,
-   * product.name, etc.
    */
 
   if (!product) {
@@ -88,7 +84,7 @@ export default function CrimsonRoseReservationPage() {
 
   /*
    * =========================================================
-   * BUTTON
+   * BUTTON STATE
    * =========================================================
    */
 
@@ -127,11 +123,8 @@ export default function CrimsonRoseReservationPage() {
    * PRIVATE PURCHASE
    * =========================================================
    *
-   * The reservation page itself does not
-   * grant purchase access.
-   *
-   * The authenticated product page handles
-   * the private-access verification.
+   * The actual authenticated purchase
+   * flow is handled by the product page.
    */
 
   if (
@@ -142,7 +135,7 @@ export default function CrimsonRoseReservationPage() {
       "Private Allocation Window";
 
     buttonHref =
-      `/product/${product.id}`;
+      "/product/crimson-rose";
 
     buttonDisabled = false;
   }
@@ -161,7 +154,7 @@ export default function CrimsonRoseReservationPage() {
       "Acquire From Collection";
 
     buttonHref =
-      `/product/${product.id}`;
+      "/product/crimson-rose";
 
     buttonDisabled = false;
   }
