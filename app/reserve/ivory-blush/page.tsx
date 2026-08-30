@@ -353,7 +353,7 @@ export default function IvoryBlushReservationPage() {
       hasPrivateAccess
     ) {
       buttonText =
-        "Private Access Reserved";
+        "View Your Reservation";
 
       /*
        * Do NOT send the customer
