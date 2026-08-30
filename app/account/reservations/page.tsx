@@ -4,13 +4,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
+import { products } from "@/lib/products";
 
 type ReservationStatus =
   | "pending"
   | "confirmed"
-  | "purchase_open"
   | "purchased"
-  | "sold_out";
+  | "refunded";
+
+type PaymentStatus =
+  | "pending"
+  | "confirmed"
+  | "purchased"
+  | "refunded"
+  | "closed";
 
 type Reservation = {
   _id: string;
@@ -19,35 +26,17 @@ type Reservation = {
   fullName?: string;
   email?: string;
   reservationFee: number;
-  paymentStatus: string;
+  paymentStatus: PaymentStatus | string;
   status?: ReservationStatus;
+  orderNumber?: string;
+  refundStatus?: string;
+  refundAmount?: number;
+  refundedAt?: string;
   createdAt?: string;
 };
 
-const productNames: Record<string, string> = {
-  "crimson-rose": "Crimson Rose",
-  "ivory-blush": "Ivory Blush",
-  "blue-crystal": "Blue Crystal",
-  "sunset-lilac": "Sunset Lilac",
-};
-
-const productImages: Record<string, string> = {
-  "crimson-rose":
-    "/products/crimson-rose/cover.jpg",
-
-  "ivory-blush":
-    "/products/ivory-blush/cover.jpg",
-
-  "blue-crystal":
-    "/products/blue-crystal/cover.JPG",
-
-  "sunset-lilac":
-    "/products/sunset-lilac/cover.jpg",
-};
-
 export default function ReservationsPage() {
-  const { data: session, status } =
-    useSession();
+  const { data: session, status } = useSession();
 
   const [reservations, setReservations] =
     useState<Reservation[]>([]);
@@ -59,12 +48,6 @@ export default function ReservationsPage() {
    * =========================================================
    * GET USER EMAIL SAFELY
    * =========================================================
-   *
-   * This prevents:
-   *
-   * "session is possibly null"
-   *
-   * during the Vercel TypeScript build.
    */
 
   const userEmail =
@@ -226,8 +209,8 @@ export default function ReservationsPage() {
 
               <p className="mt-5 text-sm leading-7 text-gray-500">
                 You do not have any
-                confirmed AVENOR studio
-                reservations yet.
+                AVENOR studio reservations
+                yet.
               </p>
 
               <Link
@@ -266,68 +249,159 @@ export default function ReservationsPage() {
               {reservations.map(
                 (reservation) => {
 
-                  const name =
-                    productNames[
-                      reservation.product
-                    ] ??
-                    "Selected Piece";
-
-                  const image =
-                    productImages[
-                      reservation.product
-                    ];
-
                   /*
                    * =================================================
-                   * RESERVATION STATE
+                   * FIND PRODUCT
                    * =================================================
                    */
 
-                  const isPaymentSuccessful =
-                    reservation.paymentStatus ===
-                    "success";
-
-                  const reservationStatus =
-                    reservation.status ??
-                    (
-                      isPaymentSuccessful
-                        ? "confirmed"
-                        : "pending"
+                  const product =
+                    products.find(
+                      (item) =>
+                        item.id ===
+                        reservation.product
                     );
 
-                  const isConfirmed =
-                    isPaymentSuccessful &&
-                    reservationStatus ===
-                      "confirmed";
+                  /*
+                   * If the product no longer
+                   * exists in products.ts,
+                   * don't break the page.
+                   */
 
-                  const isPurchaseOpen =
-                    isPaymentSuccessful &&
-                    reservationStatus ===
-                      "purchase_open";
+                  if (!product) {
+                    return (
+                      <div
+                        key={
+                          reservation._id
+                        }
+                        className="
+                          border
+                          border-[#D9C9BC]
+                          bg-white
+                          p-8
+                        "
+                      >
+                        <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
+                          Reservation
+                        </p>
 
-                  const isPurchased =
-                    reservationStatus ===
-                    "purchased";
-
-                  const isSoldOut =
-                    reservationStatus ===
-                    "sold_out";
+                        <p className="mt-4 text-sm text-gray-500">
+                          This reserved piece
+                          is no longer available
+                          in the collection.
+                        </p>
+                      </div>
+                    );
+                  }
 
                   /*
                    * =================================================
-                   * RESERVATION PAGE
+                   * PAYMENT / RESERVATION STATE
                    * =================================================
                    *
-                   * Example:
+                   * IMPORTANT:
                    *
-                   * /reserve/ivory-blush
-                   * /reserve/crimson-rose
-                   * /reserve/blue-crystal
-                   * /reserve/sunset-lilac
+                   * Your new schema uses:
+                   *
+                   * paymentStatus:
+                   * pending
+                   * confirmed
+                   * purchased
+                   * refunded
+                   * closed
+                   *
+                   * reservation status:
+                   * pending
+                   * confirmed
+                   * purchased
+                   * refunded
                    */
 
-                  const reservationUrl =
-                    `/reserve/${reservation.product}`;
+                  const hasPrivateAccess =
+                    reservation.paymentStatus ===
+                      "confirmed" &&
+                    reservation.status ===
+                      "confirmed";
+
+                  const isPurchased =
+                    reservation.status ===
+                    "purchased";
+
+                  const isRefunded =
+                    reservation.status ===
+                    "refunded" ||
+                    reservation.paymentStatus ===
+                    "refunded";
+
+                  const isPending =
+                    !hasPrivateAccess &&
+                    !isPurchased &&
+                    !isRefunded;
+
+                  /*
+                   * =================================================
+                   * COLLECTION PHASE
+                   * =================================================
+                   *
+                   * This comes from lib/products.ts.
+                   *
+                   * private_access
+                   * private_purchase
+                   * public
+                   * sold_out
+                   */
+
+                  const phase =
+                    product.collectionPhase;
+
+                  /*
+                   * =================================================
+                   * PRIVATE PURCHASE
+                   * =================================================
+                   *
+                   * Only customers with confirmed
+                   * private access can purchase.
+                   */
+
+                  const privatePurchaseAvailable =
+                    phase ===
+                      "private_purchase" &&
+                    hasPrivateAccess;
+
+                  /*
+                   * =================================================
+                   * PUBLIC PURCHASE
+                   * =================================================
+                   *
+                   * Everyone can purchase during
+                   * the public phase.
+                   */
+
+                  const publicPurchaseAvailable =
+                    phase === "public";
+
+                  /*
+                   * =================================================
+                   * SOLD OUT
+                   * =================================================
+                   */
+
+                  const editionExhausted =
+                    phase === "sold_out";
+
+                  /*
+                   * =================================================
+                   * RESERVATION WINDOW
+                   * =================================================
+                   *
+                   * Customer has reserved but
+                   * collection is not yet open.
+                   */
+
+                  const waitingForPrivateWindow =
+                    phase ===
+                      "private_access" &&
+                    hasPrivateAccess;
 
                   /*
                    * =================================================
@@ -341,20 +415,43 @@ export default function ReservationsPage() {
                   let description =
                     "Your reservation payment is still being processed.";
 
-                  if (isConfirmed) {
+                  if (hasPrivateAccess) {
                     statusLabel =
                       "Private Access Confirmed";
 
                     description =
-                      "Your private studio access for this AVENOR piece has been confirmed.";
+                      "Your ₹2,000 studio reservation has been confirmed. You have priority access to this piece.";
                   }
 
-                  if (isPurchaseOpen) {
+                  if (
+                    privatePurchaseAvailable
+                  ) {
                     statusLabel =
                       "Private Collection Access";
 
                     description =
-                      "Your reserved piece is now available for private purchase.";
+                      "Your private purchasing window is now open. This piece is available exclusively to confirmed private-access clients.";
+                  }
+
+                  if (
+                    waitingForPrivateWindow
+                  ) {
+                    statusLabel =
+                      "Private Access Secured";
+
+                    description =
+                      "Your private access is confirmed. Your purchasing window will open during the private collection release.";
+                  }
+
+                  if (
+                    publicPurchaseAvailable &&
+                    hasPrivateAccess
+                  ) {
+                    statusLabel =
+                      "Collection Now Open";
+
+                    description =
+                      "The collection is now publicly available. Your private access has already been secured.";
                   }
 
                   if (isPurchased) {
@@ -362,15 +459,23 @@ export default function ReservationsPage() {
                       "Purchased";
 
                     description =
-                      "This reserved AVENOR piece has been purchased.";
+                      "This AVENOR piece has been successfully purchased.";
                   }
 
-                  if (isSoldOut) {
+                  if (editionExhausted) {
                     statusLabel =
-                      "Out of Stock";
+                      "Edition Exhausted";
 
                     description =
-                      "This piece is no longer available for purchase.";
+                      "This limited edition has sold out and is no longer available for purchase.";
+                  }
+
+                  if (isRefunded) {
+                    statusLabel =
+                      "Reservation Refunded";
+
+                    description =
+                      "Your private reservation opportunity has ended and your reservation fee has been marked for refund.";
                   }
 
                   /*
@@ -379,14 +484,252 @@ export default function ReservationsPage() {
                    * =================================================
                    */
 
-                  const statusClass =
-                    isPurchaseOpen
-                      ? "text-[#8C9A78]"
-                      : isPurchased
-                      ? "text-[#8C9A78]"
-                      : isSoldOut
-                      ? "text-gray-400"
-                      : "text-[#AF9685]";
+                  let statusClass =
+                    "text-[#AF9685]";
+
+                  if (
+                    privatePurchaseAvailable ||
+                    publicPurchaseAvailable ||
+                    isPurchased
+                  ) {
+                    statusClass =
+                      "text-[#8C9A78]";
+                  }
+
+                  if (
+                    editionExhausted ||
+                    isRefunded
+                  ) {
+                    statusClass =
+                      "text-gray-400";
+                  }
+
+                  /*
+                   * =================================================
+                   * ACTION
+                   * =================================================
+                   */
+
+                  let action = null;
+
+                  /*
+                   * PRIVATE PURCHASE
+                   *
+                   * Confirmed private-access
+                   * customer gets:
+                   *
+                   * CLAIM PRIVATE ALLOCATION
+                   */
+
+                  if (
+                    privatePurchaseAvailable
+                  ) {
+                    action = (
+                      <Link
+                        href={`/product/${product.id}`}
+                        className="
+                          mt-8
+                          inline-block
+                          border
+                          border-[#AF9685]
+                          px-10
+                          py-4
+                          text-xs
+                          uppercase
+                          tracking-[0.3em]
+                          text-[#AF9685]
+                          transition-all
+                          duration-300
+                          hover:bg-[#AF9685]
+                          hover:text-white
+                        "
+                      >
+                        Claim Private Allocation
+                      </Link>
+                    );
+                  }
+
+                  /*
+                   * PUBLIC
+                   *
+                   * Anyone can purchase.
+                   */
+
+                  else if (
+                    publicPurchaseAvailable
+                  ) {
+                    action = (
+                      <Link
+                        href={`/product/${product.id}`}
+                        className="
+                          mt-8
+                          inline-block
+                          border
+                          border-[#AF9685]
+                          px-10
+                          py-4
+                          text-xs
+                          uppercase
+                          tracking-[0.3em]
+                          text-[#AF9685]
+                          transition-all
+                          duration-300
+                          hover:bg-[#AF9685]
+                          hover:text-white
+                        "
+                      >
+                        Acquire From Collection
+                      </Link>
+                    );
+                  }
+
+                  /*
+                   * SOLD OUT
+                   */
+
+                  else if (
+                    editionExhausted
+                  ) {
+                    action = (
+                      <span
+                        className="
+                          mt-8
+                          inline-block
+                          border
+                          border-gray-300
+                          px-10
+                          py-4
+                          text-xs
+                          uppercase
+                          tracking-[0.3em]
+                          text-gray-400
+                        "
+                      >
+                        Edition Exhausted
+                      </span>
+                    );
+                  }
+
+                  /*
+                   * PURCHASED
+                   */
+
+                  else if (isPurchased) {
+                    action = (
+                      <Link
+                        href="/account/orders"
+                        className="
+                          mt-8
+                          inline-block
+                          border
+                          border-[#AF9685]
+                          px-10
+                          py-4
+                          text-xs
+                          uppercase
+                          tracking-[0.3em]
+                          text-[#AF9685]
+                          transition-all
+                          duration-300
+                          hover:bg-[#AF9685]
+                          hover:text-white
+                        "
+                      >
+                        View Order
+                      </Link>
+                    );
+                  }
+
+                  /*
+                   * REFUNDED
+                   */
+
+                  else if (isRefunded) {
+                    action = (
+                      <span
+                        className="
+                          mt-8
+                          inline-block
+                          border
+                          border-gray-300
+                          px-10
+                          py-4
+                          text-xs
+                          uppercase
+                          tracking-[0.3em]
+                          text-gray-400
+                        "
+                      >
+                        Reservation Closed
+                      </span>
+                    );
+                  }
+
+                  /*
+                   * PRIVATE ACCESS PHASE
+                   *
+                   * They have reserved,
+                   * but the private purchasing
+                   * window has not opened yet.
+                   */
+
+                  else if (
+                    waitingForPrivateWindow
+                  ) {
+                    action = (
+                      <Link
+                        href={`/reserve/${product.id}`}
+                        className="
+                          mt-8
+                          inline-block
+                          border
+                          border-[#AF9685]
+                          px-10
+                          py-4
+                          text-xs
+                          uppercase
+                          tracking-[0.3em]
+                          text-[#AF9685]
+                          transition-all
+                          duration-300
+                          hover:bg-[#AF9685]
+                          hover:text-white
+                        "
+                      >
+                        View Private Access
+                      </Link>
+                    );
+                  }
+
+                  /*
+                   * PENDING PAYMENT
+                   */
+
+                  else if (isPending) {
+                    action = (
+                      <Link
+                        href={`/reserve/${product.id}`}
+                        className="
+                          mt-8
+                          inline-block
+                          border
+                          border-[#AF9685]
+                          px-10
+                          py-4
+                          text-xs
+                          uppercase
+                          tracking-[0.3em]
+                          text-[#AF9685]
+                          transition-all
+                          duration-300
+                          hover:bg-[#AF9685]
+                          hover:text-white
+                        "
+                      >
+                        View Reservation
+                      </Link>
+                    );
+                  }
 
                   return (
                     <div
@@ -408,7 +751,7 @@ export default function ReservationsPage() {
                         {/* ================================================= */}
 
                         <Link
-                          href={reservationUrl}
+                          href={`/product/${product.id}`}
                           className="
                             relative
                             block
@@ -419,20 +762,22 @@ export default function ReservationsPage() {
                           "
                         >
 
-                          {image && (
-                            <Image
-                              src={image}
-                              alt={name}
-                              fill
-                              sizes="(max-width: 768px) 100vw, 280px"
-                              className="
-                                object-contain
-                                transition-transform
-                                duration-500
-                                hover:scale-[1.02]
-                              "
-                            />
-                          )}
+                          <Image
+                            src={
+                              product.coverImage
+                            }
+                            alt={
+                              product.name
+                            }
+                            fill
+                            sizes="(max-width: 768px) 100vw, 280px"
+                            className="
+                              object-contain
+                              transition-transform
+                              duration-500
+                              hover:scale-[1.02]
+                            "
+                          />
 
                         </Link>
 
@@ -469,8 +814,14 @@ export default function ReservationsPage() {
                                 '"Cormorant Garamond", serif',
                             }}
                           >
-                            {name}
+                            {product.name}
                           </h2>
+
+                          {/* PRODUCT TYPE */}
+
+                          <p className="mt-3 text-xs uppercase tracking-[0.25em] text-gray-400">
+                            {product.type}
+                          </p>
 
                           {/* DESCRIPTION */}
 
@@ -479,66 +830,218 @@ export default function ReservationsPage() {
                           </p>
 
                           {/* ================================================= */}
-                          {/* PURCHASE OPEN NOTICE */}
+                          {/* PRIVATE PURCHASE NOTICE */}
                           {/* ================================================= */}
 
-                          {isPurchaseOpen && (
-                            <div className="mt-7 border border-[#D9C9BC] bg-[#F7F5F2] p-6">
+                          {privatePurchaseAvailable && (
+                            <div
+                              className="
+                                mt-7
+                                border
+                                border-[#D9C9BC]
+                                bg-[#F7F5F2]
+                                p-6
+                              "
+                            >
 
                               <p className="text-xs uppercase tracking-[0.3em] text-[#AF9685]">
                                 Reserved For You
                               </p>
 
                               <p className="mt-4 text-sm leading-7 text-gray-600">
-                                Your private purchasing
-                                window is now open.
-                                This piece has been
-                                reserved for your
-                                priority access.
+                                Your private
+                                purchasing window
+                                is now open.
+                              </p>
+
+                              <p className="mt-3 text-sm leading-7 text-gray-500">
+                                Confirmed private
+                                access clients
+                                are being
+                                prioritised before
+                                this piece is
+                                released publicly.
                               </p>
 
                             </div>
                           )}
 
                           {/* ================================================= */}
-                          {/* PURCHASED NOTICE */}
+                          {/* PRIVATE ACCESS WAITING */}
+                          {/* ================================================= */}
+
+                          {waitingForPrivateWindow && (
+                            <div
+                              className="
+                                mt-7
+                                border
+                                border-[#D9C9BC]
+                                bg-[#F7F5F2]
+                                p-6
+                              "
+                            >
+
+                              <p className="text-xs uppercase tracking-[0.3em] text-[#AF9685]">
+                                Private Access Secured
+                              </p>
+
+                              <p className="mt-4 text-sm leading-7 text-gray-600">
+                                Your reservation
+                                has been
+                                successfully
+                                confirmed.
+                              </p>
+
+                              <p className="mt-3 text-sm leading-7 text-gray-500">
+                                You will receive
+                                priority access
+                                when the private
+                                purchasing window
+                                opens.
+                              </p>
+
+                            </div>
+                          )}
+
+                          {/* ================================================= */}
+                          {/* PUBLIC RELEASE */}
+                          {/* ================================================= */}
+
+                          {publicPurchaseAvailable && (
+                            <div
+                              className="
+                                mt-7
+                                border
+                                border-[#D9C9BC]
+                                bg-[#F7F5F2]
+                                p-6
+                              "
+                            >
+
+                              <p className="text-xs uppercase tracking-[0.3em] text-[#8C9A78]">
+                                Collection Open
+                              </p>
+
+                              <p className="mt-4 text-sm leading-7 text-gray-600">
+                                The collection
+                                is now open to
+                                all clients.
+                              </p>
+
+                            </div>
+                          )}
+
+                          {/* ================================================= */}
+                          {/* SOLD OUT */}
+                          {/* ================================================= */}
+
+                          {editionExhausted && (
+                            <div
+                              className="
+                                mt-7
+                                border
+                                border-[#E5E5E5]
+                                bg-[#FAFAFA]
+                                p-6
+                              "
+                            >
+
+                              <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
+                                Edition Exhausted
+                              </p>
+
+                              <p className="mt-4 text-sm leading-7 text-gray-500">
+                                This limited
+                                edition has been
+                                fully allocated
+                                and is no longer
+                                available for
+                                purchase.
+                              </p>
+
+                            </div>
+                          )}
+
+                          {/* ================================================= */}
+                          {/* PURCHASED */}
                           {/* ================================================= */}
 
                           {isPurchased && (
-                            <div className="mt-7 border border-[#D9C9BC] bg-[#F7F5F2] p-6">
+                            <div
+                              className="
+                                mt-7
+                                border
+                                border-[#D9C9BC]
+                                bg-[#F7F5F2]
+                                p-6
+                              "
+                            >
 
                               <p className="text-xs uppercase tracking-[0.3em] text-[#8C9A78]">
                                 Purchase Complete
                               </p>
 
                               <p className="mt-4 text-sm leading-7 text-gray-600">
-                                Thank you for
-                                purchasing your
-                                reserved AVENOR
-                                piece.
+                                Your reserved
+                                AVENOR piece has
+                                been purchased
+                                successfully.
                               </p>
+
+                              {reservation.orderNumber && (
+                                <p className="mt-4 text-xs tracking-[0.08em] text-gray-400">
+                                  Order:
+                                  {" "}
+                                  {
+                                    reservation.orderNumber
+                                  }
+                                </p>
+                              )}
 
                             </div>
                           )}
 
                           {/* ================================================= */}
-                          {/* SOLD OUT NOTICE */}
+                          {/* REFUNDED */}
                           {/* ================================================= */}
 
-                          {isSoldOut && (
-                            <div className="mt-7 border border-[#E5E5E5] bg-[#FAFAFA] p-6">
+                          {isRefunded && (
+                            <div
+                              className="
+                                mt-7
+                                border
+                                border-[#E5E5E5]
+                                bg-[#FAFAFA]
+                                p-6
+                              "
+                            >
 
                               <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
-                                Out of Stock
+                                Reservation Refunded
                               </p>
 
                               <p className="mt-4 text-sm leading-7 text-gray-500">
-                                This piece was not
-                                purchased during
-                                your private access
-                                window and is now
-                                unavailable.
+                                Your private
+                                purchasing
+                                opportunity has
+                                ended without a
+                                purchase.
                               </p>
+
+                              {reservation.refundAmount &&
+                                reservation.refundAmount >
+                                  0 && (
+                                  <p className="mt-4 text-xs tracking-[0.08em] text-gray-400">
+                                    Refund:
+                                    {" "}
+                                    ₹
+                                    {Number(
+                                      reservation.refundAmount
+                                    ).toLocaleString(
+                                      "en-IN"
+                                    )}
+                                  </p>
+                                )}
 
                             </div>
                           )}
@@ -549,7 +1052,7 @@ export default function ReservationsPage() {
 
                           <div className="mt-8 space-y-4 border-t border-[#eeeeee] pt-6">
 
-                            {/* FEE */}
+                            {/* RESERVATION FEE */}
 
                             <div className="flex justify-between gap-6 text-sm">
 
@@ -568,33 +1071,55 @@ export default function ReservationsPage() {
 
                             </div>
 
-                            {/* STATUS */}
+                            {/* CUSTOMER STATUS */}
 
                             <div className="flex justify-between gap-6 text-sm">
 
                               <span className="text-gray-400">
-                                Status
+                                Access
                               </span>
 
                               <span
                                 className={
-                                  isPurchaseOpen ||
-                                  isPurchased
+                                  hasPrivateAccess
                                     ? "text-[#8C9A78]"
-                                    : isSoldOut
+                                    : isPurchased
+                                    ? "text-[#8C9A78]"
+                                    : isRefunded
                                     ? "text-gray-400"
                                     : "text-[#AF9685]"
                                 }
                               >
-                                {isPurchaseOpen
+                                {hasPrivateAccess
                                   ? "PRIVATE ACCESS"
                                   : isPurchased
                                   ? "PURCHASED"
-                                  : isSoldOut
-                                  ? "OUT OF STOCK"
-                                  : isConfirmed
-                                  ? "CONFIRMED"
+                                  : isRefunded
+                                  ? "CLOSED"
                                   : "PENDING"}
+                              </span>
+
+                            </div>
+
+                            {/* COLLECTION PHASE */}
+
+                            <div className="flex justify-between gap-6 text-sm">
+
+                              <span className="text-gray-400">
+                                Collection
+                              </span>
+
+                              <span className="text-gray-700">
+                                {phase ===
+                                "private_access"
+                                  ? "PRIVATE ACCESS"
+                                  : phase ===
+                                    "private_purchase"
+                                  ? "PRIVATE PURCHASE"
+                                  : phase ===
+                                    "public"
+                                  ? "PUBLIC"
+                                  : "SOLD OUT"}
                               </span>
 
                             </div>
@@ -603,7 +1128,8 @@ export default function ReservationsPage() {
 
                             <div className="text-xs leading-6 text-gray-400">
 
-                              Reservation Reference:
+                              Reservation
+                              Reference:
 
                               <br />
 
@@ -621,98 +1147,7 @@ export default function ReservationsPage() {
                           {/* ACTION */}
                           {/* ================================================= */}
 
-                          {isPurchaseOpen && (
-                            <Link
-                              href={`/product/${reservation.product}`}
-                              className="
-                                mt-8
-                                inline-block
-                                border
-                                border-[#AF9685]
-                                px-10
-                                py-4
-                                text-xs
-                                uppercase
-                                tracking-[0.3em]
-                                text-[#AF9685]
-                                transition-all
-                                duration-300
-                                hover:bg-[#AF9685]
-                                hover:text-white
-                              "
-                            >
-                              Buy Now
-                            </Link>
-                          )}
-
-                          {isPurchased && (
-                            <Link
-                              href="/account/orders"
-                              className="
-                                mt-8
-                                inline-block
-                                border
-                                border-[#AF9685]
-                                px-10
-                                py-4
-                                text-xs
-                                uppercase
-                                tracking-[0.3em]
-                                text-[#AF9685]
-                                transition-all
-                                duration-300
-                                hover:bg-[#AF9685]
-                                hover:text-white
-                              "
-                            >
-                              View Order
-                            </Link>
-                          )}
-
-                          {isSoldOut && (
-                            <span
-                              className="
-                                mt-8
-                                inline-block
-                                border
-                                border-gray-300
-                                px-10
-                                py-4
-                                text-xs
-                                uppercase
-                                tracking-[0.3em]
-                                text-gray-400
-                              "
-                            >
-                              Out of Stock
-                            </span>
-                          )}
-
-                          {!isPurchaseOpen &&
-                            !isPurchased &&
-                            !isSoldOut && (
-                              <Link
-                                href={reservationUrl}
-                                className="
-                                  mt-8
-                                  inline-block
-                                  border
-                                  border-[#AF9685]
-                                  px-10
-                                  py-4
-                                  text-xs
-                                  uppercase
-                                  tracking-[0.3em]
-                                  text-[#AF9685]
-                                  transition-all
-                                  duration-300
-                                  hover:bg-[#AF9685]
-                                  hover:text-white
-                                "
-                              >
-                                View Piece
-                              </Link>
-                            )}
+                          {action}
 
                         </div>
 
@@ -727,6 +1162,7 @@ export default function ReservationsPage() {
           )}
 
       </div>
+
     </main>
   );
 }
