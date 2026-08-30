@@ -17,9 +17,9 @@ export async function POST(req: Request) {
     const { orderId } = body;
 
     /*
-     * ==========================================
+     * =========================================================
      * VALIDATE ORDER ID
-     * ==========================================
+     * =========================================================
      */
 
     if (
@@ -37,7 +37,9 @@ export async function POST(req: Request) {
     }
 
     if (
-      !orderId.startsWith("AVENOR_RES_")
+      !orderId.startsWith(
+        "AVENOR_RES_"
+      )
     ) {
       return NextResponse.json(
         {
@@ -51,9 +53,9 @@ export async function POST(req: Request) {
     }
 
     /*
-     * ==========================================
+     * =========================================================
      * CONNECT DATABASE
-     * ==========================================
+     * =========================================================
      */
 
     await connectDB();
@@ -76,20 +78,19 @@ export async function POST(req: Request) {
     }
 
     /*
-     * ==========================================
+     * =========================================================
      * ALREADY CONFIRMED
-     * ==========================================
+     * =========================================================
      *
-     * Once the ₹2,000 reservation payment
-     * has been successfully confirmed:
+     * A confirmed reservation means:
      *
      * paymentStatus = confirmed
      * status = confirmed
      *
-     * This customer has PRIVATE ACCESS.
+     * Therefore the customer already has
+     * permanent PRIVATE ACCESS.
      *
-     * Do not verify again or send another
-     * confirmation email.
+     * Do not send another confirmation email.
      */
 
     if (
@@ -99,7 +100,8 @@ export async function POST(req: Request) {
         "confirmed"
     ) {
       return NextResponse.json({
-        paymentStatus: "confirmed",
+        paymentStatus:
+          "confirmed",
 
         reservationStatus:
           "confirmed",
@@ -111,11 +113,66 @@ export async function POST(req: Request) {
     }
 
     /*
-     * ==========================================
-     * EXPECTED PAYMENT AMOUNT
-     * ==========================================
+     * =========================================================
+     * ALREADY PURCHASED
+     * =========================================================
      *
-     * The amount is taken from the database.
+     * If the reservation has already been
+     * used for a purchase, do not allow the
+     * payment-confirmation endpoint to change
+     * its state again.
+     */
+
+    if (
+      reservation.status ===
+      "purchased"
+    ) {
+      return NextResponse.json({
+        paymentStatus:
+          reservation.paymentStatus,
+
+        reservationStatus:
+          "purchased",
+
+        privateAccess: true,
+
+        orderId,
+      });
+    }
+
+    /*
+     * =========================================================
+     * ALREADY REFUNDED
+     * =========================================================
+     */
+
+    if (
+      reservation.status ===
+      "refunded"
+    ) {
+      return NextResponse.json({
+        paymentStatus:
+          reservation.paymentStatus,
+
+        reservationStatus:
+          "refunded",
+
+        privateAccess: false,
+
+        orderId,
+      });
+    }
+
+    /*
+     * =========================================================
+     * EXPECTED PAYMENT AMOUNT
+     * =========================================================
+     *
+     * IMPORTANT:
+     *
+     * Never trust the amount sent by the browser.
+     *
+     * We use the amount stored in MongoDB.
      *
      * Test mode:
      * ₹1
@@ -152,9 +209,9 @@ export async function POST(req: Request) {
     }
 
     /*
-     * ==========================================
+     * =========================================================
      * ASK CASHFREE FOR PAYMENT STATUS
-     * ==========================================
+     * =========================================================
      */
 
     const cashfreeResponse =
@@ -189,7 +246,7 @@ export async function POST(req: Request) {
       await cashfreeResponse.json();
 
     console.log(
-      "Cashfree payment verification:",
+      "Cashfree reservation payment verification:",
       JSON.stringify(
         cashfreeData,
         null,
@@ -198,9 +255,9 @@ export async function POST(req: Request) {
     );
 
     /*
-     * ==========================================
+     * =========================================================
      * CASHFREE API ERROR
-     * ==========================================
+     * =========================================================
      */
 
     if (!cashfreeResponse.ok) {
@@ -224,9 +281,9 @@ export async function POST(req: Request) {
     }
 
     /*
-     * ==========================================
+     * =========================================================
      * PAYMENT TRANSACTIONS
-     * ==========================================
+     * =========================================================
      */
 
     const payments: CashfreePayment[] =
@@ -235,20 +292,26 @@ export async function POST(req: Request) {
         : [];
 
     /*
-     * ==========================================
+     * =========================================================
      * SUCCESSFUL PAYMENT
-     * ==========================================
+     * =========================================================
      *
-     * Cashfree payment SUCCESS
-     * + correct amount
+     * Cashfree:
      *
-     * becomes:
+     * payment_status = SUCCESS
+     *
+     * AND
+     *
+     * payment amount = expected amount
+     *
+     * THEN:
      *
      * paymentStatus = confirmed
      * status = confirmed
+     * privateAccess = true
      *
-     * This permanently grants PRIVATE ACCESS
-     * for this reservation.
+     * This is the moment the customer
+     * receives PRIVATE ACCESS.
      */
 
     const successfulPayment =
@@ -271,9 +334,12 @@ export async function POST(req: Request) {
       await reservation.save();
 
       /*
-       * ========================================
+       * =======================================================
        * SEND CONFIRMATION EMAIL
-       * ========================================
+       * =======================================================
+       *
+       * Email failure must NOT undo the
+       * successful payment.
        */
 
       try {
@@ -299,11 +365,6 @@ export async function POST(req: Request) {
           `AVENOR reservation confirmation email sent: ${orderId}`
         );
       } catch (emailError) {
-        /*
-         * Email failure must NOT undo
-         * the successful payment.
-         */
-
         console.error(
           "Reservation confirmation email failed:",
           emailError
@@ -315,7 +376,8 @@ export async function POST(req: Request) {
       );
 
       return NextResponse.json({
-        paymentStatus: "confirmed",
+        paymentStatus:
+          "confirmed",
 
         reservationStatus:
           "confirmed",
@@ -327,13 +389,17 @@ export async function POST(req: Request) {
     }
 
     /*
-     * ==========================================
+     * =========================================================
      * PENDING PAYMENT
-     * ==========================================
+     * =========================================================
      *
      * Payment is not complete yet.
      *
-     * Private access is NOT granted.
+     * Therefore:
+     *
+     * paymentStatus = pending
+     * status = pending
+     * privateAccess = false
      */
 
     const pendingPayment =
@@ -357,7 +423,8 @@ export async function POST(req: Request) {
       );
 
       return NextResponse.json({
-        paymentStatus: "pending",
+        paymentStatus:
+          "pending",
 
         reservationStatus:
           "pending",
@@ -369,19 +436,19 @@ export async function POST(req: Request) {
     }
 
     /*
-     * ==========================================
+     * =========================================================
      * FAILED PAYMENT
-     * ==========================================
+     * =========================================================
      *
-     * A payment transaction exists but there
-     * is no successful or pending transaction.
+     * A transaction exists but there is
+     * no successful or pending transaction.
      *
-     * Keep the reservation available so the
-     * customer can try payment again.
+     * Keep the reservation itself pending.
      *
-     * IMPORTANT:
+     * This means the customer does NOT
+     * receive private access.
      *
-     * Do NOT grant private access.
+     * They can try payment again.
      */
 
     if (payments.length > 0) {
@@ -398,7 +465,8 @@ export async function POST(req: Request) {
       );
 
       return NextResponse.json({
-        paymentStatus: "failed",
+        paymentStatus:
+          "failed",
 
         reservationStatus:
           "pending",
@@ -410,12 +478,12 @@ export async function POST(req: Request) {
     }
 
     /*
-     * ==========================================
+     * =========================================================
      * NO PAYMENT TRANSACTION YET
-     * ==========================================
+     * =========================================================
      *
-     * Cashfree may still be processing the
-     * payment.
+     * Cashfree may still be processing
+     * the payment.
      *
      * Never grant private access here.
      */
@@ -433,7 +501,8 @@ export async function POST(req: Request) {
     );
 
     return NextResponse.json({
-      paymentStatus: "pending",
+      paymentStatus:
+        "pending",
 
       reservationStatus:
         "pending",
