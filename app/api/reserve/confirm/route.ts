@@ -82,11 +82,12 @@ export async function POST(req: Request) {
      * ALREADY CONFIRMED
      * ==========================================
      *
-     * Once payment has successfully been
-     * confirmed, the customer permanently
-     * has private access.
+     * A successful reservation payment gives
+     * this customer permanent private access
+     * to this product.
      *
-     * Do not send the confirmation email again.
+     * Do not verify the payment again or send
+     * another confirmation email.
      */
 
     if (
@@ -95,8 +96,13 @@ export async function POST(req: Request) {
     ) {
       return NextResponse.json({
         paymentStatus: "success",
+
         reservationStatus:
           reservation.status,
+
+        privateAccess:
+          reservation.privateAccess === true,
+
         orderId,
       });
     }
@@ -106,10 +112,9 @@ export async function POST(req: Request) {
      * EXPECTED PAYMENT AMOUNT
      * ==========================================
      *
-     * This is taken from the reservation
-     * itself rather than trusting the client.
+     * The amount comes from the database.
      *
-     * Test:
+     * Test mode:
      * ₹1
      *
      * Production:
@@ -228,20 +233,24 @@ export async function POST(req: Request) {
 
     /*
      * ==========================================
-     * SUCCESS
+     * SUCCESSFUL PAYMENT
      * ==========================================
      *
-     * This is the important transition:
+     * IMPORTANT:
      *
      * paymentStatus:
      * pending → success
      *
-     * status:
-     * pending → confirmed
+     * privateAccess:
+     * false → true
      *
-     * "confirmed" means the customer now
-     * permanently has PRIVATE ACCESS for
-     * this product.
+     * status remains:
+     * pending
+     *
+     * "privateAccess" is what permanently
+     * identifies this customer as someone
+     * allowed to purchase during the private
+     * purchase window.
      */
 
     const successfulPayment =
@@ -258,8 +267,27 @@ export async function POST(req: Request) {
       reservation.paymentStatus =
         "success";
 
+      /*
+       * Permanently grant private access.
+       */
+
+      reservation.privateAccess =
+        true;
+
+      /*
+       * Keep the reservation workflow
+       * status separate from payment/access.
+       *
+       * It can later become:
+       *
+       * pending
+       * contacted
+       * allocated
+       * closed
+       */
+
       reservation.status =
-        "confirmed";
+        "pending";
 
       await reservation.save();
 
@@ -311,7 +339,7 @@ export async function POST(req: Request) {
         paymentStatus: "success",
 
         reservationStatus:
-          "confirmed",
+          reservation.status,
 
         privateAccess: true,
 
@@ -321,13 +349,12 @@ export async function POST(req: Request) {
 
     /*
      * ==========================================
-     * PENDING
+     * PENDING PAYMENT
      * ==========================================
      *
-     * Payment has not completed yet.
+     * Payment is not complete.
      *
-     * The customer does NOT have private
-     * access yet.
+     * privateAccess remains false.
      */
 
     const pendingPayment =
@@ -340,6 +367,9 @@ export async function POST(req: Request) {
     if (pendingPayment) {
       reservation.paymentStatus =
         "pending";
+
+      reservation.privateAccess =
+        false;
 
       reservation.status =
         "pending";
@@ -364,36 +394,23 @@ export async function POST(req: Request) {
 
     /*
      * ==========================================
-     * FAILED
+     * FAILED PAYMENT
      * ==========================================
      *
-     * IMPORTANT:
+     * The payment failed.
      *
-     * We only change paymentStatus here.
+     * Do NOT give private access.
      *
-     * We DO NOT set:
-     *
-     * reservation.status = "failed"
-     *
-     * because "failed" is not a valid
-     * reservation status in the new schema.
+     * The reservation itself remains available
+     * so the customer can try payment again.
      */
 
     if (payments.length > 0) {
       reservation.paymentStatus =
         "failed";
 
-      /*
-       * Keep reservation.status as pending.
-       *
-       * This means:
-       *
-       * payment failed
-       * ↓
-       * private access NOT granted
-       * ↓
-       * customer can try again
-       */
+      reservation.privateAccess =
+        false;
 
       reservation.status =
         "pending";
@@ -424,12 +441,14 @@ export async function POST(req: Request) {
      * Cashfree may still be processing the
      * payment.
      *
-     * Never mark this as failed simply because
-     * there is no transaction yet.
+     * Do not mark the reservation failed.
      */
 
     reservation.paymentStatus =
       "pending";
+
+    reservation.privateAccess =
+      false;
 
     reservation.status =
       "pending";
