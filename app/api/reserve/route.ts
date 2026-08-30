@@ -33,9 +33,7 @@ export async function POST(req: Request) {
           success: false,
           error: "Product is required.",
         },
-        {
-          status: 400,
-        }
+        { status: 400 }
       );
     }
 
@@ -53,9 +51,7 @@ export async function POST(req: Request) {
           error:
             "Name, email and phone are required.",
         },
-        {
-          status: 400,
-        }
+        { status: 400 }
       );
     }
 
@@ -69,9 +65,7 @@ export async function POST(req: Request) {
           error:
             "Invalid fit preference.",
         },
-        {
-          status: 400,
-        }
+        { status: 400 }
       );
     }
 
@@ -85,9 +79,7 @@ export async function POST(req: Request) {
           error:
             "Please select a standard size.",
         },
-        {
-          status: 400,
-        }
+        { status: 400 }
       );
     }
 
@@ -108,6 +100,31 @@ export async function POST(req: Request) {
 
     /*
      * =========================================================
+     * CASHFREE MODE
+     * =========================================================
+     *
+     * Set:
+     *
+     * CASHFREE_MODE=sandbox
+     *
+     * OR
+     *
+     * CASHFREE_MODE=production
+     */
+
+    const cashfreeMode =
+      process.env.CASHFREE_MODE ===
+      "sandbox"
+        ? "sandbox"
+        : "production";
+
+    const cashfreeBaseUrl =
+      cashfreeMode === "sandbox"
+        ? "https://sandbox.cashfree.com/pg"
+        : "https://api.cashfree.com/pg";
+
+    /*
+     * =========================================================
      * RESERVATION FEE
      * =========================================================
      *
@@ -119,16 +136,17 @@ export async function POST(req: Request) {
      */
 
     const isTestMode =
+      cashfreeMode === "sandbox" ||
       process.env
         .AVENOR_RESERVATION_TEST_MODE ===
-      "true";
+        "true";
 
     const reservationFee =
       isTestMode ? 1 : 2000;
 
     /*
      * =========================================================
-     * CREATE UNIQUE AVENOR ORDER ID
+     * UNIQUE ORDER ID
      * =========================================================
      */
 
@@ -145,7 +163,7 @@ export async function POST(req: Request) {
 
     const cashfreeResponse =
       await fetch(
-        "https://api.cashfree.com/pg/orders",
+        `${cashfreeBaseUrl}/orders`,
         {
           method: "POST",
 
@@ -174,7 +192,8 @@ export async function POST(req: Request) {
             order_amount:
               reservationFee,
 
-            order_currency: "INR",
+            order_currency:
+              "INR",
 
             order_note:
               `AVENOR Private Access Reservation - ${product}`,
@@ -219,6 +238,11 @@ export async function POST(req: Request) {
      */
 
     if (!cashfreeResponse.ok) {
+      console.error(
+        "Cashfree order creation failed:",
+        cashfreeData
+      );
+
       return NextResponse.json(
         {
           success: false,
@@ -247,11 +271,20 @@ export async function POST(req: Request) {
     if (
       !cashfreeData?.payment_session_id
     ) {
+      console.error(
+        "Cashfree response missing payment_session_id:",
+        cashfreeData
+      );
+
       return NextResponse.json(
         {
           success: false,
+
           error:
             "Cashfree payment session was not created.",
+
+          details:
+            cashfreeData,
         },
         {
           status: 500,
@@ -271,20 +304,11 @@ export async function POST(req: Request) {
      * =========================================================
      * CREATE PENDING RESERVATION
      * =========================================================
-     *
-     * IMPORTANT:
-     *
-     * The reservation exists now,
-     * but PRIVATE ACCESS has NOT been granted.
-     *
-     * It becomes confirmed only after
-     * Cashfree successfully confirms payment.
      */
 
     const reservation =
       await Reservation.create({
         product:
-
           product.trim(),
 
         fullName:
@@ -365,6 +389,8 @@ export async function POST(req: Request) {
 
       testMode:
         isTestMode,
+
+      cashfreeMode,
     });
   } catch (error) {
     console.error(
