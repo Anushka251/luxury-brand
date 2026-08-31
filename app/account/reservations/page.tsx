@@ -52,14 +52,20 @@ type Reservation = {
 };
 
 export default function ReservationsPage() {
-  const { data: session, status } =
-    useSession();
+  const {
+    data: session,
+    status,
+  } = useSession();
 
-  const [reservations, setReservations] =
-    useState<Reservation[]>([]);
+  const [
+    reservations,
+    setReservations,
+  ] = useState<Reservation[]>([]);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
 
   /*
    * =========================================================
@@ -85,6 +91,8 @@ export default function ReservationsPage() {
       return;
     }
 
+    let cancelled = false;
+
     async function loadReservations() {
       try {
         setLoading(true);
@@ -108,22 +116,36 @@ export default function ReservationsPage() {
         const data =
           await response.json();
 
-        setReservations(
-          data.reservations ?? []
-        );
+        if (!cancelled) {
+          setReservations(
+            Array.isArray(
+              data.reservations
+            )
+              ? data.reservations
+              : []
+          );
+        }
       } catch (error) {
         console.error(
           "Reservation loading error:",
           error
         );
 
-        setReservations([]);
+        if (!cancelled) {
+          setReservations([]);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     loadReservations();
+
+    return () => {
+      cancelled = true;
+    };
   }, [userEmail, status]);
 
   /*
@@ -165,6 +187,12 @@ export default function ReservationsPage() {
     return null;
   }
 
+  /*
+   * =========================================================
+   * PAGE
+   * =========================================================
+   */
+
   return (
     <main className="min-h-screen bg-[#FAF8F5] px-6 py-20">
 
@@ -181,7 +209,12 @@ export default function ReservationsPage() {
           </p>
 
           <h1
-            className="mt-5 text-5xl font-light text-[#AF9685]"
+            className="
+              mt-5
+              text-5xl
+              font-light
+              text-[#AF9685]
+            "
             style={{
               fontFamily:
                 '"Cormorant Garamond", serif',
@@ -303,8 +336,9 @@ export default function ReservationsPage() {
                     );
 
                   /*
-                   * If the product has been removed
-                   * from products.ts, don't crash.
+                   * =================================================
+                   * PRODUCT NO LONGER EXISTS
+                   * =================================================
                    */
 
                   if (!product) {
@@ -337,45 +371,47 @@ export default function ReservationsPage() {
 
                   /*
                    * =================================================
-                   * PAYMENT / RESERVATION STATE
+                   * NORMALISE DATABASE STATUS
                    * =================================================
-                   *
-                   * DATABASE:
-                   *
-                   * paymentStatus:
-                   * pending
-                   * confirmed
-                   * purchased
-                   * refunded
-                   * closed
-                   *
-                   * status:
-                   * pending
-                   * confirmed
-                   * purchased
-                   * refunded
+                   */
+
+                  const paymentStatus =
+                    String(
+                      reservation.paymentStatus ??
+                        ""
+                    ).toLowerCase();
+
+                  const reservationStatus =
+                    String(
+                      reservation.status ??
+                        ""
+                    ).toLowerCase();
+
+                  /*
+                   * =================================================
+                   * RESERVATION STATES
+                   * =================================================
                    */
 
                   const hasPrivateAccess =
-                    reservation.paymentStatus ===
+                    paymentStatus ===
                       "confirmed" &&
-                    reservation.status ===
+                    reservationStatus ===
                       "confirmed";
 
                   const isPurchased =
-                    reservation.status ===
+                    reservationStatus ===
                     "purchased";
 
                   const isRefunded =
-                    reservation.status ===
+                    reservationStatus ===
                       "refunded" ||
-                    reservation.paymentStatus ===
+                    paymentStatus ===
                       "refunded";
 
                   const isPending =
-                    reservation.status ===
+                    reservationStatus ===
                     "pending";
-
 
                   /*
                    * =================================================
@@ -386,14 +422,15 @@ export default function ReservationsPage() {
                   const phase =
                     product.collectionPhase;
 
-
                   /*
                    * =================================================
-                   * PRIVATE PURCHASE
+                   * PRIVATE PURCHASE AVAILABLE
                    * =================================================
                    *
-                   * ONLY a confirmed private
-                   * reservation can access this.
+                   * Only a customer with a confirmed
+                   * reservation can reach the actual
+                   * product/purchase page during the
+                   * private allocation window.
                    */
 
                   const privatePurchaseAvailable =
@@ -401,22 +438,14 @@ export default function ReservationsPage() {
                       "private_purchase" &&
                     hasPrivateAccess;
 
-
                   /*
                    * =================================================
                    * PUBLIC PURCHASE
                    * =================================================
-                   *
-                   * During public release,
-                   * everyone can view the product.
-                   *
-                   * The actual purchase API must
-                   * still enforce product availability.
                    */
 
                   const publicPurchaseAvailable =
                     phase === "public";
-
 
                   /*
                    * =================================================
@@ -427,22 +456,24 @@ export default function ReservationsPage() {
                   const editionExhausted =
                     phase === "sold_out";
 
-
                   /*
                    * =================================================
                    * WAITING FOR PRIVATE PURCHASE
                    * =================================================
                    *
-                   * Customer paid successfully,
-                   * but private purchase window
-                   * has not opened yet.
+                   * IMPORTANT:
+                   *
+                   * The customer has paid and is confirmed,
+                   * but the private purchase window has NOT
+                   * opened yet.
+                   *
+                   * They remain on the reservation page.
                    */
 
                   const waitingForPrivateWindow =
                     phase ===
                       "private_access" &&
                     hasPrivateAccess;
-
 
                   /*
                    * =================================================
@@ -456,37 +487,26 @@ export default function ReservationsPage() {
                   let description =
                     "Your reservation payment is still being processed.";
 
-
                   /*
-                   * CONFIRMED
+                   * =================================================
+                   * CONFIRMED RESERVATION
+                   * =================================================
                    */
 
-                  if (hasPrivateAccess) {
+                  if (
+                    hasPrivateAccess
+                  ) {
                     statusLabel =
                       "Private Access Confirmed";
 
                     description =
-                      "Your ₹2,000 studio reservation has been confirmed. You have priority access to this piece.";
+                      "Your ₹2,000 studio reservation has been successfully confirmed. Your private access is secured for this piece.";
                   }
 
-
                   /*
-                   * PRIVATE PURCHASE
-                   */
-
-                  if (
-                    privatePurchaseAvailable
-                  ) {
-                    statusLabel =
-                      "Private Collection Access";
-
-                    description =
-                      "Your private purchasing window is now open. This piece is available exclusively to confirmed private-access clients.";
-                  }
-
-
-                  /*
-                   * WAITING
+                   * =================================================
+                   * WAITING FOR PRIVATE PURCHASE
+                   * =================================================
                    */
 
                   if (
@@ -496,12 +516,29 @@ export default function ReservationsPage() {
                       "Private Access Secured";
 
                     description =
-                      "Your private access is confirmed. Your purchasing window will open during the private collection release.";
+                      "Your ₹2,000 reservation has been successfully confirmed. Your private access is secured for this piece. Your private purchasing window will open during the private collection release.";
                   }
 
+                  /*
+                   * =================================================
+                   * PRIVATE PURCHASE OPEN
+                   * =================================================
+                   */
+
+                  if (
+                    privatePurchaseAvailable
+                  ) {
+                    statusLabel =
+                      "Private Collection Access";
+
+                    description =
+                      "Your private purchasing window is now open. You have priority access to claim this limited piece before public release.";
+                  }
 
                   /*
+                   * =================================================
                    * PUBLIC
+                   * =================================================
                    */
 
                   if (
@@ -515,12 +552,34 @@ export default function ReservationsPage() {
                       "The collection is now publicly available. Your private access has already been secured.";
                   }
 
-
                   /*
-                   * PURCHASED
+                   * =================================================
+                   * PUBLIC WITHOUT PRIVATE ACCESS
+                   * =================================================
                    */
 
-                  if (isPurchased) {
+                  if (
+                    publicPurchaseAvailable &&
+                    !hasPrivateAccess &&
+                    !isPurchased &&
+                    !isRefunded
+                  ) {
+                    statusLabel =
+                      "Collection Now Open";
+
+                    description =
+                      "The collection is now publicly available while pieces remain.";
+                  }
+
+                  /*
+                   * =================================================
+                   * PURCHASED
+                   * =================================================
+                   */
+
+                  if (
+                    isPurchased
+                  ) {
                     statusLabel =
                       "Purchased";
 
@@ -528,12 +587,17 @@ export default function ReservationsPage() {
                       "This AVENOR piece has been successfully purchased.";
                   }
 
-
                   /*
+                   * =================================================
                    * SOLD OUT
+                   * =================================================
                    */
 
-                  if (editionExhausted) {
+                  if (
+                    editionExhausted &&
+                    !isPurchased &&
+                    !isRefunded
+                  ) {
                     statusLabel =
                       "Edition Exhausted";
 
@@ -541,19 +605,21 @@ export default function ReservationsPage() {
                       "This limited edition has sold out and is no longer available for purchase.";
                   }
 
-
                   /*
+                   * =================================================
                    * REFUNDED
+                   * =================================================
                    */
 
-                  if (isRefunded) {
+                  if (
+                    isRefunded
+                  ) {
                     statusLabel =
                       "Reservation Refunded";
 
                     description =
-                      "Your private reservation opportunity has ended and your reservation fee has been marked for refund.";
+                      "Your private reservation opportunity has ended without a purchase and the reservation fee has been marked for refund.";
                   }
-
 
                   /*
                    * =================================================
@@ -565,6 +631,7 @@ export default function ReservationsPage() {
                     "text-[#AF9685]";
 
                   if (
+                    hasPrivateAccess ||
                     privatePurchaseAvailable ||
                     publicPurchaseAvailable ||
                     isPurchased
@@ -581,7 +648,6 @@ export default function ReservationsPage() {
                       "text-gray-400";
                   }
 
-
                   /*
                    * =================================================
                    * ACTION
@@ -590,9 +656,13 @@ export default function ReservationsPage() {
 
                   let action = null;
 
-
                   /*
+                   * =================================================
                    * PRIVATE PURCHASE
+                   * =================================================
+                   *
+                   * ONLY NOW does the customer
+                   * get sent to the actual product page.
                    */
 
                   if (
@@ -600,7 +670,7 @@ export default function ReservationsPage() {
                   ) {
                     action = (
                       <Link
-                        href={`/reserve/${product.id}`}
+                        href={`/product/${product.id}`}
                         className="
                           mt-8
                           inline-block
@@ -623,9 +693,10 @@ export default function ReservationsPage() {
                     );
                   }
 
-
                   /*
+                   * =================================================
                    * PUBLIC PURCHASE
+                   * =================================================
                    */
 
                   else if (
@@ -656,9 +727,10 @@ export default function ReservationsPage() {
                     );
                   }
 
-
                   /*
+                   * =================================================
                    * SOLD OUT
+                   * =================================================
                    */
 
                   else if (
@@ -684,12 +756,15 @@ export default function ReservationsPage() {
                     );
                   }
 
-
                   /*
+                   * =================================================
                    * PURCHASED
+                   * =================================================
                    */
 
-                  else if (isPurchased) {
+                  else if (
+                    isPurchased
+                  ) {
                     action = (
                       <Link
                         href="/account/orders"
@@ -715,12 +790,15 @@ export default function ReservationsPage() {
                     );
                   }
 
-
                   /*
+                   * =================================================
                    * REFUNDED
+                   * =================================================
                    */
 
-                  else if (isRefunded) {
+                  else if (
+                    isRefunded
+                  ) {
                     action = (
                       <span
                         className="
@@ -741,9 +819,17 @@ export default function ReservationsPage() {
                     );
                   }
 
-
                   /*
-                   * WAITING FOR PRIVATE WINDOW
+                   * =================================================
+                   * WAITING FOR PRIVATE PURCHASE
+                   * =================================================
+                   *
+                   * IMPORTANT:
+                   *
+                   * This link goes to /reserve/[product].
+                   *
+                   * It NEVER goes to /product/[product]
+                   * before the purchase window opens.
                    */
 
                   else if (
@@ -774,12 +860,15 @@ export default function ReservationsPage() {
                     );
                   }
 
-
                   /*
+                   * =================================================
                    * PENDING
+                   * =================================================
                    */
 
-                  else if (isPending) {
+                  else if (
+                    isPending
+                  ) {
                     action = (
                       <Link
                         href={`/reserve/${product.id}`}
@@ -805,7 +894,6 @@ export default function ReservationsPage() {
                     );
                   }
 
-
                   /*
                    * =================================================
                    * CARD
@@ -825,14 +913,38 @@ export default function ReservationsPage() {
                       "
                     >
 
-                      <div className="grid grid-cols-1 md:grid-cols-[280px_1fr]">
+                      <div
+                        className="
+                          grid
+                          grid-cols-1
+                          md:grid-cols-[280px_1fr]
+                        "
+                      >
 
                         {/* ========================================= */}
                         {/* IMAGE */}
                         {/* ========================================= */}
 
+                        {/*
+                         * =================================================
+                         * VERY IMPORTANT
+                         * =================================================
+                         *
+                         * The reservation image ALWAYS goes to:
+                         *
+                         * /reserve/[product]
+                         *
+                         * It does NOT go to:
+                         *
+                         * /product/[product]
+                         *
+                         * This prevents customers from entering the
+                         * purchase page before the private purchase
+                         * window opens.
+                         */}
+
                         <Link
-                          href={`/product/${product.id}`}
+                          href={`/reserve/${product.id}`}
                           className="
                             relative
                             block
@@ -851,7 +963,11 @@ export default function ReservationsPage() {
                               product.name
                             }
                             fill
-                            sizes="(max-width: 768px) 100vw, 280px"
+                            sizes="
+                              (max-width: 768px)
+                              100vw,
+                              280px
+                            "
                             className="
                               object-contain
                               transition-transform
@@ -861,7 +977,6 @@ export default function ReservationsPage() {
                           />
 
                         </Link>
-
 
                         {/* ========================================= */}
                         {/* DETAILS */}
@@ -882,7 +997,6 @@ export default function ReservationsPage() {
                             {statusLabel}
                           </p>
 
-
                           {/* PRODUCT NAME */}
 
                           <h2
@@ -900,13 +1014,11 @@ export default function ReservationsPage() {
                             {product.name}
                           </h2>
 
-
                           {/* PRODUCT TYPE */}
 
                           <p className="mt-3 text-xs uppercase tracking-[0.25em] text-gray-400">
                             {product.type}
                           </p>
-
 
                           {/* DESCRIPTION */}
 
@@ -914,9 +1026,8 @@ export default function ReservationsPage() {
                             {description}
                           </p>
 
-
                           {/* ========================================= */}
-                          {/* PRIVATE PURCHASE */}
+                          {/* PRIVATE PURCHASE OPEN */}
                           {/* ========================================= */}
 
                           {privatePurchaseAvailable && (
@@ -951,7 +1062,6 @@ export default function ReservationsPage() {
 
                             </div>
                           )}
-
 
                           {/* ========================================= */}
                           {/* PRIVATE ACCESS WAITING */}
@@ -990,7 +1100,6 @@ export default function ReservationsPage() {
                             </div>
                           )}
 
-
                           {/* ========================================= */}
                           {/* PUBLIC RELEASE */}
                           {/* ========================================= */}
@@ -1018,7 +1127,6 @@ export default function ReservationsPage() {
 
                             </div>
                           )}
-
 
                           {/* ========================================= */}
                           {/* SOLD OUT */}
@@ -1050,7 +1158,6 @@ export default function ReservationsPage() {
 
                             </div>
                           )}
-
 
                           {/* ========================================= */}
                           {/* PURCHASED */}
@@ -1090,7 +1197,6 @@ export default function ReservationsPage() {
 
                             </div>
                           )}
-
 
                           {/* ========================================= */}
                           {/* REFUNDED */}
@@ -1137,7 +1243,6 @@ export default function ReservationsPage() {
                             </div>
                           )}
 
-
                           {/* ========================================= */}
                           {/* RESERVATION DETAILS */}
                           {/* ========================================= */}
@@ -1162,7 +1267,6 @@ export default function ReservationsPage() {
                               </span>
 
                             </div>
-
 
                             {/* ACCESS */}
 
@@ -1194,7 +1298,6 @@ export default function ReservationsPage() {
 
                             </div>
 
-
                             {/* COLLECTION */}
 
                             <div className="flex justify-between gap-6 text-sm">
@@ -1220,7 +1323,6 @@ export default function ReservationsPage() {
 
                             </div>
 
-
                             {/* REFERENCE */}
 
                             <div className="text-xs leading-6 text-gray-400">
@@ -1239,7 +1341,6 @@ export default function ReservationsPage() {
                             </div>
 
                           </div>
-
 
                           {/* ========================================= */}
                           {/* ACTION */}
