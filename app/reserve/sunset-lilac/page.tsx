@@ -27,7 +27,7 @@ export default function SunsetLilacReservationPage() {
 
   /*
    * =========================================================
-   * FIND PRODUCT
+   * PRODUCT
    * =========================================================
    */
 
@@ -40,11 +40,15 @@ export default function SunsetLilacReservationPage() {
    * CHECK PRIVATE ACCESS
    * =========================================================
    *
-   * Private access requires:
+   * DATABASE IS THE SOURCE OF TRUTH.
    *
+   * Private access exists ONLY when:
+   *
+   * product === "sunset-lilac"
    * paymentStatus === "confirmed"
-   * AND
    * status === "confirmed"
+   *
+   * We do NOT use sessionStorage.
    */
 
   useEffect(() => {
@@ -55,11 +59,17 @@ export default function SunsetLilacReservationPage() {
     const email =
       session?.user?.email ?? "";
 
+    /*
+     * Customer is not logged in.
+     */
+
     if (!email) {
       setHasPrivateAccess(false);
       setCheckingAccess(false);
       return;
     }
+
+    let cancelled = false;
 
     async function checkPrivateAccess() {
       try {
@@ -70,6 +80,7 @@ export default function SunsetLilacReservationPage() {
             email
           )}`,
           {
+            method: "GET",
             cache: "no-store",
           }
         );
@@ -84,16 +95,123 @@ export default function SunsetLilacReservationPage() {
           await response.json();
 
         const reservations: Reservation[] =
-          data.reservations ?? [];
+          Array.isArray(
+            data.reservations
+          )
+            ? data.reservations
+            : [];
+
+        /*
+         * Find a CONFIRMED reservation
+         * specifically for Sunset Lilac.
+         */
 
         const confirmed =
           reservations.some(
             (reservation) =>
               reservation.product ===
                 "sunset-lilac" &&
-              reservation.paymentStatus ===
+              String(
+                reservation.paymentStatus
+              ).toLowerCase() ===
                 "confirmed" &&
-              reservation.status ===
+              String(
+                reservation.status ?? ""
+              ).toLowerCase() ===
+                "confirmed"
+          );
+
+        if (!cancelled) {
+          setHasPrivateAccess(
+            confirmed
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Sunset Lilac private access check error:",
+          error
+        );
+
+        if (!cancelled) {
+          setHasPrivateAccess(false);
+        }
+      } finally {
+        if (!cancelled) {
+          setCheckingAccess(false);
+        }
+      }
+    }
+
+    checkPrivateAccess();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    session,
+    sessionStatus,
+  ]);
+
+  /*
+   * =========================================================
+   * REFRESH ACCESS WHEN CUSTOMER RETURNS
+   * =========================================================
+   *
+   * If payment was completed in another page/tab,
+   * check the database again when the customer
+   * returns to this page.
+   */
+
+  useEffect(() => {
+    if (sessionStatus === "loading") {
+      return;
+    }
+
+    const email =
+      session?.user?.email ?? "";
+
+    if (!email) {
+      return;
+    }
+
+    async function refreshAccess() {
+      try {
+        const response = await fetch(
+          `/api/reservations?email=${encodeURIComponent(
+            email
+          )}`,
+          {
+            method: "GET",
+            cache: "no-store",
+          }
+        );
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data =
+          await response.json();
+
+        const reservations: Reservation[] =
+          Array.isArray(
+            data.reservations
+          )
+            ? data.reservations
+            : [];
+
+        const confirmed =
+          reservations.some(
+            (reservation) =>
+              reservation.product ===
+                "sunset-lilac" &&
+              String(
+                reservation.paymentStatus
+              ).toLowerCase() ===
+                "confirmed" &&
+              String(
+                reservation.status ?? ""
+              ).toLowerCase() ===
                 "confirmed"
           );
 
@@ -102,17 +220,27 @@ export default function SunsetLilacReservationPage() {
         );
       } catch (error) {
         console.error(
-          "Sunset Lilac private access check error:",
+          "Sunset Lilac private access refresh error:",
           error
         );
-
-        setHasPrivateAccess(false);
-      } finally {
-        setCheckingAccess(false);
       }
     }
 
-    checkPrivateAccess();
+    function handleFocus() {
+      refreshAccess();
+    }
+
+    window.addEventListener(
+      "focus",
+      handleFocus
+    );
+
+    return () => {
+      window.removeEventListener(
+        "focus",
+        handleFocus
+      );
+    };
   }, [
     session,
     sessionStatus,
@@ -122,21 +250,40 @@ export default function SunsetLilacReservationPage() {
    * =========================================================
    * PRODUCT SAFETY CHECK
    * =========================================================
-   *
-   * Array.find() can return undefined.
    */
 
   if (!product) {
     return (
-      <main className="min-h-screen bg-[#FAF8F5] flex items-center justify-center px-6">
+      <main
+        className="
+          min-h-screen
+          bg-[#FAF8F5]
+          flex
+          items-center
+          justify-center
+          px-6
+        "
+      >
         <div className="max-w-xl text-center">
 
-          <p className="text-xs uppercase tracking-[0.35em] text-gray-400">
+          <p
+            className="
+              text-xs
+              uppercase
+              tracking-[0.35em]
+              text-gray-400
+            "
+          >
             AVENOR
           </p>
 
           <h1
-            className="mt-5 text-5xl font-light text-[#AF9685]"
+            className="
+              mt-5
+              text-5xl
+              font-light
+              text-[#AF9685]
+            "
             style={{
               fontFamily:
                 '"Cormorant Garamond", serif',
@@ -145,7 +292,14 @@ export default function SunsetLilacReservationPage() {
             Piece Not Found
           </h1>
 
-          <p className="mt-6 text-sm leading-7 text-gray-500">
+          <p
+            className="
+              mt-6
+              text-sm
+              leading-7
+              text-gray-500
+            "
+          >
             This piece is currently unavailable
             from the collection.
           </p>
@@ -204,19 +358,59 @@ export default function SunsetLilacReservationPage() {
    * =========================================================
    * PHASE 1 — PRIVATE ACCESS
    * =========================================================
+   *
+   * BEFORE PAYMENT:
+   * Reserve Private Access
+   *
+   * AFTER SUCCESSFUL PAYMENT:
+   * View Your Reservation
    */
 
   if (
     phase ===
     "private_access"
   ) {
-    buttonText =
-      "Reserve Private Access";
+    if (
+      sessionStatus === "loading" ||
+      checkingAccess
+    ) {
+      buttonText =
+        "Checking Private Access";
 
-    buttonHref =
-      "/reserve/form/sunset-lilac";
+      buttonDisabled = true;
+    } else if (
+      session &&
+      hasPrivateAccess
+    ) {
+      /*
+       * Customer already completed
+       * the reservation.
+       *
+       * DO NOT send them back to
+       * the reservation form.
+       */
 
-    buttonDisabled = false;
+      buttonText =
+        "View Your Reservation";
+
+      buttonHref =
+        "/account/reservations";
+
+      buttonDisabled = false;
+    } else {
+      /*
+       * Customer has not reserved
+       * this piece yet.
+       */
+
+      buttonText =
+        "Reserve Private Access";
+
+      buttonHref =
+        "/reserve/form/sunset-lilac";
+
+      buttonDisabled = false;
+    }
   }
 
   /*
@@ -241,21 +435,27 @@ export default function SunsetLilacReservationPage() {
       session &&
       hasPrivateAccess
     ) {
+      /*
+       * Confirmed reservation.
+       *
+       * Customer can claim the
+       * private allocation.
+       */
+
       buttonText =
         "Claim Private Allocation";
-
-      /*
-       * Fixed route.
-       *
-       * This avoids TypeScript's possible
-       * undefined warning from product.id.
-       */
 
       buttonHref =
         "/product/sunset-lilac";
 
       buttonDisabled = false;
     } else {
+      /*
+       * Customer did not reserve.
+       *
+       * Do not allow private claim.
+       */
+
       buttonText =
         "Reserved for Private Access";
 
@@ -298,10 +498,29 @@ export default function SunsetLilacReservationPage() {
     buttonDisabled = true;
   }
 
-  return (
-    <main className="min-h-screen bg-[#FAF8F5]">
+  /*
+   * =========================================================
+   * PAGE
+   * =========================================================
+   */
 
-      <section className="mx-auto max-w-5xl px-6 pt-10 pb-20">
+  return (
+    <main
+      className="
+        min-h-screen
+        bg-[#FAF8F5]
+      "
+    >
+
+      <section
+        className="
+          mx-auto
+          max-w-5xl
+          px-6
+          pt-10
+          pb-20
+        "
+      >
 
         {/* ================================================= */}
         {/* GALLERY */}
@@ -320,6 +539,7 @@ export default function SunsetLilacReservationPage() {
             duration: 1.2,
           }}
         >
+
           <ProductGallery
             id="sunset-lilac"
             name="Sunset Lilac"
@@ -330,20 +550,46 @@ export default function SunsetLilacReservationPage() {
               "/products/sunset-lilac/3.JPG",
             ]}
           />
+
         </motion.div>
+
 
         {/* ================================================= */}
         {/* PRODUCT INFORMATION */}
         {/* ================================================= */}
 
-        <div className="mx-auto max-w-2xl pt-12 text-center">
+        <div
+          className="
+            mx-auto
+            max-w-2xl
+            pt-12
+            text-center
+          "
+        >
 
-          <p className="text-xs uppercase tracking-[0.35em] text-gray-400">
+          {/* PRODUCT TYPE */}
+
+          <p
+            className="
+              text-xs
+              uppercase
+              tracking-[0.35em]
+              text-gray-400
+            "
+          >
             {product.type}
           </p>
 
+
+          {/* PRODUCT NAME */}
+
           <h1
-            className="mt-4 text-5xl font-light text-[#AF9685]"
+            className="
+              mt-4
+              text-5xl
+              font-light
+              text-[#AF9685]
+            "
             style={{
               fontFamily:
                 '"Cormorant Garamond", serif',
@@ -352,16 +598,37 @@ export default function SunsetLilacReservationPage() {
             {product.name}
           </h1>
 
-          <p className="mt-8 text-[15px] leading-8 text-[#6B625B]">
+
+          {/* DESCRIPTION */}
+
+          <p
+            className="
+              mt-8
+              text-[15px]
+              leading-8
+              text-[#6B625B]
+            "
+          >
             {product.description}
           </p>
 
-          <p className="mt-5 text-sm tracking-[0.08em] text-gray-500">
+
+          {/* PRICE */}
+
+          <p
+            className="
+              mt-5
+              text-sm
+              tracking-[0.08em]
+              text-gray-500
+            "
+          >
             ₹
             {product.price.toLocaleString(
               "en-IN"
             )}
           </p>
+
 
           {/* ================================================= */}
           {/* COLLECTION PHASE */}
@@ -369,41 +636,91 @@ export default function SunsetLilacReservationPage() {
 
           <div className="mt-10">
 
+            {/* PRIVATE ACCESS */}
+
             {phase ===
               "private_access" && (
-              <p className="text-xs uppercase tracking-[0.28em] text-[#AF9685]">
-                Private Access Applications Open
+              <p
+                className="
+                  text-xs
+                  uppercase
+                  tracking-[0.28em]
+                  text-[#AF9685]
+                "
+              >
+                {hasPrivateAccess
+                  ? "Private Access Reserved"
+                  : "Private Access Applications Open"}
               </p>
             )}
+
+
+            {/* PRIVATE PURCHASE */}
 
             {phase ===
               "private_purchase" && (
-              <p className="text-xs uppercase tracking-[0.28em] text-[#AF9685]">
-                Private Allocation Window
+              <p
+                className="
+                  text-xs
+                  uppercase
+                  tracking-[0.28em]
+                  text-[#AF9685]
+                "
+              >
+                {hasPrivateAccess
+                  ? "Your Private Allocation Window"
+                  : "Private Allocation Window"}
               </p>
             )}
 
+
+            {/* PUBLIC */}
+
             {phase ===
               "public" && (
-              <p className="text-xs uppercase tracking-[0.28em] text-[#8C9A78]">
+              <p
+                className="
+                  text-xs
+                  uppercase
+                  tracking-[0.28em]
+                  text-[#8C9A78]
+                "
+              >
                 Now Available From The Collection
               </p>
             )}
 
+
+            {/* SOLD OUT */}
+
             {phase ===
               "sold_out" && (
-              <p className="text-xs uppercase tracking-[0.28em] text-gray-400">
+              <p
+                className="
+                  text-xs
+                  uppercase
+                  tracking-[0.28em]
+                  text-gray-400
+                "
+              >
                 Edition Exhausted
               </p>
             )}
 
           </div>
 
+
           {/* ================================================= */}
           {/* ACTION */}
           {/* ================================================= */}
 
-          <div className="mt-12 flex justify-center">
+          <div
+            className="
+              mt-12
+              flex
+              justify-center
+            "
+          >
 
             <Link
               href={
@@ -442,41 +759,66 @@ export default function SunsetLilacReservationPage() {
 
           </div>
 
+
           {/* ================================================= */}
-          {/* PRIVATE PURCHASE */}
+          {/* PRIVATE PURCHASE MESSAGE */}
           {/* ================================================= */}
 
           {phase ===
             "private_purchase" && (
-            <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
+            <p
+              className="
+                mt-8
+                text-[11px]
+                leading-6
+                tracking-[0.18em]
+                text-gray-400
+              "
+            >
               {hasPrivateAccess
                 ? "Your private access gives you priority to claim this limited piece before the collection opens publicly."
                 : "This edition is currently reserved for clients with confirmed private access. Public access will follow if pieces remain available."}
             </p>
           )}
 
+
           {/* ================================================= */}
-          {/* PRIVATE ACCESS */}
+          {/* PRIVATE ACCESS MESSAGE */}
           {/* ================================================= */}
 
           {phase ===
             "private_access" && (
-            <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
-              Studio reservations close 48 hours
-              before the collection is released
-              publicly. Clients who complete the
-              reservation process receive priority
-              access before the public release.
+            <p
+              className="
+                mt-8
+                text-[11px]
+                leading-6
+                tracking-[0.18em]
+                text-gray-400
+              "
+            >
+              {hasPrivateAccess
+                ? "Your ₹2,000 reservation has been successfully confirmed. Your private access is secured for this piece."
+                : "Studio reservations close 48 hours before the collection is released publicly. Clients who complete the reservation process receive priority access before the public release."}
             </p>
           )}
 
+
           {/* ================================================= */}
-          {/* PUBLIC */}
+          {/* PUBLIC MESSAGE */}
           {/* ================================================= */}
 
           {phase ===
             "public" && (
-            <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
+            <p
+              className="
+                mt-8
+                text-[11px]
+                leading-6
+                tracking-[0.18em]
+                text-gray-400
+              "
+            >
               The private allocation window has
               concluded. Sunset Lilac is now
               available to all clients while
@@ -484,13 +826,22 @@ export default function SunsetLilacReservationPage() {
             </p>
           )}
 
+
           {/* ================================================= */}
-          {/* SOLD OUT */}
+          {/* SOLD OUT MESSAGE */}
           {/* ================================================= */}
 
           {phase ===
             "sold_out" && (
-            <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
+            <p
+              className="
+                mt-8
+                text-[11px]
+                leading-6
+                tracking-[0.18em]
+                text-gray-400
+              "
+            >
               This limited edition has been
               fully acquired and is no longer
               available.
@@ -498,7 +849,9 @@ export default function SunsetLilacReservationPage() {
           )}
 
         </div>
+
       </section>
+
     </main>
   );
 }
