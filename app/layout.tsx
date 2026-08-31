@@ -148,14 +148,14 @@ export const metadata: Metadata = {
     /*
      * If you have an OG image, place it at:
      *
-     * /public/og-image.jpg
+     * /public/avenor-hero2.jpg
      *
      * Otherwise remove this images section.
      */
 
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/avenor-hero2.jpg",
 
         width: 1200,
 
@@ -184,7 +184,7 @@ export const metadata: Metadata = {
       "Limited-edition couture created through thoughtful design, refined craftsmanship, and quiet luxury.",
 
     images: [
-      "/og-image.jpg",
+      "/avenor-hero2.jpg",
     ],
   },
 
