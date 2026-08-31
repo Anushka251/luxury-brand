@@ -2,13 +2,32 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import ProductGallery from "@/app/product-components/ProductGallery";
 import { products } from "@/lib/products";
 
+type Reservation = {
+  product: string;
+  paymentStatus: string;
+  status?: string;
+};
+
 export default function CrimsonRoseReservationPage() {
+  const {
+    data: session,
+    status: sessionStatus,
+  } = useSession();
+
+  const [hasPrivateAccess, setHasPrivateAccess] =
+    useState(false);
+
+  const [checkingAccess, setCheckingAccess] =
+    useState(true);
+
   /*
    * =========================================================
-   * FIND PRODUCT
+   * PRODUCT
    * =========================================================
    */
 
@@ -18,21 +37,252 @@ export default function CrimsonRoseReservationPage() {
 
   /*
    * =========================================================
+   * CHECK PRIVATE ACCESS
+   * =========================================================
+   *
+   * Database is the source of truth.
+   *
+   * Customer has private access ONLY when:
+   *
+   * product === "crimson-rose"
+   * paymentStatus === "confirmed"
+   * status === "confirmed"
+   *
+   * We do NOT rely on sessionStorage.
+   */
+
+  useEffect(() => {
+    if (sessionStatus === "loading") {
+      return;
+    }
+
+    const email =
+      session?.user?.email ?? "";
+
+    /*
+     * No logged-in customer
+     */
+
+    if (!email) {
+      setHasPrivateAccess(false);
+      setCheckingAccess(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function checkPrivateAccess() {
+      try {
+        setCheckingAccess(true);
+
+        const response = await fetch(
+          `/api/reservations?email=${encodeURIComponent(
+            email
+          )}`,
+          {
+            method: "GET",
+            cache: "no-store",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            "Unable to check private access."
+          );
+        }
+
+        const data =
+          await response.json();
+
+        const reservations: Reservation[] =
+          Array.isArray(
+            data.reservations
+          )
+            ? data.reservations
+            : [];
+
+        /*
+         * Find a CONFIRMED reservation
+         * specifically for Crimson Rose.
+         */
+
+        const confirmed =
+          reservations.some(
+            (reservation) =>
+              reservation.product ===
+                "crimson-rose" &&
+              String(
+                reservation.paymentStatus
+              ).toLowerCase() ===
+                "confirmed" &&
+              String(
+                reservation.status ?? ""
+              ).toLowerCase() ===
+                "confirmed"
+          );
+
+        if (!cancelled) {
+          setHasPrivateAccess(
+            confirmed
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Crimson Rose private access check error:",
+          error
+        );
+
+        if (!cancelled) {
+          setHasPrivateAccess(false);
+        }
+      } finally {
+        if (!cancelled) {
+          setCheckingAccess(false);
+        }
+      }
+    }
+
+    checkPrivateAccess();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    session,
+    sessionStatus,
+  ]);
+
+  /*
+   * =========================================================
+   * REFRESH ACCESS WHEN CUSTOMER RETURNS
+   * =========================================================
+   *
+   * Useful when payment was completed in another
+   * page/tab and the customer returns here.
+   */
+
+  useEffect(() => {
+    if (sessionStatus === "loading") {
+      return;
+    }
+
+    const email =
+      session?.user?.email ?? "";
+
+    if (!email) {
+      return;
+    }
+
+    async function refreshAccess() {
+      try {
+        const response = await fetch(
+          `/api/reservations?email=${encodeURIComponent(
+            email
+          )}`,
+          {
+            method: "GET",
+            cache: "no-store",
+          }
+        );
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data =
+          await response.json();
+
+        const reservations: Reservation[] =
+          Array.isArray(
+            data.reservations
+          )
+            ? data.reservations
+            : [];
+
+        const confirmed =
+          reservations.some(
+            (reservation) =>
+              reservation.product ===
+                "crimson-rose" &&
+              String(
+                reservation.paymentStatus
+              ).toLowerCase() ===
+                "confirmed" &&
+              String(
+                reservation.status ?? ""
+              ).toLowerCase() ===
+                "confirmed"
+          );
+
+        setHasPrivateAccess(
+          confirmed
+        );
+      } catch (error) {
+        console.error(
+          "Crimson Rose private access refresh error:",
+          error
+        );
+      }
+    }
+
+    function handleFocus() {
+      refreshAccess();
+    }
+
+    window.addEventListener(
+      "focus",
+      handleFocus
+    );
+
+    return () => {
+      window.removeEventListener(
+        "focus",
+        handleFocus
+      );
+    };
+  }, [
+    session,
+    sessionStatus,
+  ]);
+
+  /*
+   * =========================================================
    * PRODUCT SAFETY CHECK
    * =========================================================
    */
 
   if (!product) {
     return (
-      <main className="min-h-screen bg-[#FAF8F5] flex items-center justify-center px-6">
+      <main
+        className="
+          min-h-screen
+          bg-[#FAF8F5]
+          flex
+          items-center
+          justify-center
+          px-6
+        "
+      >
         <div className="max-w-xl text-center">
 
-          <p className="text-xs uppercase tracking-[0.35em] text-gray-400">
+          <p
+            className="
+              text-xs
+              uppercase
+              tracking-[0.35em]
+              text-gray-400
+            "
+          >
             AVENOR
           </p>
 
           <h1
-            className="mt-5 text-5xl font-light text-[#AF9685]"
+            className="
+              mt-5
+              text-5xl
+              font-light
+              text-[#AF9685]
+            "
             style={{
               fontFamily:
                 '"Cormorant Garamond", serif',
@@ -41,7 +291,14 @@ export default function CrimsonRoseReservationPage() {
             Piece Not Found
           </h1>
 
-          <p className="mt-6 text-sm leading-7 text-gray-500">
+          <p
+            className="
+              mt-6
+              text-sm
+              leading-7
+              text-gray-500
+            "
+          >
             This piece is currently unavailable
             from the collection.
           </p>
@@ -98,51 +355,118 @@ export default function CrimsonRoseReservationPage() {
 
   /*
    * =========================================================
-   * PRIVATE ACCESS
+   * PHASE 1 — PRIVATE ACCESS
    * =========================================================
    *
-   * Customers can apply for a studio
-   * reservation during this phase.
+   * BEFORE PAYMENT:
+   *
+   * Reserve Private Access
+   *
+   * AFTER SUCCESSFUL PAYMENT:
+   *
+   * View Your Reservation
    */
 
   if (
     phase ===
     "private_access"
   ) {
-    buttonText =
-      "Reserve Private Access";
+    if (
+      sessionStatus === "loading" ||
+      checkingAccess
+    ) {
+      buttonText =
+        "Checking Private Access";
 
-    buttonHref =
-      "/reserve/form/crimson-rose";
+      buttonDisabled = true;
+    } else if (
+      session &&
+      hasPrivateAccess
+    ) {
+      /*
+       * Customer already reserved this piece.
+       *
+       * DO NOT send them back to the
+       * reservation form.
+       */
 
-    buttonDisabled = false;
+      buttonText =
+        "View Your Reservation";
+
+      buttonHref =
+        "/account/reservations";
+
+      buttonDisabled = false;
+    } else {
+      /*
+       * Customer has not reserved
+       * this piece yet.
+       */
+
+      buttonText =
+        "Reserve Private Access";
+
+      buttonHref =
+        "/reserve/form/crimson-rose";
+
+      buttonDisabled = false;
+    }
   }
 
   /*
    * =========================================================
-   * PRIVATE PURCHASE
+   * PHASE 2 — PRIVATE PURCHASE
    * =========================================================
-   *
-   * The actual authenticated purchase
-   * flow is handled by the product page.
    */
 
   if (
     phase ===
     "private_purchase"
   ) {
-    buttonText =
-      "Private Allocation Window";
+    if (
+      sessionStatus === "loading" ||
+      checkingAccess
+    ) {
+      buttonText =
+        "Checking Private Access";
 
-    buttonHref =
-      "/product/crimson-rose";
+      buttonDisabled = true;
+    } else if (
+      session &&
+      hasPrivateAccess
+    ) {
+      /*
+       * Customer has confirmed private access.
+       *
+       * They can now claim their
+       * private allocation.
+       */
 
-    buttonDisabled = false;
+      buttonText =
+        "Claim Private Allocation";
+
+      buttonHref =
+        "/product/crimson-rose";
+
+      buttonDisabled = false;
+    } else {
+      /*
+       * Customer did not reserve.
+       *
+       * Do not allow them to claim
+       * the private allocation.
+       */
+
+      buttonText =
+        "Reserved for Private Access";
+
+      buttonDisabled = true;
+    }
   }
 
   /*
    * =========================================================
-   * PUBLIC
+   * PHASE 3 — PUBLIC
    * =========================================================
    */
 
@@ -161,7 +485,7 @@ export default function CrimsonRoseReservationPage() {
 
   /*
    * =========================================================
-   * SOLD OUT
+   * PHASE 4 — SOLD OUT
    * =========================================================
    */
 
@@ -175,10 +499,29 @@ export default function CrimsonRoseReservationPage() {
     buttonDisabled = true;
   }
 
-  return (
-    <main className="min-h-screen bg-[#FAF8F5]">
+  /*
+   * =========================================================
+   * PAGE
+   * =========================================================
+   */
 
-      <section className="mx-auto max-w-5xl px-6 pt-10 pb-20">
+  return (
+    <main
+      className="
+        min-h-screen
+        bg-[#FAF8F5]
+      "
+    >
+
+      <section
+        className="
+          mx-auto
+          max-w-5xl
+          px-6
+          pt-10
+          pb-20
+        "
+      >
 
         {/* ================================================= */}
         {/* GALLERY */}
@@ -197,6 +540,7 @@ export default function CrimsonRoseReservationPage() {
             duration: 1.2,
           }}
         >
+
           <ProductGallery
             id="crimson-rose"
             name="Crimson Rose"
@@ -212,20 +556,46 @@ export default function CrimsonRoseReservationPage() {
               "/products/crimson-rose/8.jpg",
             ]}
           />
+
         </motion.div>
+
 
         {/* ================================================= */}
         {/* PRODUCT INFORMATION */}
         {/* ================================================= */}
 
-        <div className="mx-auto max-w-2xl pt-12 text-center">
+        <div
+          className="
+            mx-auto
+            max-w-2xl
+            pt-12
+            text-center
+          "
+        >
 
-          <p className="text-xs uppercase tracking-[0.35em] text-gray-400">
+          {/* PRODUCT TYPE */}
+
+          <p
+            className="
+              text-xs
+              uppercase
+              tracking-[0.35em]
+              text-gray-400
+            "
+          >
             {product.type}
           </p>
 
+
+          {/* PRODUCT NAME */}
+
           <h1
-            className="mt-4 text-5xl font-light text-[#AF9685]"
+            className="
+              mt-4
+              text-5xl
+              font-light
+              text-[#AF9685]
+            "
             style={{
               fontFamily:
                 '"Cormorant Garamond", serif',
@@ -234,16 +604,37 @@ export default function CrimsonRoseReservationPage() {
             {product.name}
           </h1>
 
-          <p className="mt-8 text-[15px] leading-8 text-[#6B625B]">
+
+          {/* DESCRIPTION */}
+
+          <p
+            className="
+              mt-8
+              text-[15px]
+              leading-8
+              text-[#6B625B]
+            "
+          >
             {product.description}
           </p>
 
-          <p className="mt-5 text-sm tracking-[0.08em] text-gray-500">
+
+          {/* PRICE */}
+
+          <p
+            className="
+              mt-5
+              text-sm
+              tracking-[0.08em]
+              text-gray-500
+            "
+          >
             ₹
             {product.price.toLocaleString(
               "en-IN"
             )}
           </p>
+
 
           {/* ================================================= */}
           {/* COLLECTION PHASE */}
@@ -251,41 +642,91 @@ export default function CrimsonRoseReservationPage() {
 
           <div className="mt-10">
 
+            {/* PRIVATE ACCESS */}
+
             {phase ===
               "private_access" && (
-              <p className="text-xs uppercase tracking-[0.28em] text-[#AF9685]">
-                Private Access Applications Open
+              <p
+                className="
+                  text-xs
+                  uppercase
+                  tracking-[0.28em]
+                  text-[#AF9685]
+                "
+              >
+                {hasPrivateAccess
+                  ? "Private Access Reserved"
+                  : "Private Access Applications Open"}
               </p>
             )}
+
+
+            {/* PRIVATE PURCHASE */}
 
             {phase ===
               "private_purchase" && (
-              <p className="text-xs uppercase tracking-[0.28em] text-[#AF9685]">
-                Private Allocation Window
+              <p
+                className="
+                  text-xs
+                  uppercase
+                  tracking-[0.28em]
+                  text-[#AF9685]
+                "
+              >
+                {hasPrivateAccess
+                  ? "Your Private Allocation Window"
+                  : "Private Allocation Window"}
               </p>
             )}
 
+
+            {/* PUBLIC */}
+
             {phase ===
               "public" && (
-              <p className="text-xs uppercase tracking-[0.28em] text-[#8C9A78]">
+              <p
+                className="
+                  text-xs
+                  uppercase
+                  tracking-[0.28em]
+                  text-[#8C9A78]
+                "
+              >
                 Now Available From The Collection
               </p>
             )}
 
+
+            {/* SOLD OUT */}
+
             {phase ===
               "sold_out" && (
-              <p className="text-xs uppercase tracking-[0.28em] text-gray-400">
+              <p
+                className="
+                  text-xs
+                  uppercase
+                  tracking-[0.28em]
+                  text-gray-400
+                "
+              >
                 Edition Exhausted
               </p>
             )}
 
           </div>
 
+
           {/* ================================================= */}
           {/* ACTION */}
           {/* ================================================= */}
 
-          <div className="mt-8 flex justify-center">
+          <div
+            className="
+              mt-12
+              flex
+              justify-center
+            "
+          >
 
             <Link
               href={
@@ -324,44 +765,66 @@ export default function CrimsonRoseReservationPage() {
 
           </div>
 
+
           {/* ================================================= */}
-          {/* PRIVATE ACCESS */}
+          {/* PRIVATE ACCESS MESSAGE */}
           {/* ================================================= */}
 
           {phase ===
             "private_access" && (
-            <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
-              Studio reservations close before
-              the private allocation window.
-              Clients who complete the
-              reservation process receive
-              priority access before the
-              collection opens publicly.
+            <p
+              className="
+                mt-8
+                text-[11px]
+                leading-6
+                tracking-[0.18em]
+                text-gray-400
+              "
+            >
+              {hasPrivateAccess
+                ? "Your ₹2,000 reservation has been successfully confirmed. Your private access is secured for this piece."
+                : "Studio reservations close before the private allocation window. Clients who complete the reservation process receive priority access before the collection opens publicly."}
             </p>
           )}
 
+
           {/* ================================================= */}
-          {/* PRIVATE PURCHASE */}
+          {/* PRIVATE PURCHASE MESSAGE */}
           {/* ================================================= */}
 
           {phase ===
             "private_purchase" && (
-            <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
-              The private allocation window is
-              currently open. Confirmed private
-              access clients receive priority to
-              claim this limited piece before
-              public release.
+            <p
+              className="
+                mt-8
+                text-[11px]
+                leading-6
+                tracking-[0.18em]
+                text-gray-400
+              "
+            >
+              {hasPrivateAccess
+                ? "Your private access gives you priority to claim this limited piece before the collection opens publicly."
+                : "This edition is currently reserved for clients with confirmed private access. Public access will follow if pieces remain available."}
             </p>
           )}
 
+
           {/* ================================================= */}
-          {/* PUBLIC */}
+          {/* PUBLIC MESSAGE */}
           {/* ================================================= */}
 
           {phase ===
             "public" && (
-            <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
+            <p
+              className="
+                mt-8
+                text-[11px]
+                leading-6
+                tracking-[0.18em]
+                text-gray-400
+              "
+            >
               The private allocation window has
               concluded. This edition is now
               available to all clients while
@@ -369,13 +832,22 @@ export default function CrimsonRoseReservationPage() {
             </p>
           )}
 
+
           {/* ================================================= */}
-          {/* SOLD OUT */}
+          {/* SOLD OUT MESSAGE */}
           {/* ================================================= */}
 
           {phase ===
             "sold_out" && (
-            <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
+            <p
+              className="
+                mt-8
+                text-[11px]
+                leading-6
+                tracking-[0.18em]
+                text-gray-400
+              "
+            >
               This limited edition has been
               fully acquired and is no longer
               available.
@@ -383,7 +855,9 @@ export default function CrimsonRoseReservationPage() {
           )}
 
         </div>
+
       </section>
+
     </main>
   );
 }
