@@ -522,7 +522,7 @@ export default function IvoryBlushReservationPage() {
           </h1>
 
           <p className="mt-8 text-[15px] leading-8 text-[#6B625B]">
-            {product.description}
+            {product.detailDescription}
           </p>
 
           <p className="mt-5 text-sm tracking-[0.08em] text-gray-500">
