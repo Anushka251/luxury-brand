@@ -605,7 +605,7 @@ export default function BlueCrystalReservationPage() {
               text-[#6B625B]
             "
           >
-            {product.description}
+            {product.detailDescription}
           </p>
 
 
