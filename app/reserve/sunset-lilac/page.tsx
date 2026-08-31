@@ -609,7 +609,7 @@ export default function SunsetLilacReservationPage() {
               text-[#6B625B]
             "
           >
-            {product.description}
+            {product.detailDescription}
           </p>
 
 
