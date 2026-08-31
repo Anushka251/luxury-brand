@@ -615,7 +615,7 @@ export default function CrimsonRoseReservationPage() {
               text-[#6B625B]
             "
           >
-            {product.description}
+            {product.detailDescription}
           </p>
 
 
