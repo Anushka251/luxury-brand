@@ -2,20 +2,29 @@ import nodemailer from "nodemailer";
 import path from "path";
 import { products } from "@/lib/products";
 
+/*
+ * =========================================================
+ * ZOHO MAIL TRANSPORTER
+ * =========================================================
+ */
+
 export const transporter =
   nodemailer.createTransport({
     host: "smtp.zoho.in",
     port: 465,
     secure: true,
+
     auth: {
       user: process.env.ZOHO_EMAIL,
       pass: process.env.ZOHO_PASSWORD,
     },
   });
 
-/* =========================================================
-   NORMAL ORDER EMAIL
-========================================================= */
+/*
+ * =========================================================
+ * NORMAL ORDER EMAIL
+ * =========================================================
+ */
 
 interface OrderItem {
   name: string;
@@ -43,11 +52,10 @@ export async function sendOrderConfirmationEmail({
 }: OrderEmailProps) {
   const itemsHtml = items
     .map((item) => {
-      const imageUrl = item.image?.startsWith(
-        "http"
-      )
-        ? item.image
-        : `https://avenorcollection.com${item.image}`;
+      const imageUrl =
+        item.image?.startsWith("http")
+          ? item.image
+          : `https://avenorcollection.com${item.image}`;
 
       const productUrl = item.slug
         ? `https://avenorcollection.com/product/${item.slug}`
@@ -59,12 +67,14 @@ export async function sendOrderConfirmationEmail({
             padding:16px 0;
             border-bottom:1px solid #e5e5e5;
           ">
+
             <table
               width="100%"
               cellpadding="0"
               cellspacing="0"
               border="0"
             >
+
               <tr>
 
                 <td width="90" valign="top">
@@ -93,6 +103,7 @@ export async function sendOrderConfirmationEmail({
                   valign="top"
                   style="padding-left:16px;"
                 >
+
                   <a
                     href="${productUrl}"
                     target="_blank"
@@ -104,7 +115,7 @@ export async function sendOrderConfirmationEmail({
                     <p style="
                       margin:0;
                       font-size:14px;
-                      color:#111;
+                      color:#111111;
                       font-weight:500;
                     ">
                       ${item.name}
@@ -116,7 +127,7 @@ export async function sendOrderConfirmationEmail({
                       ? `
                         <p style="
                           margin:6px 0 0;
-                          color:#666;
+                          color:#666666;
                           font-size:13px;
                         ">
                           Size: ${item.size}
@@ -127,18 +138,19 @@ export async function sendOrderConfirmationEmail({
 
                   <p style="
                     margin:6px 0 0;
-                    color:#666;
+                    color:#666666;
                     font-size:13px;
                   ">
                     Qty: ${item.quantity}
                   </p>
+
                 </td>
 
                 <td
                   valign="top"
                   align="right"
                   style="
-                    color:#111;
+                    color:#111111;
                     font-size:14px;
                     font-weight:500;
                     white-space:nowrap;
@@ -150,7 +162,9 @@ export async function sendOrderConfirmationEmail({
                 </td>
 
               </tr>
+
             </table>
+
           </td>
         </tr>
       `;
@@ -159,6 +173,9 @@ export async function sendOrderConfirmationEmail({
 
   await transporter.sendMail({
     from: `"Avenor Collection" <${process.env.ZOHO_EMAIL}>`,
+
+    replyTo:
+      "support@avenorcollection.com",
 
     to: customerEmail,
 
@@ -469,10 +486,11 @@ export async function sendOrderConfirmationEmail({
   });
 }
 
-
-/* =========================================================
-   AVENOR STUDIO RESERVATION EMAIL
-========================================================= */
+/*
+ * =========================================================
+ * AVENOR STUDIO RESERVATION EMAIL
+ * =========================================================
+ */
 
 interface ReservationEmailProps {
   customerEmail: string;
@@ -491,7 +509,7 @@ export async function sendReservationConfirmationEmail({
 }: ReservationEmailProps) {
 
   /*
-   * Find the exact product from products.ts.
+   * FIND PRODUCT
    */
 
   const productData = products.find(
@@ -504,21 +522,11 @@ export async function sendReservationConfirmationEmail({
     );
   }
 
-  /*
-   * Product name.
-   */
-
   const productName =
     productData.name;
 
   /*
-   * Exact image path from products.ts.
-   *
-   * Example:
-   * /products/crimson-rose/cover.jpg
-   *
-   * becomes:
-   * /project/public/products/crimson-rose/cover.jpg
+   * LOCAL COVER IMAGE
    */
 
   const coverImagePath =
@@ -529,45 +537,53 @@ export async function sendReservationConfirmationEmail({
     );
 
   /*
-   * Product page.
-   *
-   * The image, product name and button
-   * all link to this page.
+   * PRODUCT PAGE
    */
 
   const productUrl =
     `https://avenorcollection.com/product/${product}`;
 
   /*
-   * Unique Content-ID.
-   *
-   * The image is embedded directly inside
-   * the email rather than loaded from the
-   * website.
+   * UNIQUE IMAGE CID
    */
 
   const imageCid =
     `avenor-${product}-${orderId}@avenorcollection.com`;
 
+  /*
+   * SEND EMAIL
+   */
+
   await transporter.sendMail({
     from:
       `"Avenor Collection" <${process.env.ZOHO_EMAIL}>`,
 
-    to: customerEmail,
+    replyTo:
+      "support@avenorcollection.com",
+
+    to:
+      customerEmail,
 
     subject:
       `AVENOR Studio Reservation Confirmed • ${productName}`,
 
     /*
-     * EMBED THE COVER IMAGE.
+     * EMBED PRODUCT IMAGE
      */
 
     attachments: [
       {
         filename:
-          `${product}-cover`,
-        path: coverImagePath,
-        cid: imageCid,
+          `${product}-cover.jpg`,
+
+        path:
+          coverImagePath,
+
+        cid:
+          imageCid,
+
+        contentType:
+          "image/jpeg",
       },
     ],
 
@@ -606,9 +622,7 @@ export async function sendReservationConfirmationEmail({
                 "
               >
 
-                <!-- =================================================
-                     AVENOR LOGO
-                ================================================== -->
+                <!-- AVENOR LOGO -->
 
                 <tr>
                   <td align="center">
@@ -627,10 +641,7 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-
-                <!-- =================================================
-                     HEADER
-                ================================================== -->
+                <!-- HEADER -->
 
                 <tr>
                   <td style="
@@ -673,10 +684,7 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-
-                <!-- =================================================
-                     PRODUCT IMAGE
-                ================================================== -->
+                <!-- PRODUCT IMAGE -->
 
                 <tr>
                   <td
@@ -716,10 +724,7 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-
-                <!-- =================================================
-                     PRODUCT NAME
-                ================================================== -->
+                <!-- PRODUCT NAME -->
 
                 <tr>
                   <td
@@ -769,10 +774,7 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-
-                <!-- =================================================
-                     PAYMENT
-                ================================================== -->
+                <!-- PAYMENT -->
 
                 <tr>
                   <td style="
@@ -845,10 +847,7 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-
-                <!-- =================================================
-                     RESERVATION MESSAGE
-                ================================================== -->
+                <!-- RESERVATION MESSAGE -->
 
                 <tr>
                   <td style="
@@ -887,10 +886,7 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-
-                <!-- =================================================
-                     RESERVATION REFERENCE
-                ================================================== -->
+                <!-- RESERVATION REFERENCE -->
 
                 <tr>
                   <td style="
@@ -940,10 +936,7 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-
-                <!-- =================================================
-                     VIEW PRODUCT BUTTON
-                ================================================== -->
+                <!-- VIEW PRODUCT -->
 
                 <tr>
                   <td
@@ -973,10 +966,7 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-
-                <!-- =================================================
-                     SUPPORT
-                ================================================== -->
+                <!-- SUPPORT -->
 
                 <tr>
                   <td style="
@@ -1003,10 +993,7 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-
-                <!-- =================================================
-                     FOOTER
-                ================================================== -->
+                <!-- FOOTER -->
 
                 <tr>
                   <td
