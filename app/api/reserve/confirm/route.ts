@@ -69,20 +69,22 @@ export async function POST(req: Request) {
 
     /*
      * =========================================================
-     * ALREADY CONFIRMED
+     * ALREADY REFUNDED
      * =========================================================
      */
 
     if (
-      reservation.paymentStatus ===
-        "confirmed" &&
-      reservation.status ===
-        "confirmed"
+      reservation.status === "refunded"
     ) {
       return NextResponse.json({
-        paymentStatus: "confirmed",
-        reservationStatus: "confirmed",
-        privateAccess: true,
+        paymentStatus:
+          reservation.paymentStatus,
+
+        reservationStatus:
+          "refunded",
+
+        privateAccess: false,
+
         orderId,
       });
     }
@@ -99,26 +101,12 @@ export async function POST(req: Request) {
       return NextResponse.json({
         paymentStatus:
           reservation.paymentStatus,
-        reservationStatus: "purchased",
+
+        reservationStatus:
+          "purchased",
+
         privateAccess: true,
-        orderId,
-      });
-    }
 
-    /*
-     * =========================================================
-     * ALREADY REFUNDED
-     * =========================================================
-     */
-
-    if (
-      reservation.status === "refunded"
-    ) {
-      return NextResponse.json({
-        paymentStatus:
-          reservation.paymentStatus,
-        reservationStatus: "refunded",
-        privateAccess: false,
         orderId,
       });
     }
@@ -127,12 +115,6 @@ export async function POST(req: Request) {
      * =========================================================
      * EXPECTED PAYMENT AMOUNT
      * =========================================================
-     *
-     * The amount comes from MongoDB.
-     *
-     * Current reservation fee:
-     *
-     * ₹2,000
      */
 
     const expectedAmount =
@@ -164,16 +146,6 @@ export async function POST(req: Request) {
      * =========================================================
      * CASHFREE ENVIRONMENT
      * =========================================================
-     *
-     * IMPORTANT:
-     *
-     * This MUST match app/api/reserve/route.ts
-     *
-     * CASHFREE_MODE=sandbox
-     *     → Sandbox
-     *
-     * CASHFREE_MODE=production
-     *     → Production
      */
 
     const cashfreeMode =
@@ -212,7 +184,7 @@ export async function POST(req: Request) {
 
     /*
      * =========================================================
-     * GET CASHFREE PAYMENTS
+     * VERIFY PAYMENT WITH CASHFREE
      * =========================================================
      */
 
@@ -301,16 +273,6 @@ export async function POST(req: Request) {
      * =========================================================
      * SUCCESSFUL PAYMENT
      * =========================================================
-     *
-     * Cashfree must report:
-     *
-     * payment_status = SUCCESS
-     *
-     * AND
-     *
-     * payment_amount = ₹2,000
-     *
-     * Only then is private access granted.
      */
 
     const successfulPayment =
@@ -326,6 +288,13 @@ export async function POST(req: Request) {
       );
 
     if (successfulPayment) {
+
+      /*
+       * =======================================================
+       * CONFIRM RESERVATION
+       * =======================================================
+       */
+
       reservation.paymentStatus =
         "confirmed";
 
@@ -336,43 +305,72 @@ export async function POST(req: Request) {
 
       /*
        * =======================================================
-       * CONFIRMATION EMAIL
+       * SEND AVENOR EMAIL
        * =======================================================
+       *
+       * Only send once.
        */
 
-      try {
-        await sendReservationConfirmationEmail(
-          {
-            customerEmail:
-              reservation.email,
+      if (
+        reservation.confirmationEmailSent !==
+        true
+      ) {
+        try {
 
-            customerName:
-              reservation.fullName,
+          await sendReservationConfirmationEmail(
+            {
+              customerEmail:
+                reservation.email,
 
-            product:
-              reservation.product,
+              customerName:
+                reservation.fullName,
 
-            orderId,
+              product:
+                reservation.product,
 
-            reservationFee:
-              expectedAmount,
-          }
-        );
+              orderId,
 
+              reservationFee:
+                expectedAmount,
+            }
+          );
+
+          reservation.confirmationEmailSent =
+            true;
+
+          reservation.confirmationEmailSentAt =
+            new Date();
+
+          await reservation.save();
+
+          console.log(
+            `AVENOR reservation confirmation email sent: ${orderId}`
+          );
+
+        } catch (emailError) {
+
+          /*
+           * Email failure does NOT
+           * cancel the successful payment.
+           */
+
+          console.error(
+            "AVENOR reservation email failed:",
+            emailError
+          );
+
+        }
+      } else {
         console.log(
-          `AVENOR confirmation email sent: ${orderId}`
-        );
-      } catch (emailError) {
-        /*
-         * Email failure must NOT
-         * cancel successful access.
-         */
-
-        console.error(
-          "Reservation confirmation email failed:",
-          emailError
+          `AVENOR reservation email already sent: ${orderId}`
         );
       }
+
+      /*
+       * =======================================================
+       * PRIVATE ACCESS
+       * =======================================================
+       */
 
       console.log(
         `AVENOR PRIVATE ACCESS CONFIRMED: ${orderId}`
@@ -407,6 +405,7 @@ export async function POST(req: Request) {
       );
 
     if (pendingPayment) {
+
       reservation.paymentStatus =
         "pending";
 
@@ -430,16 +429,12 @@ export async function POST(req: Request) {
 
     /*
      * =========================================================
-     * FAILED / OTHER TRANSACTION
+     * FAILED / OTHER PAYMENT
      * =========================================================
-     *
-     * Do NOT grant private access.
-     *
-     * Keep the reservation pending so
-     * the customer can retry.
      */
 
     if (payments.length > 0) {
+
       reservation.paymentStatus =
         "pending";
 
@@ -463,7 +458,7 @@ export async function POST(req: Request) {
 
     /*
      * =========================================================
-     * NO PAYMENT TRANSACTION YET
+     * NO PAYMENT YET
      * =========================================================
      */
 
@@ -486,7 +481,9 @@ export async function POST(req: Request) {
 
       orderId,
     });
+
   } catch (error) {
+
     console.error(
       "Reservation payment confirmation error:",
       error
