@@ -509,7 +509,9 @@ export async function sendReservationConfirmationEmail({
 }: ReservationEmailProps) {
 
   /*
+   * =======================================================
    * FIND PRODUCT
+   * =======================================================
    */
 
   const productData = products.find(
@@ -526,7 +528,9 @@ export async function sendReservationConfirmationEmail({
     productData.name;
 
   /*
+   * =======================================================
    * LOCAL COVER IMAGE
+   * =======================================================
    */
 
   const coverImagePath =
@@ -537,21 +541,39 @@ export async function sendReservationConfirmationEmail({
     );
 
   /*
-   * PRODUCT PAGE
+   * =======================================================
+   * RESERVATION PAGE
+   * =======================================================
+   *
+   * IMPORTANT:
+   *
+   * Reservation email links must go to:
+   *
+   * /reserve/blue-crystal
+   *
+   * NOT:
+   *
+   * /product/blue-crystal
+   *
+   * The product variable is automatically used.
    */
 
-  const productUrl =
-    `https://avenorcollection.com/product/${product}`;
+  const reservationUrl =
+    `https://avenorcollection.com/reserve/${product}`;
 
   /*
+   * =======================================================
    * UNIQUE IMAGE CID
+   * =======================================================
    */
 
   const imageCid =
     `avenor-${product}-${orderId}@avenorcollection.com`;
 
   /*
+   * =======================================================
    * SEND EMAIL
+   * =======================================================
    */
 
   await transporter.sendMail({
@@ -622,7 +644,9 @@ export async function sendReservationConfirmationEmail({
                 "
               >
 
-                <!-- AVENOR LOGO -->
+                <!-- =================================================
+                     AVENOR LOGO
+                ================================================== -->
 
                 <tr>
                   <td align="center">
@@ -641,7 +665,9 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-                <!-- HEADER -->
+                <!-- =================================================
+                     HEADER
+                ================================================== -->
 
                 <tr>
                   <td style="
@@ -684,7 +710,9 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-                <!-- PRODUCT IMAGE -->
+                <!-- =================================================
+                     PRODUCT IMAGE
+                ================================================== -->
 
                 <tr>
                   <td
@@ -695,7 +723,7 @@ export async function sendReservationConfirmationEmail({
                   >
 
                     <a
-                      href="${productUrl}"
+                      href="${reservationUrl}"
                       target="_blank"
                       style="
                         display:block;
@@ -724,7 +752,9 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-                <!-- PRODUCT NAME -->
+                <!-- =================================================
+                     PRODUCT NAME
+                ================================================== -->
 
                 <tr>
                   <td
@@ -756,7 +786,7 @@ export async function sendReservationConfirmationEmail({
                     </p>
 
                     <a
-                      href="${productUrl}"
+                      href="${reservationUrl}"
                       target="_blank"
                       style="
                         display:inline-block;
@@ -774,7 +804,9 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-                <!-- PAYMENT -->
+                <!-- =================================================
+                     PAYMENT
+                ================================================== -->
 
                 <tr>
                   <td style="
@@ -847,7 +879,9 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-                <!-- RESERVATION MESSAGE -->
+                <!-- =================================================
+                     RESERVATION MESSAGE
+                ================================================== -->
 
                 <tr>
                   <td style="
@@ -886,7 +920,9 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-                <!-- RESERVATION REFERENCE -->
+                <!-- =================================================
+                     RESERVATION REFERENCE
+                ================================================== -->
 
                 <tr>
                   <td style="
@@ -936,7 +972,9 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-                <!-- VIEW PRODUCT -->
+                <!-- =================================================
+                     VIEW RESERVATION PAGE
+                ================================================== -->
 
                 <tr>
                   <td
@@ -947,7 +985,7 @@ export async function sendReservationConfirmationEmail({
                   >
 
                     <a
-                      href="${productUrl}"
+                      href="${reservationUrl}"
                       target="_blank"
                       style="
                         display:inline-block;
@@ -966,7 +1004,9 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-                <!-- SUPPORT -->
+                <!-- =================================================
+                     SUPPORT
+                ================================================== -->
 
                 <tr>
                   <td style="
@@ -993,7 +1033,9 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
-                <!-- FOOTER -->
+                <!-- =================================================
+                     FOOTER
+                ================================================== -->
 
                 <tr>
                   <td
