@@ -85,7 +85,7 @@ export async function POST(req: Request) {
 
     /*
      * =========================================================
-     * NORMALIZE CUSTOMER INFORMATION
+     * CUSTOMER INFORMATION
      * =========================================================
      */
 
@@ -102,11 +102,6 @@ export async function POST(req: Request) {
      * =========================================================
      * CASHFREE MODE
      * =========================================================
-     *
-     * Set CASHFREE_MODE=sandbox while testing.
-     *
-     * Set CASHFREE_MODE=production when
-     * using your live Cashfree credentials.
      */
 
     const cashfreeMode =
@@ -122,12 +117,32 @@ export async function POST(req: Request) {
 
     /*
      * =========================================================
+     * CASHFREE CREDENTIAL CHECK
+     * =========================================================
+     */
+
+    if (
+      !process.env.CASHFREE_CLIENT_ID ||
+      !process.env.CASHFREE_CLIENT_SECRET
+    ) {
+      console.error(
+        "Cashfree credentials are missing."
+      );
+
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Cashfree configuration is incomplete.",
+        },
+        { status: 500 }
+      );
+    }
+
+    /*
+     * =========================================================
      * RESERVATION FEE
      * =========================================================
-     *
-     * FIXED RESERVATION FEE
-     *
-     * ₹2,000
      */
 
     const reservationFee = 2000;
@@ -164,11 +179,11 @@ export async function POST(req: Request) {
 
             "x-client-id":
               process.env
-                .CASHFREE_CLIENT_ID!,
+                .CASHFREE_CLIENT_ID,
 
             "x-client-secret":
               process.env
-                .CASHFREE_CLIENT_SECRET!,
+                .CASHFREE_CLIENT_SECRET,
 
             "x-api-version":
               "2023-08-01",
@@ -292,15 +307,11 @@ export async function POST(req: Request) {
      * =========================================================
      * CREATE PENDING RESERVATION
      * =========================================================
-     *
-     * The reservation starts as pending.
-     *
-     * Private access is granted only after
-     * Cashfree confirms the ₹2,000 payment.
      */
 
     const reservation =
       await Reservation.create({
+
         product:
           product.trim(),
 
@@ -349,6 +360,12 @@ export async function POST(req: Request) {
 
         refundedAt:
           null,
+
+        confirmationEmailSent:
+          false,
+
+        confirmationEmailSentAt:
+          null,
       });
 
     console.log(
@@ -363,6 +380,7 @@ export async function POST(req: Request) {
      */
 
     return NextResponse.json({
+
       success: true,
 
       order_id:
@@ -382,7 +400,9 @@ export async function POST(req: Request) {
 
       cashfreeMode,
     });
+
   } catch (error) {
+
     console.error(
       "Reservation creation error:",
       error
