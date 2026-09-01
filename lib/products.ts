@@ -142,7 +142,7 @@ Every detail is thoughtfully finished to celebrate the artistry of fine craftsma
       "/products/sunset-lilac/3.JPG",
     ],
 
-    totalPieces: 10,
+    totalPieces: 7,
 
     collectionPhase:
       "private_access",
