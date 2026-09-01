@@ -78,11 +78,13 @@ export async function sendOrderConfirmationEmail({
               <tr>
 
                 <td width="90" valign="top">
+
                   <a
                     href="${productUrl}"
                     target="_blank"
                     style="text-decoration:none;"
                   >
+
                     <img
                       src="${imageUrl}"
                       alt="${item.name}"
@@ -96,7 +98,9 @@ export async function sendOrderConfirmationEmail({
                         border:1px solid #eeeeee;
                       "
                     />
+
                   </a>
+
                 </td>
 
                 <td
@@ -112,6 +116,7 @@ export async function sendOrderConfirmationEmail({
                       color:#111111;
                     "
                   >
+
                     <p style="
                       margin:0;
                       font-size:14px;
@@ -120,6 +125,7 @@ export async function sendOrderConfirmationEmail({
                     ">
                       ${item.name}
                     </p>
+
                   </a>
 
                   ${
@@ -172,12 +178,14 @@ export async function sendOrderConfirmationEmail({
     .join("");
 
   await transporter.sendMail({
-    from: `"Avenor Collection" <${process.env.ZOHO_EMAIL}>`,
+    from:
+      `"Avenor Collection" <${process.env.ZOHO_EMAIL}>`,
 
     replyTo:
       "support@avenorcollection.com",
 
-    to: customerEmail,
+    to:
+      customerEmail,
 
     subject:
       `Avenor Order Confirmation • ${orderNumber}`,
@@ -545,21 +553,28 @@ export async function sendReservationConfirmationEmail({
    * RESERVATION PAGE
    * =======================================================
    *
-   * IMPORTANT:
+   * For Crimson Rose:
    *
-   * Reservation email links must go to:
+   * https://avenorcollection.com/reserve/crimson-rose
    *
-   * /reserve/blue-crystal
-   *
-   * NOT:
-   *
-   * /product/blue-crystal
-   *
-   * The product variable is automatically used.
+   * =======================================================
    */
 
   const reservationUrl =
-    `https://avenorcollection.com/reserve/${product}`;
+    "https://avenorcollection.com/reserve/crimson-rose";
+
+  /*
+   * =======================================================
+   * PRIVATE ACCESS PAGE
+   * =======================================================
+   *
+   * The main button goes here.
+   *
+   * =======================================================
+   */
+
+  const privateAccessUrl =
+    "https://avenorcollection.com/account/private-access";
 
   /*
    * =======================================================
@@ -712,6 +727,7 @@ export async function sendReservationConfirmationEmail({
 
                 <!-- =================================================
                      PRODUCT IMAGE
+                     CLICKING IMAGE → RESERVATION PAGE
                 ================================================== -->
 
                 <tr>
@@ -784,6 +800,8 @@ export async function sendReservationConfirmationEmail({
                     ">
                       ${productName}
                     </p>
+
+                    <!-- VIEW PIECE → RESERVATION PAGE -->
 
                     <a
                       href="${reservationUrl}"
@@ -973,7 +991,8 @@ export async function sendReservationConfirmationEmail({
                 </tr>
 
                 <!-- =================================================
-                     VIEW RESERVATION PAGE
+                     VIEW CRIMSON ROSE BUTTON
+                     → PRIVATE ACCESS PAGE
                 ================================================== -->
 
                 <tr>
@@ -985,7 +1004,7 @@ export async function sendReservationConfirmationEmail({
                   >
 
                     <a
-                      href="${reservationUrl}"
+                      href="${privateAccessUrl}"
                       target="_blank"
                       style="
                         display:inline-block;
