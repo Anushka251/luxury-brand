@@ -78,13 +78,11 @@ export async function sendOrderConfirmationEmail({
               <tr>
 
                 <td width="90" valign="top">
-
                   <a
                     href="${productUrl}"
                     target="_blank"
                     style="text-decoration:none;"
                   >
-
                     <img
                       src="${imageUrl}"
                       alt="${item.name}"
@@ -98,9 +96,7 @@ export async function sendOrderConfirmationEmail({
                         border:1px solid #eeeeee;
                       "
                     />
-
                   </a>
-
                 </td>
 
                 <td
@@ -116,7 +112,6 @@ export async function sendOrderConfirmationEmail({
                       color:#111111;
                     "
                   >
-
                     <p style="
                       margin:0;
                       font-size:14px;
@@ -125,7 +120,6 @@ export async function sendOrderConfirmationEmail({
                     ">
                       ${item.name}
                     </p>
-
                   </a>
 
                   ${
@@ -178,8 +172,7 @@ export async function sendOrderConfirmationEmail({
     .join("");
 
   await transporter.sendMail({
-    from:
-      `"Avenor Collection" <${process.env.ZOHO_EMAIL}>`,
+    from: `"Avenor Collection" <${process.env.ZOHO_EMAIL}>`,
 
     replyTo:
       "support@avenorcollection.com",
@@ -494,6 +487,7 @@ export async function sendOrderConfirmationEmail({
   });
 }
 
+
 /*
  * =========================================================
  * AVENOR STUDIO RESERVATION EMAIL
@@ -518,7 +512,7 @@ export async function sendReservationConfirmationEmail({
 
   /*
    * =======================================================
-   * FIND PRODUCT
+   * FIND EXACT PRODUCT
    * =======================================================
    */
 
@@ -531,6 +525,12 @@ export async function sendReservationConfirmationEmail({
       `Product not found for reservation: ${product}`
     );
   }
+
+  /*
+   * =======================================================
+   * PRODUCT NAME
+   * =======================================================
+   */
 
   const productName =
     productData.name;
@@ -550,27 +550,35 @@ export async function sendReservationConfirmationEmail({
 
   /*
    * =======================================================
-   * RESERVATION PAGE
+   * DYNAMIC RESERVATION PAGE
    * =======================================================
    *
-   * For Crimson Rose:
+   * IMPORTANT:
    *
-   * https://avenorcollection.com/reserve/crimson-rose
+   * This is dynamic.
    *
-   * =======================================================
+   * Crimson Rose
+   * → /reserve/crimson-rose
+   *
+   * Ivory Blush
+   * → /reserve/ivory-blush
+   *
+   * Blue Crystal
+   * → /reserve/blue-crystal
+   *
+   * Sunset Lilac
+   * → /reserve/sunset-lilac
    */
 
   const reservationUrl =
-    "https://avenorcollection.com/reserve/crimson-rose";
+    `https://avenorcollection.com/reserve/${product}`;
 
   /*
    * =======================================================
    * PRIVATE ACCESS PAGE
    * =======================================================
    *
-   * The main button goes here.
-   *
-   * =======================================================
+   * The final button always goes here.
    */
 
   const privateAccessUrl =
@@ -680,6 +688,7 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
+
                 <!-- =================================================
                      HEADER
                 ================================================== -->
@@ -725,9 +734,10 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
+
                 <!-- =================================================
                      PRODUCT IMAGE
-                     CLICKING IMAGE → RESERVATION PAGE
+                     CLICK → PRODUCT RESERVE PAGE
                 ================================================== -->
 
                 <tr>
@@ -768,6 +778,7 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
+
                 <!-- =================================================
                      PRODUCT NAME
                 ================================================== -->
@@ -801,7 +812,11 @@ export async function sendReservationConfirmationEmail({
                       ${productName}
                     </p>
 
-                    <!-- VIEW PIECE → RESERVATION PAGE -->
+
+                    <!-- =================================================
+                         VIEW PIECE
+                         CLICK → PRODUCT RESERVE PAGE
+                    ================================================== -->
 
                     <a
                       href="${reservationUrl}"
@@ -821,6 +836,7 @@ export async function sendReservationConfirmationEmail({
 
                   </td>
                 </tr>
+
 
                 <!-- =================================================
                      PAYMENT
@@ -897,6 +913,7 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
+
                 <!-- =================================================
                      RESERVATION MESSAGE
                 ================================================== -->
@@ -937,6 +954,7 @@ export async function sendReservationConfirmationEmail({
 
                   </td>
                 </tr>
+
 
                 <!-- =================================================
                      RESERVATION REFERENCE
@@ -990,9 +1008,10 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
+
                 <!-- =================================================
-                     VIEW CRIMSON ROSE BUTTON
-                     → PRIVATE ACCESS PAGE
+                     FINAL BUTTON
+                     CLICK → PRIVATE ACCESS PAGE
                 ================================================== -->
 
                 <tr>
@@ -1023,6 +1042,7 @@ export async function sendReservationConfirmationEmail({
                   </td>
                 </tr>
 
+
                 <!-- =================================================
                      SUPPORT
                 ================================================== -->
@@ -1051,6 +1071,7 @@ export async function sendReservationConfirmationEmail({
 
                   </td>
                 </tr>
+
 
                 <!-- =================================================
                      FOOTER
@@ -1097,6 +1118,7 @@ export async function sendReservationConfirmationEmail({
 
                   </td>
                 </tr>
+
 
               </table>
 
