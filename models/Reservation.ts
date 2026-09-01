@@ -108,10 +108,8 @@ const ReservationSchema = new Schema(
      * Production:
      * ₹2,000
      *
-     * Test mode:
-     * ₹1
-     *
-     * The actual amount paid is stored here.
+     * The actual reservation fee is
+     * stored here.
      */
 
     reservationFee: {
@@ -128,6 +126,7 @@ const ReservationSchema = new Schema(
 
     paymentStatus: {
       type: String,
+
       enum: [
         "pending",
         "confirmed",
@@ -135,7 +134,9 @@ const ReservationSchema = new Schema(
         "refunded",
         "closed",
       ],
+
       default: "pending",
+
       index: true,
     },
 
@@ -145,22 +146,19 @@ const ReservationSchema = new Schema(
      * ==========================================
      *
      * pending
-     * → Reservation/payment has not yet
-     *   been successfully completed.
+     * → Payment/reservation not completed.
      *
      * confirmed
-     * → Customer successfully paid the
-     *   reservation fee.
-     * → Customer has PRIVATE ACCESS.
+     * → Reservation fee successfully paid.
+     * → Customer receives PRIVATE ACCESS.
      *
      * purchased
-     * → Customer used their private access
+     * → Customer used private access
      *   and purchased the piece.
      *
      * refunded
-     * → Customer's private opportunity ended
-     *   without purchase and the reservation
-     *   fee is being/has been returned.
+     * → Reservation opportunity ended
+     *   and the fee was refunded.
      */
 
     status: {
@@ -180,14 +178,32 @@ const ReservationSchema = new Schema(
 
     /*
      * ==========================================
-     * OPTIONAL PURCHASE INFORMATION
+     * AVENOR CONFIRMATION EMAIL
+     * ==========================================
+     *
+     * Prevents duplicate reservation
+     * confirmation emails if the payment
+     * confirmation endpoint is called more
+     * than once.
+     */
+
+    confirmationEmailSent: {
+      type: Boolean,
+      default: false,
+    },
+
+    confirmationEmailSentAt: {
+      type: Date,
+      default: null,
+    },
+
+    /*
+     * ==========================================
+     * PURCHASE INFORMATION
      * ==========================================
      *
      * When the customer eventually purchases
-     * the piece, we can store the normal
-     * order number here.
-     *
-     * This makes it easy to connect:
+     * the piece, store the normal order number.
      *
      * Reservation → Order
      */
@@ -203,9 +219,6 @@ const ReservationSchema = new Schema(
      * ==========================================
      * REFUND INFORMATION
      * ==========================================
-     *
-     * We will use these later when implementing
-     * the private-window refund logic.
      */
 
     refundStatus: {
@@ -231,6 +244,7 @@ const ReservationSchema = new Schema(
       default: null,
     },
   },
+
   {
     timestamps: true,
   }
