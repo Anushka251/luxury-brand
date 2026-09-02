@@ -40,14 +40,15 @@ export default function IvoryBlushReservationPage() {
    * CHECK PRIVATE ACCESS
    * =========================================================
    *
-   * A customer has private access ONLY when:
+   * Database is the source of truth.
+   *
+   * Customer has private access ONLY when:
    *
    * product === "ivory-blush"
    * paymentStatus === "confirmed"
    * status === "confirmed"
    *
-   * The DATABASE is the source of truth.
-   * We do NOT rely on sessionStorage here.
+   * We do NOT rely on sessionStorage.
    */
 
   useEffect(() => {
@@ -153,11 +154,8 @@ export default function IvoryBlushReservationPage() {
 
   /*
    * =========================================================
-   * REFRESH ACCESS WHEN CUSTOMER RETURNS TO PAGE
+   * REFRESH ACCESS WHEN CUSTOMER RETURNS
    * =========================================================
-   *
-   * This helps if the customer completes payment
-   * in another page/tab and then comes back here.
    */
 
   useEffect(() => {
@@ -218,7 +216,7 @@ export default function IvoryBlushReservationPage() {
         );
       } catch (error) {
         console.error(
-          "Private access refresh error:",
+          "Ivory Blush private access refresh error:",
           error
         );
       }
@@ -252,15 +250,36 @@ export default function IvoryBlushReservationPage() {
 
   if (!product) {
     return (
-      <main className="min-h-screen bg-[#FAF8F5] flex items-center justify-center px-6">
+      <main
+        className="
+          min-h-screen
+          bg-[#FAF8F5]
+          flex
+          items-center
+          justify-center
+          px-6
+        "
+      >
         <div className="max-w-xl text-center">
 
-          <p className="text-xs uppercase tracking-[0.35em] text-gray-400">
+          <p
+            className="
+              text-xs
+              uppercase
+              tracking-[0.35em]
+              text-gray-400
+            "
+          >
             AVENOR
           </p>
 
           <h1
-            className="mt-5 text-5xl font-light text-[#AF9685]"
+            className="
+              mt-5
+              text-5xl
+              font-light
+              text-[#AF9685]
+            "
             style={{
               fontFamily:
                 '"Cormorant Garamond", serif',
@@ -269,7 +288,14 @@ export default function IvoryBlushReservationPage() {
             Piece Not Found
           </h1>
 
-          <p className="mt-6 text-sm leading-7 text-gray-500">
+          <p
+            className="
+              mt-6
+              text-sm
+              leading-7
+              text-gray-500
+            "
+          >
             This piece is currently unavailable
             from the collection.
           </p>
@@ -328,12 +354,6 @@ export default function IvoryBlushReservationPage() {
    * =========================================================
    * PHASE 1 — PRIVATE ACCESS
    * =========================================================
-   *
-   * BEFORE PAYMENT:
-   * Reserve Private Access
-   *
-   * AFTER SUCCESSFUL PAYMENT:
-   * Private Access Reserved
    */
 
   if (
@@ -354,13 +374,6 @@ export default function IvoryBlushReservationPage() {
     ) {
       buttonText =
         "View Your Reservation";
-
-      /*
-       * Do NOT send the customer
-       * back to the reservation form.
-       *
-       * Send them to their reservations.
-       */
 
       buttonHref =
         "/account/reservations";
@@ -399,13 +412,6 @@ export default function IvoryBlushReservationPage() {
       session &&
       hasPrivateAccess
     ) {
-      /*
-       * Confirmed reservation.
-       *
-       * Customer can now claim
-       * the private allocation.
-       */
-
       buttonText =
         "Claim Private Allocation";
 
@@ -414,12 +420,6 @@ export default function IvoryBlushReservationPage() {
 
       buttonDisabled = false;
     } else {
-      /*
-       * Private purchase is open,
-       * but this customer did not
-       * reserve access.
-       */
-
       buttonText =
         "Reserved for Private Access";
 
@@ -462,10 +462,29 @@ export default function IvoryBlushReservationPage() {
     buttonDisabled = true;
   }
 
-  return (
-    <main className="min-h-screen bg-[#FAF8F5]">
+  /*
+   * =========================================================
+   * PAGE
+   * =========================================================
+   */
 
-      <section className="mx-auto max-w-5xl px-6 pt-10 pb-20">
+  return (
+    <main
+      className="
+        min-h-screen
+        bg-[#FAF8F5]
+      "
+    >
+
+      <section
+        className="
+          mx-auto
+          max-w-5xl
+          px-6
+          pt-10
+          pb-20
+        "
+      >
 
         {/* ================================================= */}
         {/* GALLERY */}
@@ -484,6 +503,7 @@ export default function IvoryBlushReservationPage() {
             duration: 1.2,
           }}
         >
+
           <ProductGallery
             id="ivory-blush"
             name="Ivory Blush"
@@ -499,20 +519,46 @@ export default function IvoryBlushReservationPage() {
               "/products/ivory-blush/8.jpg",
             ]}
           />
+
         </motion.div>
+
 
         {/* ================================================= */}
         {/* PRODUCT INFORMATION */}
         {/* ================================================= */}
 
-        <div className="mx-auto max-w-2xl pt-12 text-center">
+        <div
+          className="
+            mx-auto
+            max-w-2xl
+            pt-12
+            text-center
+          "
+        >
 
-          <p className="text-xs uppercase tracking-[0.35em] text-gray-400">
+          {/* PRODUCT TYPE */}
+
+          <p
+            className="
+              text-xs
+              uppercase
+              tracking-[0.35em]
+              text-gray-400
+            "
+          >
             {product.type}
           </p>
 
+
+          {/* PRODUCT NAME */}
+
           <h1
-            className="mt-4 text-5xl font-light text-[#AF9685]"
+            className="
+              mt-4
+              text-5xl
+              font-light
+              text-[#AF9685]
+            "
             style={{
               fontFamily:
                 '"Cormorant Garamond", serif',
@@ -521,16 +567,54 @@ export default function IvoryBlushReservationPage() {
             {product.name}
           </h1>
 
-          <p className="mt-8 text-[15px] leading-8 text-[#6B625B]">
+
+          {/* DESCRIPTION */}
+
+          <p
+            className="
+              mt-8
+              text-[15px]
+              leading-8
+              text-[#6B625B]
+            "
+          >
             {product.detailDescription}
           </p>
 
-          <p className="mt-5 text-sm tracking-[0.08em] text-gray-500">
+
+          {/* PRICE */}
+
+          <p
+            className="
+              mt-5
+              text-sm
+              tracking-[0.08em]
+              text-gray-500
+            "
+          >
             ₹
             {product.price.toLocaleString(
               "en-IN"
             )}
           </p>
+
+
+          {/* ================================================= */}
+          {/* EDITION SIZE */}
+          {/* ================================================= */}
+
+          <p
+            className="
+              mt-4
+              text-xs
+              uppercase
+              tracking-[0.28em]
+              text-[#AF9685]
+            "
+          >
+            Edition of {product.totalPieces}
+          </p>
+
 
           {/* ================================================= */}
           {/* COLLECTION PHASE */}
@@ -538,45 +622,91 @@ export default function IvoryBlushReservationPage() {
 
           <div className="mt-10">
 
+            {/* PRIVATE ACCESS */}
+
             {phase ===
               "private_access" && (
-              <p className="text-xs uppercase tracking-[0.28em] text-[#AF9685]">
+              <p
+                className="
+                  text-xs
+                  uppercase
+                  tracking-[0.28em]
+                  text-[#AF9685]
+                "
+              >
                 {hasPrivateAccess
                   ? "Private Access Reserved"
                   : "Private Access Applications Open"}
               </p>
             )}
 
+
+            {/* PRIVATE PURCHASE */}
+
             {phase ===
               "private_purchase" && (
-              <p className="text-xs uppercase tracking-[0.28em] text-[#AF9685]">
+              <p
+                className="
+                  text-xs
+                  uppercase
+                  tracking-[0.28em]
+                  text-[#AF9685]
+                "
+              >
                 {hasPrivateAccess
                   ? "Your Private Allocation Window"
                   : "Private Allocation Window"}
               </p>
             )}
 
+
+            {/* PUBLIC */}
+
             {phase ===
               "public" && (
-              <p className="text-xs uppercase tracking-[0.28em] text-[#8C9A78]">
+              <p
+                className="
+                  text-xs
+                  uppercase
+                  tracking-[0.28em]
+                  text-[#8C9A78]
+                "
+              >
                 Now Available From The Collection
               </p>
             )}
 
+
+            {/* SOLD OUT */}
+
             {phase ===
               "sold_out" && (
-              <p className="text-xs uppercase tracking-[0.28em] text-gray-400">
+              <p
+                className="
+                  text-xs
+                  uppercase
+                  tracking-[0.28em]
+                  text-gray-400
+                "
+              >
                 Edition Exhausted
               </p>
             )}
 
           </div>
 
+
           {/* ================================================= */}
           {/* ACTION */}
           {/* ================================================= */}
 
-          <div className="mt-12 flex justify-center">
+          <div
+            className="
+              mt-12
+              flex
+              justify-center
+            "
+          >
 
             <Link
               href={
@@ -615,18 +745,6 @@ export default function IvoryBlushReservationPage() {
 
           </div>
 
-          {/* ================================================= */}
-          {/* PRIVATE PURCHASE MESSAGE */}
-          {/* ================================================= */}
-
-          {phase ===
-            "private_purchase" && (
-            <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
-              {hasPrivateAccess
-                ? "Your private access gives you priority to claim this limited piece before the collection opens publicly."
-                : "This edition is currently reserved for clients with confirmed private access. Public access will follow if pieces remain available."}
-            </p>
-          )}
 
           {/* ================================================= */}
           {/* PRIVATE ACCESS MESSAGE */}
@@ -634,12 +752,43 @@ export default function IvoryBlushReservationPage() {
 
           {phase ===
             "private_access" && (
-            <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
+            <p
+              className="
+                mt-8
+                text-[11px]
+                leading-6
+                tracking-[0.18em]
+                text-gray-400
+              "
+            >
               {hasPrivateAccess
                 ? "Your ₹2,000 reservation has been successfully confirmed. Your private access is secured for this piece."
-                : "Studio reservations close 48 hours before the collection is released publicly. Clients who complete the reservation process receive priority access to the collection before the public release."}
+                : "Studio reservations close before the private allocation window. Clients who complete the reservation process receive priority access before the collection opens publicly."}
             </p>
           )}
+
+
+          {/* ================================================= */}
+          {/* PRIVATE PURCHASE MESSAGE */}
+          {/* ================================================= */}
+
+          {phase ===
+            "private_purchase" && (
+            <p
+              className="
+                mt-8
+                text-[11px]
+                leading-6
+                tracking-[0.18em]
+                text-gray-400
+              "
+            >
+              {hasPrivateAccess
+                ? "Your private access gives you priority to claim this limited piece before the collection opens publicly."
+                : "This edition is currently reserved for clients with confirmed private access. Public access will follow if pieces remain available."}
+            </p>
+          )}
+
 
           {/* ================================================= */}
           {/* PUBLIC MESSAGE */}
@@ -647,7 +796,15 @@ export default function IvoryBlushReservationPage() {
 
           {phase ===
             "public" && (
-            <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
+            <p
+              className="
+                mt-8
+                text-[11px]
+                leading-6
+                tracking-[0.18em]
+                text-gray-400
+              "
+            >
               The private allocation window has
               concluded. Ivory Blush is now
               available to all clients while
@@ -655,13 +812,22 @@ export default function IvoryBlushReservationPage() {
             </p>
           )}
 
+
           {/* ================================================= */}
           {/* SOLD OUT MESSAGE */}
           {/* ================================================= */}
 
           {phase ===
             "sold_out" && (
-            <p className="mt-8 text-[11px] leading-6 tracking-[0.18em] text-gray-400">
+            <p
+              className="
+                mt-8
+                text-[11px]
+                leading-6
+                tracking-[0.18em]
+                text-gray-400
+              "
+            >
               This limited edition has been
               fully acquired and is no longer
               available.
@@ -669,7 +835,9 @@ export default function IvoryBlushReservationPage() {
           )}
 
         </div>
+
       </section>
+
     </main>
   );
 }
