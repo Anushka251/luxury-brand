@@ -385,13 +385,8 @@ export default function BlueCrystalReservationPage() {
         "View Your Reservation";
 
       /*
-       * IMPORTANT:
-       *
-       * Do NOT send the customer
-       * back to the reservation form.
-       *
-       * Send them to their reservation
-       * account page.
+       * Send confirmed customer
+       * to reservation account page.
        */
 
       buttonHref =
@@ -431,13 +426,6 @@ export default function BlueCrystalReservationPage() {
       session &&
       hasPrivateAccess
     ) {
-      /*
-       * Confirmed reservation.
-       *
-       * Customer can claim
-       * the private allocation.
-       */
-
       buttonText =
         "Claim Private Allocation";
 
@@ -446,12 +434,6 @@ export default function BlueCrystalReservationPage() {
 
       buttonDisabled = false;
     } else {
-      /*
-       * Private purchase is open,
-       * but this customer did not
-       * reserve private access.
-       */
-
       buttonText =
         "Reserved for Private Access";
 
@@ -623,6 +605,23 @@ export default function BlueCrystalReservationPage() {
             {product.price.toLocaleString(
               "en-IN"
             )}
+          </p>
+
+
+          {/* ================================================= */}
+          {/* EDITION SIZE */}
+          {/* ================================================= */}
+
+          <p
+            className="
+              mt-4
+              text-xs
+              uppercase
+              tracking-[0.28em]
+              text-[#AF9685]
+            "
+          >
+            Edition of {product.totalPieces}
           </p>
 
 
