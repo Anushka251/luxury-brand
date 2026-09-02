@@ -357,14 +357,6 @@ export default function CrimsonRoseReservationPage() {
    * =========================================================
    * PHASE 1 — PRIVATE ACCESS
    * =========================================================
-   *
-   * BEFORE PAYMENT:
-   *
-   * Reserve Private Access
-   *
-   * AFTER SUCCESSFUL PAYMENT:
-   *
-   * View Your Reservation
    */
 
   if (
@@ -383,13 +375,6 @@ export default function CrimsonRoseReservationPage() {
       session &&
       hasPrivateAccess
     ) {
-      /*
-       * Customer already reserved this piece.
-       *
-       * DO NOT send them back to the
-       * reservation form.
-       */
-
       buttonText =
         "View Your Reservation";
 
@@ -398,11 +383,6 @@ export default function CrimsonRoseReservationPage() {
 
       buttonDisabled = false;
     } else {
-      /*
-       * Customer has not reserved
-       * this piece yet.
-       */
-
       buttonText =
         "Reserve Private Access";
 
@@ -435,13 +415,6 @@ export default function CrimsonRoseReservationPage() {
       session &&
       hasPrivateAccess
     ) {
-      /*
-       * Customer has confirmed private access.
-       *
-       * They can now claim their
-       * private allocation.
-       */
-
       buttonText =
         "Claim Private Allocation";
 
@@ -450,13 +423,6 @@ export default function CrimsonRoseReservationPage() {
 
       buttonDisabled = false;
     } else {
-      /*
-       * Customer did not reserve.
-       *
-       * Do not allow them to claim
-       * the private allocation.
-       */
-
       buttonText =
         "Reserved for Private Access";
 
@@ -633,6 +599,23 @@ export default function CrimsonRoseReservationPage() {
             {product.price.toLocaleString(
               "en-IN"
             )}
+          </p>
+
+
+          {/* ================================================= */}
+          {/* EDITION SIZE */}
+          {/* ================================================= */}
+
+          <p
+            className="
+              mt-4
+              text-xs
+              uppercase
+              tracking-[0.28em]
+              text-[#AF9685]
+            "
+          >
+            Edition of {product.totalPieces}
           </p>
 
 
