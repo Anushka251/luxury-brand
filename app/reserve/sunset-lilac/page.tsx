@@ -156,10 +156,6 @@ export default function SunsetLilacReservationPage() {
    * =========================================================
    * REFRESH ACCESS WHEN CUSTOMER RETURNS
    * =========================================================
-   *
-   * If payment was completed in another page/tab,
-   * check the database again when the customer
-   * returns to this page.
    */
 
   useEffect(() => {
@@ -358,12 +354,6 @@ export default function SunsetLilacReservationPage() {
    * =========================================================
    * PHASE 1 — PRIVATE ACCESS
    * =========================================================
-   *
-   * BEFORE PAYMENT:
-   * Reserve Private Access
-   *
-   * AFTER SUCCESSFUL PAYMENT:
-   * View Your Reservation
    */
 
   if (
@@ -382,14 +372,6 @@ export default function SunsetLilacReservationPage() {
       session &&
       hasPrivateAccess
     ) {
-      /*
-       * Customer already completed
-       * the reservation.
-       *
-       * DO NOT send them back to
-       * the reservation form.
-       */
-
       buttonText =
         "View Your Reservation";
 
@@ -398,11 +380,6 @@ export default function SunsetLilacReservationPage() {
 
       buttonDisabled = false;
     } else {
-      /*
-       * Customer has not reserved
-       * this piece yet.
-       */
-
       buttonText =
         "Reserve Private Access";
 
@@ -435,13 +412,6 @@ export default function SunsetLilacReservationPage() {
       session &&
       hasPrivateAccess
     ) {
-      /*
-       * Confirmed reservation.
-       *
-       * Customer can claim the
-       * private allocation.
-       */
-
       buttonText =
         "Claim Private Allocation";
 
@@ -450,12 +420,6 @@ export default function SunsetLilacReservationPage() {
 
       buttonDisabled = false;
     } else {
-      /*
-       * Customer did not reserve.
-       *
-       * Do not allow private claim.
-       */
-
       buttonText =
         "Reserved for Private Access";
 
@@ -597,6 +561,21 @@ export default function SunsetLilacReservationPage() {
           >
             {product.name}
           </h1>
+
+
+          {/* EDITION SIZE */}
+
+          <p
+            className="
+              mt-4
+              text-xs
+              uppercase
+              tracking-[0.28em]
+              text-[#AF9685]
+            "
+          >
+            Edition of {product.totalPieces}
+          </p>
 
 
           {/* DESCRIPTION */}
