@@ -22,7 +22,7 @@ export const products: Product[] = [
     id: "crimson-rose",
     name: "Crimson Rose",
     type: "Lace-up Co-ord Set",
-    price: 30000,
+    price: 15000,
 
     description:
       "A lace-up sculpted co-ord set crafted in luminous dual-tone satin.",
