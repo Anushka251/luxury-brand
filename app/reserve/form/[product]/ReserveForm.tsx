@@ -7,38 +7,20 @@ type Props = {
   product: string;
 };
 
-export default function ReserveForm({
-  product,
-}: Props) {
-  const { data: session, status } =
-    useSession();
+export default function ReserveForm({ product }: Props) {
+  const { data: session, status } = useSession();
 
-  const [fitPreference, setFitPreference] =
-    useState("custom");
+  const [fitPreference, setFitPreference] = useState("custom");
+  const [instagram, setInstagram] = useState("");
+  const [phone, setPhone] = useState("");
+  const [standardSize, setStandardSize] = useState("");
+  const [occasion, setOccasion] = useState("");
+  const [notes, setNotes] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [instagram, setInstagram] =
-    useState("");
-
-  const [phone, setPhone] =
-    useState("");
-
-  const [standardSize, setStandardSize] =
-    useState("");
-
-  const [occasion, setOccasion] =
-    useState("");
-
-  const [notes, setNotes] =
-    useState("");
-
-  const [isLoading, setIsLoading] =
-    useState(false);
-
-  /*
-   * ==========================================
-   * SESSION LOADING
-   * ==========================================
-   */
+  /* ==========================================
+     SESSION LOADING
+  ========================================== */
 
   if (status === "loading") {
     return (
@@ -48,38 +30,28 @@ export default function ReserveForm({
     );
   }
 
-  /*
-   * ==========================================
-   * REQUIRE LOGIN
-   * ==========================================
-   */
+  /* ==========================================
+     REQUIRE LOGIN
+  ========================================== */
 
   if (!session) {
     signIn(undefined, {
-      callbackUrl:
-        window.location.pathname,
+      callbackUrl: window.location.pathname,
     });
 
     return null;
   }
 
-  /*
-   * ==========================================
-   * CUSTOMER INFORMATION
-   * ==========================================
-   */
+  /* ==========================================
+     CUSTOMER INFORMATION
+  ========================================== */
 
-  const userName =
-    session.user?.name ?? "";
+  const userName = session.user?.name ?? "";
+  const userEmail = session.user?.email ?? "";
 
-  const userEmail =
-    session.user?.email ?? "";
-
-  /*
-   * ==========================================
-   * PRODUCT NAME
-   * ==========================================
-   */
+  /* ==========================================
+     PRODUCT NAME
+  ========================================== */
 
   const productName =
     product === "crimson-rose"
@@ -92,234 +64,140 @@ export default function ReserveForm({
       ? "Sunset Lilac"
       : "Selected Piece";
 
-  /*
-   * ==========================================
-   * SUBMIT RESERVATION
-   * ==========================================
-   */
+  /* ==========================================
+     SUBMIT RESERVATION
+  ========================================== */
 
   async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>
   ) {
     e.preventDefault();
 
-    /*
-     * Validate phone
-     */
+    /* Validate phone */
 
     if (!phone.trim()) {
-      alert(
-        "Please enter your contact number."
-      );
-
+      alert("Please enter your contact number.");
       return;
     }
 
-    /*
-     * Validate standard size
-     */
+    /* Validate standard size */
 
-    if (
-      fitPreference === "standard" &&
-      !standardSize
-    ) {
-      alert(
-        "Please select your standard size."
-      );
-
+    if (fitPreference === "standard" && !standardSize) {
+      alert("Please select your standard size.");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      /*
-       * ========================================
-       * CREATE RESERVATION + CASHFREE ORDER
-       * ========================================
-       *
-       * IMPORTANT:
-       *
-       * /api/reserve now handles BOTH:
-       *
-       * 1. Cashfree order creation
-       * 2. Pending reservation creation
-       */
+      /* ========================================
+         CREATE RESERVATION + CASHFREE ORDER
+      ======================================== */
 
-      const response = await fetch(
-        "/api/reserve",
-        {
-          method: "POST",
+      const response = await fetch("/api/reserve", {
+        method: "POST",
 
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
+        headers: {
+          "Content-Type": "application/json",
+        },
 
-          body: JSON.stringify({
-            product,
+        body: JSON.stringify({
+          product,
+          fullName: userName,
+          email: userEmail,
+          instagram,
+          phone,
+          fitPreference,
+          standardSize,
+          occasion,
+          notes,
+        }),
+      });
 
-            fullName:
-              userName,
+      const data = await response.json();
 
-            email:
-              userEmail,
-
-            instagram,
-
-            phone,
-
-            fitPreference,
-
-            standardSize,
-
-            occasion,
-
-            notes,
-          }),
-        }
-      );
-
-      const data =
-        await response.json();
-
-      /*
-       * ========================================
-       * API ERROR
-       * ========================================
-       */
+      /* ========================================
+         API ERROR
+      ======================================== */
 
       if (!response.ok) {
         throw new Error(
-          data.error ||
-            "Unable to create reservation."
+          data.error || "Unable to create reservation."
         );
       }
 
-      /*
-       * ========================================
-       * PAYMENT SESSION CHECK
-       * ========================================
-       */
+      /* ========================================
+         PAYMENT SESSION CHECK
+      ======================================== */
 
-      if (
-        !data.payment_session_id
-      ) {
+      if (!data.payment_session_id) {
         throw new Error(
           "Payment session was not created."
         );
       }
 
-      /*
-       * ========================================
-       * SAVE RESERVATION INFORMATION
-       * ========================================
-       *
-       * The payment-success page uses this
-       * to identify the selected product.
-       *
-       * We intentionally keep this in
-       * sessionStorage.
-       */
+      /* ========================================
+         SAVE RESERVATION INFORMATION
+      ======================================== */
 
       sessionStorage.setItem(
         "avenor_reservation",
         JSON.stringify({
-          orderId:
-            data.order_id,
-
-          reservationId:
-            data.reservation_id,
-
+          orderId: data.order_id,
+          reservationId: data.reservation_id,
           product,
-
-          fullName:
-            userName,
-
-          email:
-            userEmail,
-
+          fullName: userName,
+          email: userEmail,
           instagram,
-
           phone,
-
           fitPreference,
-
           standardSize,
-
           occasion,
-
           notes,
         })
       );
 
-      /*
-       * ========================================
-       * LOAD CASHFREE SDK
-       * ========================================
-       */
+      /* ========================================
+         LOAD CASHFREE SDK
+      ======================================== */
 
-      if (
-        !(window as any).Cashfree
-      ) {
-        await new Promise<void>(
-          (
-            resolve,
-            reject
-          ) => {
-            const script =
-              document.createElement(
-                "script"
-              );
+      if (!(window as any).Cashfree) {
+        await new Promise<void>((resolve, reject) => {
+          const script = document.createElement("script");
 
-            script.src =
-              "https://sdk.cashfree.com/js/v3/cashfree.js";
+          script.src =
+            "https://sdk.cashfree.com/js/v3/cashfree.js";
 
-            script.onload = () =>
-              resolve();
+          script.onload = () => resolve();
 
-            script.onerror = () =>
-              reject(
-                new Error(
-                  "Unable to load Cashfree."
-                )
-              );
-
-            document.body.appendChild(
-              script
+          script.onerror = () =>
+            reject(
+              new Error("Unable to load Cashfree.")
             );
-          }
-        );
+
+          document.body.appendChild(script);
+        });
       }
 
-      /*
-       * ========================================
-       * INITIALIZE CASHFREE
-       * ========================================
-       */
+      /* ========================================
+         INITIALIZE CASHFREE
+      ======================================== */
 
-      const cashfree =
-        (window as any).Cashfree({
-          mode:
-            process.env
-              .NEXT_PUBLIC_CASHFREE_MODE ===
-            "sandbox"
-              ? "sandbox"
-              : "production",
-        });
+      const cashfree = (window as any).Cashfree({
+        mode:
+          process.env.NEXT_PUBLIC_CASHFREE_MODE ===
+          "sandbox"
+            ? "sandbox"
+            : "production",
+      });
 
-      /*
-       * ========================================
-       * OPEN CASHFREE CHECKOUT
-       * ========================================
-       */
+      /* ========================================
+         OPEN CASHFREE CHECKOUT
+      ======================================== */
 
       await cashfree.checkout({
-        paymentSessionId:
-          data.payment_session_id,
-
-        redirectTarget:
-          "_self",
+        paymentSessionId: data.payment_session_id,
+        redirectTarget: "_self",
       });
     } catch (error) {
       console.error(
@@ -362,26 +240,20 @@ export default function ReserveForm({
           </h1>
 
           <p className="mt-6 text-sm leading-8 text-gray-500">
-            You are requesting private
-            access to{" "}
-            <strong>
-              {productName}
-            </strong>
-            .
+            You are requesting private access to{" "}
+            <strong>{productName}</strong>.
           </p>
 
           <p className="mt-4 text-sm leading-8 text-gray-500">
-            Your private-access reservation
-            is available before the public
-            release and gives you priority
-            access during the private
-            purchasing window.
+            Your private-access reservation is
+            available before the public release and
+            gives you priority access during the
+            private purchasing window.
           </p>
 
           <p className="mt-5 text-sm font-medium text-[#AF9685]">
-            Your private access is secured
-            only after successful payment
-            of the ₹2,000 reservation fee.
+            Your private access is secured only after
+            successful payment of the ₹500 reservation fee.
           </p>
 
         </div>
@@ -448,6 +320,7 @@ export default function ReserveForm({
           <div>
             <label className="mb-2 block text-xs uppercase tracking-[0.3em] text-gray-500">
               Instagram Handle
+
               <span className="ml-2 normal-case tracking-normal text-gray-400">
                 (Optional)
               </span>
@@ -458,9 +331,7 @@ export default function ReserveForm({
               placeholder="@username"
               value={instagram}
               onChange={(e) =>
-                setInstagram(
-                  e.target.value
-                )
+                setInstagram(e.target.value)
               }
               className="
                 w-full
@@ -487,9 +358,7 @@ export default function ReserveForm({
               required
               value={phone}
               onChange={(e) =>
-                setPhone(
-                  e.target.value
-                )
+                setPhone(e.target.value)
               }
               className="
                 w-full
@@ -518,19 +387,15 @@ export default function ReserveForm({
                   type="radio"
                   name="fit"
                   checked={
-                    fitPreference ===
-                    "custom"
+                    fitPreference === "custom"
                   }
                   onChange={() =>
-                    setFitPreference(
-                      "custom"
-                    )
+                    setFitPreference("custom")
                   }
                 />
 
                 <span>
-                  Custom Studio
-                  Measurements
+                  Custom Studio Measurements
                 </span>
               </label>
 
@@ -539,13 +404,10 @@ export default function ReserveForm({
                   type="radio"
                   name="fit"
                   checked={
-                    fitPreference ===
-                    "standard"
+                    fitPreference === "standard"
                   }
                   onChange={() =>
-                    setFitPreference(
-                      "standard"
-                    )
+                    setFitPreference("standard")
                   }
                 />
 
@@ -559,10 +421,8 @@ export default function ReserveForm({
 
           {/* STANDARD SIZE */}
 
-          {fitPreference ===
-            "standard" && (
+          {fitPreference === "standard" && (
             <div>
-
               <label className="mb-2 block text-xs uppercase tracking-[0.3em] text-gray-500">
                 Standard Size
               </label>
@@ -570,9 +430,7 @@ export default function ReserveForm({
               <select
                 value={standardSize}
                 onChange={(e) =>
-                  setStandardSize(
-                    e.target.value
-                  )
+                  setStandardSize(e.target.value)
                 }
                 className="
                   w-full
@@ -589,34 +447,18 @@ export default function ReserveForm({
                   Select Size
                 </option>
 
-                <option value="XS">
-                  XS
-                </option>
-
-                <option value="S">
-                  S
-                </option>
-
-                <option value="M">
-                  M
-                </option>
-
-                <option value="L">
-                  L
-                </option>
-
-                <option value="XL">
-                  XL
-                </option>
+                <option value="XS">XS</option>
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
               </select>
-
             </div>
           )}
 
           {/* OCCASION */}
 
           <div>
-
             <label className="mb-2 block text-xs uppercase tracking-[0.3em] text-gray-500">
               Occasion (Optional)
             </label>
@@ -626,9 +468,7 @@ export default function ReserveForm({
               placeholder="Wedding, Gala, Reception..."
               value={occasion}
               onChange={(e) =>
-                setOccasion(
-                  e.target.value
-                )
+                setOccasion(e.target.value)
               }
               className="
                 w-full
@@ -641,13 +481,11 @@ export default function ReserveForm({
                 focus:border-[#AF9685]
               "
             />
-
           </div>
 
           {/* NOTES */}
 
           <div>
-
             <label className="mb-2 block text-xs uppercase tracking-[0.3em] text-gray-500">
               Additional Notes (Optional)
             </label>
@@ -656,9 +494,7 @@ export default function ReserveForm({
               rows={5}
               value={notes}
               onChange={(e) =>
-                setNotes(
-                  e.target.value
-                )
+                setNotes(e.target.value)
               }
               className="
                 w-full
@@ -671,7 +507,6 @@ export default function ReserveForm({
                 focus:border-[#AF9685]
               "
             />
-
           </div>
 
           {/* ==========================================
@@ -686,51 +521,40 @@ export default function ReserveForm({
 
             <p className="mt-4 text-sm leading-7 text-gray-600">
               A{" "}
-              <strong>
-                ₹2,000 reservation fee
-              </strong>{" "}
-              is required to secure your
-              private access.
+              <strong>₹500 reservation fee</strong>{" "}
+              is required to secure your private access.
             </p>
 
             <p className="mt-3 text-sm leading-7 text-gray-600">
-              Your private access is
-              confirmed only after the
-              payment has been successfully
+              Your private access is confirmed only
+              after the payment has been successfully
               verified.
             </p>
 
             <p className="mt-3 text-sm leading-7 text-gray-600">
-              Once confirmed, you receive
-              priority access to this piece
-              during its private purchasing
-              window before the public
-              release.
+              Once confirmed, you receive priority
+              access to this piece during its private
+              purchasing window before the public release.
             </p>
 
             <p className="mt-3 text-sm leading-7 text-gray-600">
-              If the piece becomes fully
-              sold out during the private
-              purchasing window before you
-              are able to purchase it, your
-              ₹2,000 reservation fee will be
-              returned.
+              If the piece becomes fully sold out during
+              the private purchasing window before you
+              are able to purchase it, your ₹500 reservation
+              fee will be returned.
             </p>
 
             <p className="mt-3 text-sm leading-7 text-gray-600">
-              If you choose not to purchase
-              while your private purchasing
-              window is open, the reservation
-              fee is not refundable.
+              If you choose not to purchase while your
+              private purchasing window is open, the
+              reservation fee is not refundable.
             </p>
 
             <p className="mt-4 text-xs leading-6 tracking-[0.08em] text-gray-400">
-              Private access does not
-              guarantee that a piece will
-              remain available. Quantities
-              are strictly limited and
-              allocations are subject to
-              availability.
+              Private access does not guarantee that a
+              piece will remain available. Quantities are
+              strictly limited and allocations are subject
+              to availability.
             </p>
 
           </div>
@@ -760,7 +584,7 @@ export default function ReserveForm({
           >
             {isLoading
               ? "Opening Secure Payment..."
-              : "Continue to Payment — ₹2,000"}
+              : "Continue to Payment — ₹500"}
           </button>
 
         </form>
@@ -770,13 +594,13 @@ export default function ReserveForm({
         ========================================== */}
 
         <p className="mt-10 text-center text-xs leading-6 tracking-[0.15em] text-gray-400">
-          Private access closes before
-          the collection enters its private
-          purchasing window.
+          Private access closes before the collection
+          enters its private purchasing window.
+
           <br />
-          Once the private window ends,
-          the collection may open publicly
-          and pieces may sell out.
+
+          Once the private window ends, the collection
+          may open publicly and pieces may sell out.
         </p>
 
       </div>
