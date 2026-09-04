@@ -145,7 +145,7 @@ export async function POST(req: Request) {
      * =========================================================
      */
 
-    const reservationFee = 2000;
+    const reservationFee = 500;
 
     /*
      * =========================================================
