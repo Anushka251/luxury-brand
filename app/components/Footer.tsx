@@ -55,7 +55,7 @@ export default function Footer() {
         {/* RIGHT */}
         <div className="space-y-4">
           <a
-            href="https://instagram.com/_anushka__meena_"
+            href="https://instagram.com/anushka_avenor"
             target="_blank"
             rel="noopener noreferrer"
             className="block hover:text-black transition"
