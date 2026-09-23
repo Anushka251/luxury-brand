@@ -58,7 +58,7 @@ const productSchema = {
     "@type": "Offer",
     url: "https://avenorcollection.com/reserve/sunset-lilac",
     priceCurrency: "INR",
-    price: 25000,
+    price: 8100,
     availability:
       "https://schema.org/InStock",
     itemCondition:
