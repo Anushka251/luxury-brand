@@ -39,6 +39,7 @@ export default function ProductGallery({
       ? [0, 4, 6, 7].includes(index)
       : [2, 3, 5, 7].includes(index);
 
+  // Preload all gallery images
   useEffect(() => {
     images.forEach((src) => {
       const img = new window.Image();
@@ -63,8 +64,9 @@ export default function ProductGallery({
     if (
       touchStartX === null ||
       touchEndX === null
-    )
+    ) {
       return;
+    }
 
     const distance =
       touchStartX - touchEndX;
@@ -91,8 +93,9 @@ export default function ProductGallery({
     if (
       isTransitioning ||
       images.length <= 1
-    )
+    ) {
       return;
+    }
 
     setIsTransitioning(true);
 
@@ -111,8 +114,9 @@ export default function ProductGallery({
     if (
       isTransitioning ||
       images.length <= 1
-    )
+    ) {
       return;
+    }
 
     setIsTransitioning(true);
 
@@ -189,7 +193,8 @@ export default function ProductGallery({
         >
           <img
             src={images[index]}
-            alt={name}
+            alt={`${name} by Avenor — image ${index + 1}`}
+            title={`${name} — Avenor`}
             className={`
               object-contain
               object-center
