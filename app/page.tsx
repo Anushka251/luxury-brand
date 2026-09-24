@@ -140,7 +140,7 @@ export default function Home(): React.JSX.Element {
               >
                 <Image
                   src="/products/crimson-rose/cover.jpg"
-                  alt="Crimson Rose"
+                  alt="Crimson Rose by Avenor"
                   width={700}
                   height={950}
                   className="w-full h-auto object-cover"
@@ -189,7 +189,7 @@ export default function Home(): React.JSX.Element {
               >
                 <Image
                   src="/products/blue-crystal/cover.JPG"
-                  alt="Blue Crystal"
+                  alt="Blue Crystal by Avenor"
                   width={700}
                   height={950}
                   className="w-full h-auto object-cover"
@@ -225,6 +225,55 @@ export default function Home(): React.JSX.Element {
               </Link>
             </motion.div>
 
+            {/* PLUM AURUM */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 1.4 }}
+            >
+              <Link
+                href="/reserve/plum-aurum"
+                className="block hover:opacity-95 transition"
+              >
+                <Image
+                  src="/products/plum-aurum/1.jpg"
+                  alt="Plum Aurum by Avenor"
+                  width={700}
+                  height={950}
+                  className="w-full h-auto object-cover"
+                />
+
+                <div className="pt-8 text-center">
+                  <p className="text-[11px] tracking-[0.35em] uppercase text-gray-400">
+                    Embellished Mini Dress
+                  </p>
+
+                  <h2
+                    className="
+                      mt-3
+                      text-4xl
+                      md:text-4xl
+                      lg:text-5xl
+                      font-light
+                      tracking-[0.06em]
+                      text-[#AF9685]
+                      leading-none
+                    "
+                    style={{
+                      fontFamily: '"Cormorant Garamond", serif',
+                    }}
+                  >
+                    Plum Aurum
+                  </h2>
+
+                  <p className="mt-5 text-xs tracking-[0.35em] text-gray-500">
+                    DISCOVER THE COLLECTION
+                  </p>
+                </div>
+              </Link>
+            </motion.div>
+
           </div>
 
           {/* RIGHT COLUMN */}
@@ -243,7 +292,7 @@ export default function Home(): React.JSX.Element {
               >
                 <Image
                   src="/products/ivory-blush/cover.jpg"
-                  alt="Ivory Blush"
+                  alt="Ivory Blush by Avenor"
                   width={700}
                   height={950}
                   className="w-full h-auto object-cover"
@@ -292,7 +341,7 @@ export default function Home(): React.JSX.Element {
               >
                 <Image
                   src="/products/sunset-lilac/cover.jpg"
-                  alt="Sunset Lilac"
+                  alt="Sunset Lilac by Avenor"
                   width={700}
                   height={950}
                   className="w-full h-auto object-cover"
