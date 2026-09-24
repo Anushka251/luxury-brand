@@ -58,6 +58,8 @@ export default function Shop() {
                 ? "/reserve/blue-crystal"
                 : p.id === "sunset-lilac"
                 ? "/reserve/sunset-lilac"
+                : p.id === "plum-aurum"
+                ? "/reserve/plum-aurum"
                 : `/product/${p.id}`
             }
             scroll={true}
@@ -75,7 +77,7 @@ export default function Shop() {
             >
               <Image
                 src={p.coverImage}
-                alt={p.name}
+                alt={`${p.name} by Avenor`}
                 fill
                 priority
                 sizes="
