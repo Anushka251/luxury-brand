@@ -147,4 +147,34 @@ Every detail is thoughtfully finished to celebrate the artistry of fine craftsma
     collectionPhase:
       "private_access",
   },
+
+  {
+    id: "plum-aurum",
+    name: "Plum Aurum",
+    type: "Embellished Mini Dress",
+    price: 7700,
+
+    description:
+      "A softly luminous embellished mini dress combining muted plum tones with champagne-gold detailing.",
+
+    detailDescription: `
+Plum Aurum is a study in understated glamour, crafted in a muted plum palette with delicate champagne-gold embellishment. The softly shimmering details catch the light against the sculpted silhouette, creating a refined balance between warmth, texture, and contemporary elegance.
+
+Every detail is thoughtfully finished to celebrate the artistry of fine craftsmanship. Produced in limited quantities, Plum Aurum embodies AVENOR's philosophy of quiet luxury, individuality, and effortless sophistication.
+    `,
+
+    coverImage:
+      "/products/plum-aurum/1.jpg",
+
+    images: [
+      "/products/plum-aurum/1.jpg",
+      "/products/plum-aurum/2.jpg",
+      "/products/plum-aurum/3.jpg",
+    ],
+
+    totalPieces: 3,
+
+    collectionPhase:
+      "private_access",
+  },
 ];
