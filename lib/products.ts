@@ -22,7 +22,7 @@ export const products: Product[] = [
     id: "crimson-rose",
     name: "Crimson Rose",
     type: "Lace-up Co-ord Set",
-    price: 17000,
+    price: 16000,
 
     description:
       "A lace-up sculpted co-ord set crafted in luminous dual-tone satin.",
@@ -57,7 +57,7 @@ Every detail reflects precision craftsmanship—from the clean construction to t
     id: "ivory-blush",
     name: "Ivory Blush",
     type: "Dusty Gold Floral Embroidered Gown",
-    price: 35000,
+    price: 32000,
 
     description:
       "A dusty gold floral embroidered gown designed for timeless elegance.",
@@ -92,7 +92,7 @@ Every gown is meticulously constructed with exceptional attention to detail, cel
     id: "blue-crystal",
     name: "Blue Crystal",
     type: "Embroidered Mini Dress",
-    price: 24000,
+    price: 22000,
 
     description:
       "An intricately embroidered mini dress designed with a luminous crystal-like finish.",
@@ -122,7 +122,7 @@ Every detail is thoughtfully finished to celebrate the artistry of fine craftsma
     id: "sunset-lilac",
     name: "Sunset Lilac",
     type: "Embroidered Mini Dress",
-    price: 20000,
+    price: 18000,
 
     description:
       "A softly luminous embroidered mini dress blending dusky lilac tones with delicate embellishment.",
@@ -152,7 +152,7 @@ Every detail is thoughtfully finished to celebrate the artistry of fine craftsma
     id: "plum-aurum",
     name: "Plum Aurum",
     type: "Embellished Mini Dress",
-    price: 19000,
+    price: 17000,
 
     description:
       "A softly luminous embellished mini dress combining muted plum tones with champagne-gold detailing.",
