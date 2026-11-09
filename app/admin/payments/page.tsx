@@ -2,51 +2,70 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { QRCodeSVG } from "qrcode.react";
+import { products } from "@/data/products";
 
-const products = [
-  { id: "crimson-rose", name: "Crimson Rose", price: 8600 },
-  { id: "ivory-blush", name: "Ivory Blush", price: 14600 },
-  { id: "blue-crystal", name: "Blue Crystal", price: 9800 },
-  { id: "sunset-lilac", name: "Sunset Lilac", price: 8100 },
-  { id: "plum-aurum", name: "Plum Aurum", price: 7700 },
-];
+type PaymentQR = {
+  payment_link_url: string;
+  payment_qr: string;
+  link_id: string;
+};
 
 export default function PaymentCounter() {
   const [customer, setCustomer] = useState("");
   const [quantities, setQuantities] = useState<
     Record<string, number>
   >({});
-  const [paymentUrl, setPaymentUrl] = useState("");
+  const [payment, setPayment] = useState<PaymentQR | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const total = useMemo(() => {
-    return products.reduce(
-      (sum, product) =>
-        sum +
-        product.price *
-          (quantities[product.id] || 0),
-      0
-    );
-  }, [quantities]);
 
   const selectedProducts = products.filter(
     (product) => (quantities[product.id] || 0) > 0
   );
 
+  const total = useMemo(
+    () =>
+      selectedProducts.reduce(
+        (sum, product) =>
+          sum + product.price * quantities[product.id],
+        0
+      ),
+    [selectedProducts, quantities]
+  );
+
+  const formatPrice = (amount: number) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(amount);
+
+  function updateQuantity(id: string, value: string) {
+    const quantity = Math.max(
+      0,
+      Math.min(10, Math.floor(Number(value) || 0))
+    );
+
+    setQuantities((previous) => ({
+      ...previous,
+      [id]: quantity,
+    }));
+
+    setPayment(null);
+  }
+
   async function generateQR() {
     if (!customer.trim()) {
-      alert("Enter customer name");
+      alert("Please enter customer name.");
       return;
     }
 
-    if (!selectedProducts.length) {
-      alert("Select at least one product");
+    if (selectedProducts.length === 0) {
+      alert("Please select at least one product.");
       return;
     }
 
     setLoading(true);
-    setPaymentUrl("");
+    setPayment(null);
 
     try {
       const response = await fetch(
@@ -57,10 +76,10 @@ export default function PaymentCounter() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            customerName: customer,
-            items: selectedProducts.map((p) => ({
-              productId: p.id,
-              quantity: quantities[p.id],
+            customerName: customer.trim(),
+            items: selectedProducts.map((product) => ({
+              productId: product.id,
+              quantity: quantities[product.id],
             })),
           }),
         }
@@ -69,15 +88,17 @@ export default function PaymentCounter() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Payment creation failed");
+        throw new Error(
+          data.error || "Unable to generate payment QR."
+        );
       }
 
-      setPaymentUrl(data.payment_link_url);
+      setPayment(data);
     } catch (error) {
       alert(
         error instanceof Error
           ? error.message
-          : "Something went wrong"
+          : "Something went wrong."
       );
     } finally {
       setLoading(false);
@@ -85,34 +106,48 @@ export default function PaymentCounter() {
   }
 
   return (
-    <main className="min-h-screen bg-[#FAF8F5] px-5 py-10">
+    <main className="min-h-screen bg-[#FAF8F5] px-5 py-12">
       <div className="mx-auto max-w-xl">
 
-        <h1 className="text-center text-3xl text-[#AF9685]">
-          AVENOR
-        </h1>
+        <header className="mb-12 text-center">
+          <h1
+            className="text-4xl font-light tracking-wide text-[#AF9685]"
+            style={{
+              fontFamily: '"Cormorant Garamond", serif',
+            }}
+          >
+            AVENOR
+          </h1>
 
-        <p className="mt-2 text-center text-xs tracking-[0.3em] text-gray-400">
-          PRIVATE PAYMENT COUNTER
-        </p>
+          <p className="mt-3 text-xs tracking-[0.35em] text-gray-400">
+            PRIVATE PAYMENT COUNTER
+          </p>
+        </header>
 
-        <div className="mt-10 space-y-6">
+        <div className="space-y-8">
 
-          <div>
-            <label className="text-xs uppercase tracking-widest text-gray-500">
+          {/* CUSTOMER */}
+
+          <section>
+            <label className="mb-2 block text-xs uppercase tracking-[0.25em] text-gray-500">
               Customer Name
             </label>
 
             <input
               value={customer}
-              onChange={(e) => setCustomer(e.target.value)}
+              onChange={(e) => {
+                setCustomer(e.target.value);
+                setPayment(null);
+              }}
               placeholder="Enter full name"
-              className="mt-2 w-full border border-[#D9C9BC] bg-white p-4"
+              className="w-full border border-[#D9C9BC] bg-white px-4 py-4 outline-none focus:border-[#AF9685]"
             />
-          </div>
+          </section>
 
-          <div>
-            <h2 className="mb-4 text-xs uppercase tracking-widest text-gray-500">
+          {/* PRODUCTS */}
+
+          <section>
+            <h2 className="mb-5 text-xs uppercase tracking-[0.25em] text-gray-500">
               Select Products
             </h2>
 
@@ -120,97 +155,133 @@ export default function PaymentCounter() {
               {products.map((product) => (
                 <div
                   key={product.id}
-                  className="flex items-center justify-between gap-3 border border-[#D9C9BC] bg-white p-4"
+                  className="flex items-center justify-between gap-4 border border-[#D9C9BC] bg-white p-4"
                 >
-                  <div>
-                    <p>{product.name}</p>
-                    <p className="mt-1 text-sm text-gray-400">
-                      ₹{product.price.toLocaleString("en-IN")}
+                  <div className="min-w-0">
+                    <p className="text-sm text-gray-800">
+                      {product.name}
+                    </p>
+
+                    <p className="mt-1 text-sm text-[#AF9685]">
+                      {formatPrice(product.price)}
                     </p>
                   </div>
 
                   <input
                     type="number"
                     min="0"
+                    max="10"
                     step="1"
-                    value={quantities[product.id] || 0}
-                    onChange={(e) => {
-                      const value = Math.max(
-                        0,
-                        Math.floor(Number(e.target.value) || 0)
-                      );
-
-                      setQuantities((prev) => ({
-                        ...prev,
-                        [product.id]: value,
-                      }));
-                    }}
-                    className="w-16 border border-[#D9C9BC] p-2 text-center"
+                    value={quantities[product.id] || ""}
+                    placeholder="0"
+                    onChange={(e) =>
+                      updateQuantity(
+                        product.id,
+                        e.target.value
+                      )
+                    }
+                    className="w-16 border border-[#D9C9BC] bg-[#FAF8F5] p-3 text-center outline-none"
                   />
                 </div>
               ))}
             </div>
-          </div>
+          </section>
 
-          <div className="border border-[#D9C9BC] bg-[#F7F5F2] p-6">
-            <p className="text-xs uppercase tracking-widest text-gray-400">
-              Total Amount
+          {/* BILL */}
+
+          <section className="border border-[#D9C9BC] bg-[#F7F5F2] p-6">
+
+            <p className="text-xs uppercase tracking-[0.25em] text-[#AF9685]">
+              Purchase Summary
             </p>
 
-            <p className="mt-3 text-4xl text-[#AF9685]">
-              ₹{total.toLocaleString("en-IN")}
+            <div className="mt-5 space-y-3">
+              {selectedProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="flex justify-between gap-3 text-sm"
+                >
+                  <span>
+                    {product.name} × {quantities[product.id]}
+                  </span>
+
+                  <span>
+                    {formatPrice(
+                      product.price * quantities[product.id]
+                    )}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="my-5 border-t border-[#D9C9BC]" />
+
+            <p className="text-xs uppercase tracking-[0.25em] text-gray-500">
+              Total Payable
             </p>
 
-            <p className="mt-2 text-xs text-gray-400">
-              {selectedProducts.length} product types selected
+            <p className="mt-3 text-4xl font-light text-[#AF9685]">
+              {formatPrice(total)}
             </p>
-          </div>
+
+          </section>
+
+          {/* GENERATE */}
 
           <button
+            type="button"
             onClick={generateQR}
             disabled={loading || total <= 0}
-            className="w-full bg-[#AF9685] py-4 text-sm tracking-widest text-white disabled:opacity-50"
+            className="w-full border border-[#AF9685] bg-[#AF9685] py-5 text-xs tracking-[0.3em] text-white transition hover:bg-[#967B69] disabled:opacity-50"
           >
-            {loading ? "GENERATING..." : "GENERATE PAYMENT QR"}
+            {loading
+              ? "GENERATING PAYMENT QR..."
+              : "GENERATE PAYMENT QR"}
           </button>
 
-          {paymentUrl && (
-            <div className="border border-[#D9C9BC] bg-white p-6 text-center">
+          {/* QR */}
 
-              <h2 className="text-xl text-[#AF9685]">
+          {payment && (
+            <section className="border border-[#D9C9BC] bg-white p-7 text-center">
+
+              <h2 className="text-2xl text-[#AF9685]">
                 AVENOR
               </h2>
 
-              <p className="mt-4 text-sm text-gray-500">
+              <p className="mt-4 text-xs uppercase tracking-widest text-gray-400">
                 Amount Payable
               </p>
 
-              <p className="mt-2 text-3xl">
-                ₹{total.toLocaleString("en-IN")}
+              <p className="mt-2 text-4xl text-[#AF9685]">
+                {formatPrice(total)}
               </p>
 
-              <div className="mt-6 flex justify-center">
-                <QRCodeSVG
-                  value={paymentUrl}
-                  size={220}
-                  level="H"
+              <div className="mt-7 flex justify-center">
+                <img
+                  src={payment.payment_qr}
+                  alt="Cashfree payment QR"
+                  className="h-64 w-64 object-contain"
                 />
               </div>
 
               <p className="mt-5 text-sm text-gray-500">
-                Scan to complete your payment securely.
+                Ask the customer to scan and complete payment.
               </p>
 
               <a
-                href={paymentUrl}
+                href={payment.payment_link_url}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-5 inline-block border border-[#AF9685] px-6 py-3 text-sm text-[#AF9685]"
+                className="mt-6 inline-block border border-[#AF9685] px-6 py-3 text-xs tracking-widest text-[#AF9685]"
               >
                 OPEN PAYMENT LINK
               </a>
 
-            </div>
+              <p className="mt-4 text-xs text-gray-400">
+                Payment reference: {payment.link_id}
+              </p>
+
+            </section>
           )}
 
         </div>
