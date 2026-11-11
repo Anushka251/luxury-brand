@@ -7,17 +7,28 @@ import { products } from "@/lib/products";
 
 const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
-declare global {
-  interface Window {
-    Cashfree?: (options: {
-      mode: "sandbox" | "production";
-    }) => {
-      checkout: (options: {
-        paymentSessionId: string;
-        redirectTarget: "_self";
-      }) => Promise<unknown>;
-    };
-  }
+type CashfreeCheckout = {
+  checkout: (options: {
+    paymentSessionId: string;
+    redirectTarget: "_self";
+  }) => Promise<unknown>;
+};
+
+function getCashfree(): CashfreeCheckout | undefined {
+  const cashfreeWindow = window as Window & {
+    Cashfree?: (
+      options: {
+        mode: "sandbox" | "production";
+      }
+    ) => CashfreeCheckout;
+  };
+
+  return cashfreeWindow.Cashfree?.({
+    mode:
+      process.env.NEXT_PUBLIC_CASHFREE_MODE === "sandbox"
+        ? "sandbox"
+        : "production",
+  });
 }
 
 export default function PaymentCounter() {
@@ -95,7 +106,11 @@ export default function PaymentCounter() {
   */
 
   async function loadCashfree(): Promise<void> {
-    if (window.Cashfree) return;
+    const cashfreeWindow = window as Window & {
+      Cashfree?: unknown;
+    };
+
+    if (cashfreeWindow.Cashfree) return;
 
     await new Promise<void>((resolve, reject) => {
       const scriptUrl =
@@ -106,7 +121,7 @@ export default function PaymentCounter() {
       ) as HTMLScriptElement | null;
 
       if (existing) {
-        if (window.Cashfree) {
+        if (cashfreeWindow.Cashfree) {
           resolve();
           return;
         }
@@ -119,9 +134,10 @@ export default function PaymentCounter() {
 
         existing.addEventListener(
           "error",
-          () => reject(
-            new Error("Unable to load Cashfree.")
-          ),
+          () =>
+            reject(
+              new Error("Unable to load Cashfree.")
+            ),
           { once: true }
         );
 
@@ -302,7 +318,13 @@ export default function PaymentCounter() {
 
       await loadCashfree();
 
-      if (!window.Cashfree) {
+      /*
+      INITIALIZE CASHFREE
+      */
+
+      const cashfree = getCashfree();
+
+      if (!cashfree) {
         throw new Error(
           "Cashfree checkout could not be initialized."
         );
@@ -311,13 +333,6 @@ export default function PaymentCounter() {
       /*
       OPEN CASHFREE CHECKOUT
       */
-
-      const cashfree = window.Cashfree({
-        mode:
-          data.cashfreeMode === "sandbox"
-            ? "sandbox"
-            : "production",
-      });
 
       await cashfree.checkout({
         paymentSessionId:
