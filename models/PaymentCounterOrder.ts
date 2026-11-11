@@ -25,22 +25,18 @@ const PaymentCounterOrderSchema = new Schema(
       type: Number,
       required: true,
     },
-    linkId: {
+    cashfreeOrderId: {
       type: String,
       required: true,
       unique: true,
     },
-    cashfreeLinkId: {
+    cfOrderId: {
       type: String,
       default: "",
     },
-    paymentUrl: {
-      type: String,
-      required: true,
-    },
     paymentStatus: {
       type: String,
-      enum: ["PENDING", "PAID", "EXPIRED"],
+      enum: ["PENDING", "PAID", "FAILED"],
       default: "PENDING",
     },
     emailStatus: {
