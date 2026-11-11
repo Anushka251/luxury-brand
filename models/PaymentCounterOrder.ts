@@ -41,7 +41,7 @@ const PaymentCounterOrderSchema = new Schema(
     },
     emailStatus: {
       type: String,
-      enum: ["PENDING", "SENT", "FAILED"],
+      enum: ["PENDING", "SENDING", "SENT", "FAILED"],
       default: "PENDING",
     },
     paidAt: {
